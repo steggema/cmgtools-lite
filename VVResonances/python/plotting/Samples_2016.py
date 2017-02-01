@@ -6,7 +6,7 @@ from CMGTools.H2TauTau.proto.plotter.PlotConfigs import SampleCfg
 from CMGTools.VVResonances.plotting.HistCreator import setSumWeights
 
 
-from CMGTools.RootTools.samples.samples_13TeV_RunIISummer16MiniAODv2 import SingleTop, WJetsToLNuHT, QCDHT, DYJetsM50HT, DiBosons
+from CMGTools.RootTools.samples.samples_13TeV_RunIISummer16MiniAODv2 import SingleTop, WJetsToLNuHT, QCDHT, DYJetsM50HT, DiBosons, TTJets
 from CMGTools.RootTools.samples.samples_13TeV_RunIISummer16MiniAODv2 import TT_pow
 from CMGTools.RootTools.samples.samples_13TeV_DATA2016 import *
 from CMGTools.VVResonances.samples.signal_13TeV_80X_reHLT import signalSamples
@@ -41,10 +41,10 @@ def createSampleLists(analysis_dir='samples/',
     # explicit list of samples:
     wjetsSampleNames = ["WJetsToLNu_HT1200to2500", "WJetsToLNu_HT2500toInf", "WJetsToLNu_HT400to600", "WJetsToLNu_HT600to800", "WJetsToLNu_HT800to1200", 'WJetsToLNu_HT100to200', 'WJetsToLNu_HT200to400']
     dyjetsSampleNames = ['DYJetsToLL_M50_HT100to200', 'DYJetsToLL_M50_HT200to400', 'DYJetsToLL_M50_HT400to600', 'DYJetsToLL_M50_HT600to800', 'DYJetsToLL_M50_HT800to1200', 'DYJetsToLL_M50_HT1200to2500', 'DYJetsToLL_M50_HT2500toInf']
-    ttjetsSampleNames = ["TTbar"]
+    ttjetsSampleNames = ["TT_pow"]
     qcdSampleNames = ["QCD_HT1000to1500", "QCD_HT1500to2000", "QCD_HT2000toInf", "QCD_HT500to700", "QCD_HT700to1000"]
-    vvSampleNames = ['WWTo1L1Nu2Q']  # ['WWTo1L1Nu2Q', 'WZTo1L1Nu2Q']
-    singleTopSampleNames = ['TToLeptons_sch', 'TBar_tWch', 'T_tWch']  # ['TToLeptons_tch_powheg', 'TBarToLeptons_tch_powheg', 'TToLeptons_sch', 'TBar_tWch', 'T_tWch']
+    vvSampleNames = ['WWTo1L1Nu2Q', 'WWTo1L1Nu2Q', 'WZTo1L1Nu2Q']
+    singleTopSampleNames = ['TToLeptons_tch_powheg', 'TBarToLeptons_tch_powheg', 'TToLeptons_sch', 'TBar_tWch', 'T_tWch']
     topSamples = [TT_pow]
     if useTopMcatnlo:
         topSamples = [TTJets]
