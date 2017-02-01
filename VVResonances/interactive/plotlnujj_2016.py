@@ -44,7 +44,7 @@ cuts['lnujj_e_nob'] = findCut(categories, cat="lnujj", lep="e", reg="nob")
 
 
 # -> Command line
-analysis_dir = '/data/clange/ntuples/VV_20170116/'
+analysis_dir = '/data/clange/ntuples/VV_20170130/'
 tree_prod_name = ''
 
 samples_mc, samples_data, samples, all_samples, sampleDict = createSampleLists(analysis_dir, channel='WV', weight=weight_MC)
