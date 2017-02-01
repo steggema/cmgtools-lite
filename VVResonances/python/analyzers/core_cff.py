@@ -210,8 +210,8 @@ lepWeightAna = cfg.Analyzer(
         {'cut':lambda x: abs(x.pdgId())==13,'dimensions':2,'filename':'MuonIso_Z_RunBCD_prompt80X_7p65.root','histoname':"MC_NUM_TightRelIso_DEN_TightID_PAR_pt_spliteta_bin1/pt_abseta_ratio",'x':lambda x:x.pt(),'y':lambda x: abs(x.eta()),'tag':'sfWV'},
         {'cut':lambda x: abs(x.pdgId())==13,'dimensions':2,'filename':'SingleMuonTrigger_Z_RunBCD_prompt80X_7p65.root','histoname':"Mu50_OR_TkMu50_PtEtaBins_Run274954_to_276097/efficienciesDATA/pt_abseta_DATA",'x':lambda x:x.pt(),'y':lambda x: abs(x.eta()),'tag':'sfHLT'},
         #Electrons flat from Sam
-        {'cut':lambda x: abs(x.pdgId())==11 and x.isEB(),'filename':'None','f':lambda x:0.961,'tag':'sfWV'},
-        {'cut':lambda x: abs(x.pdgId())==11 and x.isEE(),'filename':'None','f':lambda x:0.965,'tag':'sfWV'},
+        {'cut':lambda x: abs(x.pdgId())==11 and x.isEB(),'filename':'None','f':lambda x:0.971,'tag':'sfWV'},
+        {'cut':lambda x: abs(x.pdgId())==11 and x.isEE(),'filename':'None','f':lambda x:0.981,'tag':'sfWV'},
         {'cut':lambda x: abs(x.pdgId())==11,'dimensions':2,'filename':'myTriggerScaleFactors.root','histoname':"EleTrigger",'x':lambda x:x.pt(),'y':lambda x: abs(x.eta()),'tag':'sfHLT'}
         ]
 )
