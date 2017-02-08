@@ -39,7 +39,7 @@ cat_metFilters = "(Flag_goodVertices&&Flag_CSCTightHaloFilter&&Flag_HBHENoiseFil
 cat_lnujj_basic = "(lnujj_nOtherLeptons==0&&lnujj_l2_softDrop_mass>0&&lnujj_LV_mass>{cut_mlnujj}&&((abs(lnujj_l1_l_pdgId)==11||(abs(lnujj_l1_l_pdgId)==13))))".format(cut_mlnujj=cut_mlnujj)
 cat_jj_basic = 'lnujj_nOtherLeptons==0&&((HLT_HT800||HLT_HT900)&&run>2000)+(run<2000)&&jj_LV_mass>{cut_mjj}'.format(cut_mjj=cut_mjj)
 
-cat_lnujj_mu = '(abs(lnujj_l1_l_pdgId)==13)'
+cat_lnujj_mu = '(abs(lnujj_l1_l_pdgId)==13&&(lnujj_l1_l_relIso04<0.05))'
 cat_lnujj_e = '(abs(lnujj_l1_l_pdgId)==11)'
 
 # tau21 cuts for VV
