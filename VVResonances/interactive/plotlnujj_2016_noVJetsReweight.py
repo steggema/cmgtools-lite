@@ -47,7 +47,7 @@ cuts['lnujj_e'] = findCut(categories, cat="lnujj", lep="e")
 analysis_dir = '/data/clange/ntuples/VV_20170130/'
 tree_prod_name = ''
 
-samples_mc, samples_data, samples, all_samples, sampleDict = createSampleLists(analysis_dir, channel='WV', weight=weight_MC, reweightVJets=True)
+samples_mc, samples_data, samples, all_samples, sampleDict = createSampleLists(analysis_dir, channel='WV', weight=weight_MC, reweightVJets=False)
 
 # Taken from Variables.py, can get subset with e.g. getVars(['mt', 'mvis'])
 variables = generic_vars + lnujj_vars + lnujj_vbf_vars
