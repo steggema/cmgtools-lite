@@ -13,30 +13,49 @@ from CMGTools.VVResonances.samples.signal_13TeV_80X_reHLT import signalSamples
 
 def createSampleLists(analysis_dir='samples/',
                       channel='VV', weight='', signalSample='',
-                      vJetsKFac=1., reweightVJets=False,
+                      vJetsKFac=1., reweightVJets2015=False, reweightVJets=True,
                       reweightTop=False, useTopMcatnlo=False):
 
     # settings and code to reweight V+jets samples (EW and QCD NLO corrections)
     # the following two k-factors are from samples_13TeV_RunIISpring16MiniAODv2.py
+    if reweightVJets == reweightVJets2015:
+        raise AssertionError
     wJetsKFac = 1.21
     dyJetsKFac = 1.23
+    wJetsQCDCorrections2015 = {}
+    dyJetsQCDCorrections2015 = {}
     wJetsQCDCorrections = {}
     dyJetsQCDCorrections = {}
     # taken from http://cms.cern.ch/iCMS/jsp/db_notes/noteInfo.jsp?cmsnoteid=CMS%20AN-2015/186 (Table 4)
-    wJetsQCDCorrections["WJetsToLNu_HT100to200"] = 1.459/wJetsKFac
-    wJetsQCDCorrections["WJetsToLNu_HT200to400"] = 1.434/wJetsKFac
-    wJetsQCDCorrections["WJetsToLNu_HT400to600"] = 1.532/wJetsKFac
-    wJetsQCDCorrections["WJetsToLNu_HT600to800"] = 1.004/wJetsKFac
-    wJetsQCDCorrections["WJetsToLNu_HT800to1200"] = 1.004/wJetsKFac
-    wJetsQCDCorrections["WJetsToLNu_HT1200to2500"] = 1.004/wJetsKFac
-    wJetsQCDCorrections["WJetsToLNu_HT2500toInf"] = 1.004/wJetsKFac
-    dyJetsQCDCorrections["DYJetsToLL_M50_HT100to200"] = 1.588/dyJetsKFac
-    dyJetsQCDCorrections["DYJetsToLL_M50_HT200to400"] = 1.438/dyJetsKFac
-    dyJetsQCDCorrections["DYJetsToLL_M50_HT400to600"] = 1.494/dyJetsKFac
-    dyJetsQCDCorrections["DYJetsToLL_M50_HT600to800"] = 1.139/dyJetsKFac
-    dyJetsQCDCorrections["DYJetsToLL_M50_HT800to1200"] = 1.139/dyJetsKFac
-    dyJetsQCDCorrections["DYJetsToLL_M50_HT1200to2500"] = 1.139/dyJetsKFac
-    dyJetsQCDCorrections["DYJetsToLL_M50_HT2500toInf"] = 1.139/dyJetsKFac
+    wJetsQCDCorrections2015["WJetsToLNu_HT100to200"] = 1.459/wJetsKFac
+    wJetsQCDCorrections2015["WJetsToLNu_HT200to400"] = 1.434/wJetsKFac
+    wJetsQCDCorrections2015["WJetsToLNu_HT400to600"] = 1.532/wJetsKFac
+    wJetsQCDCorrections2015["WJetsToLNu_HT600to800"] = 1.004/wJetsKFac
+    wJetsQCDCorrections2015["WJetsToLNu_HT800to1200"] = 1.004/wJetsKFac
+    wJetsQCDCorrections2015["WJetsToLNu_HT1200to2500"] = 1.004/wJetsKFac
+    wJetsQCDCorrections2015["WJetsToLNu_HT2500toInf"] = 1.004/wJetsKFac
+    dyJetsQCDCorrections2015["DYJetsToLL_M50_HT100to200"] = 1.588/dyJetsKFac
+    dyJetsQCDCorrections2015["DYJetsToLL_M50_HT200to400"] = 1.438/dyJetsKFac
+    dyJetsQCDCorrections2015["DYJetsToLL_M50_HT400to600"] = 1.494/dyJetsKFac
+    dyJetsQCDCorrections2015["DYJetsToLL_M50_HT600to800"] = 1.139/dyJetsKFac
+    dyJetsQCDCorrections2015["DYJetsToLL_M50_HT800to1200"] = 1.139/dyJetsKFac
+    dyJetsQCDCorrections2015["DYJetsToLL_M50_HT1200to2500"] = 1.139/dyJetsKFac
+    dyJetsQCDCorrections2015["DYJetsToLL_M50_HT2500toInf"] = 1.139/dyJetsKFac
+    # new for Summer16 W+jets (no Z+jets reweighting for now)
+    wJetsQCDCorrections["WJetsToLNu_HT100to200"] = 0.931355
+    wJetsQCDCorrections["WJetsToLNu_HT200to400"] = 0.913146
+    wJetsQCDCorrections["WJetsToLNu_HT400to600"] = 0.866418
+    wJetsQCDCorrections["WJetsToLNu_HT600to800"] = 0.799251
+    wJetsQCDCorrections["WJetsToLNu_HT800to1200"] = 0.706555
+    wJetsQCDCorrections["WJetsToLNu_HT1200to2500"] = 0.567275
+    wJetsQCDCorrections["WJetsToLNu_HT2500toInf"] = 0.422828
+    dyJetsQCDCorrections["DYJetsToLL_M50_HT100to200"] = 1.
+    dyJetsQCDCorrections["DYJetsToLL_M50_HT200to400"] = 1.
+    dyJetsQCDCorrections["DYJetsToLL_M50_HT400to600"] = 1.
+    dyJetsQCDCorrections["DYJetsToLL_M50_HT600to800"] = 1.
+    dyJetsQCDCorrections["DYJetsToLL_M50_HT800to1200"] = 1.
+    dyJetsQCDCorrections["DYJetsToLL_M50_HT1200to2500"] = 1.
+    dyJetsQCDCorrections["DYJetsToLL_M50_HT2500toInf"] = 1.
 
     # explicit list of samples:
     wjetsSampleNames = ["WJetsToLNu_HT1200to2500", "WJetsToLNu_HT2500toInf", "WJetsToLNu_HT400to600", "WJetsToLNu_HT600to800", "WJetsToLNu_HT800to1200", 'WJetsToLNu_HT100to200', 'WJetsToLNu_HT200to400']
@@ -76,9 +95,13 @@ def createSampleLists(analysis_dir='samples/',
         vJetsWeight = str(vJetsKFac)
         if sample.name in channelSampleNames:
             if (sample in DYJetsM50HT) and reweightVJets:
-                vJetsWeight = 'getDYWeight(truth_genBoson_pt) * {}'.format(dyJetsQCDCorrections[sample.name])
+                vJetsWeight = '{} * {}'.format(vJetsKFac, dyJetsQCDCorrections[sample.name])
             elif (sample in WJetsToLNuHT) and reweightVJets:
-                vJetsWeight = 'getWWeight(truth_genBoson_pt) * {}'.format(wJetsQCDCorrections[sample.name])
+                vJetsWeight = '{} * {}'.format(vJetsKFac, wJetsQCDCorrections[sample.name])
+            if (sample in DYJetsM50HT) and reweightVJets2015:
+                vJetsWeight = 'getDYWeight(truth_genBoson_pt) * {} * {}'.format(vJetsKFac, dyJetsQCDCorrections2015[sample.name])
+            elif (sample in WJetsToLNuHT) and reweightVJets2015:
+                vJetsWeight = 'getWWeight(truth_genBoson_pt) * {} * {}'.format(vJetsKFac, wJetsQCDCorrections2015[sample.name])
             samples_essential.append(
                 SampleCfg(name=sample.name, dir_name=sample.name, ana_dir=analysis_dir, tree_prod_name=tree_prod_name,
                     xsec=sample.xSection, sumweights=sample.nGenEvents, weight_expr=('*'.join([weight, vJetsWeight]))))
