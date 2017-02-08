@@ -347,7 +347,7 @@ vvAna = cfg.Analyzer(
 #    boostedBdiscriminator = "pfBoostedDoubleSecondaryVertexAK8BJetTags",
     cDiscriminatorL = "pfCombinedCvsLJetTags",
     cDiscriminatorB = "pfCombinedCvsBJetTags",
-    btagCSVFile = "${CMSSW_BASE}/src/CMGTools/VVResonances/data/CSVv2Moriond17_2017_1_26_BtoH.csv",
+    btagCSVFile = "${CMSSW_BASE}/src/CMGTools/VVResonances/data/CSVv2_Moriond17_B_H.csv",
     puppiJecCorrFile = "${CMSSW_BASE}/src/CMGTools/VVResonances/data/puppiCorr.root"
 
 )
