@@ -129,8 +129,11 @@ class NJetsAnalyzer(Analyzer):
             if self.cfg_ana.verbose:
                 print 'NUP, njets, weight', event.NUP, njets, event.NJetWeight
 
+#         import pdb ; pdb.set_trace()
         if self.applyWeightFunc:
             event.NJetWeight = self.weight_func(njets, event.geninvmass)
+            event.eventWeight *= event.NJetWeight
+#         import pdb ; pdb.set_trace()
 
         if self.cfg_ana.fillTree:
             self.tree.reset()
