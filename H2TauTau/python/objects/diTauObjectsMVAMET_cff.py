@@ -12,7 +12,7 @@ from CMGTools.H2TauTau.skims.skim_cff import diTauFullSelSkimSequence, diTauFull
 # tau pre-selection
 tauPreSelectionDiTau = tauPreSelection.clone(
   #cut = 'pt > 40. && abs(eta) < 2.5 && tauID("decayModeFinding") > 0.5')
-  cut = 'pt > 40. && abs(eta) < 2.5 && tauID("decayModeFindingNewDMs") > 0.5') # RIC: new DM. Probably we'd want to save both with an OR and decide later, useful for studying new tauID
+  cut = 'pt > 38. && abs(eta) < 2.5 && tauID("decayModeFindingNewDMs") > 0.5') # RIC: new DM. Probably we'd want to save both with an OR and decide later, useful for studying new tauID
 
 # 2012 preselection:
 # cut = 'leg1().pt()>40. && leg2().pt()>40. && leg1().tauID("byCombinedIsolationDeltaBetaCorrRaw3Hits") < 10. &&  leg2().tauID("byCombinedIsolationDeltaBetaCorrRaw3Hits") < 10.',
@@ -24,7 +24,7 @@ cmgDiTauCor = cmgDiTauCor.clone()
 cmgDiTauTauPtSel = cms.EDFilter(
   "PATCompositeCandidateSelector",
   src = cms.InputTag("cmgDiTauCor"),
-  cut = cms.string("daughter(0).pt()>40. && daughter(1).pt()>40.")
+  cut = cms.string("daughter(0).pt()>38. && daughter(1).pt()>38.")
   )
 
 # SVFit ----------------------------------------------------------------
