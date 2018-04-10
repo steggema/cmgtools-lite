@@ -208,7 +208,7 @@ def createHistogram(hist_cfg, all_stack=False, verbose=False, friend_func=None):
             if hist_cfg.weight:
                 norm_cut = '({c}) * {we}'.format(c=norm_cut, we=weight)
                 shape_cut = '({c}) * {we}'.format(c=shape_cut, we=weight)
-
+            
             ttree.Project(hname, vcfg.drawname, norm_cut)
 
             if shape_cut != norm_cut:

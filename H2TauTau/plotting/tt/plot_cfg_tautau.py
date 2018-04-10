@@ -57,7 +57,7 @@ def prepareCuts(mode):
     if mode == 'mssm':
         cuts.append(MyCut('nobtag', inc_cut & Cut('n_bjets==0')))
         cuts.append(MyCut('inclusive', inc_cut & Cut('1')))
-        cuts.append(MyCut('btag', inc_cut & Cut('n_bjets==1 && n_jets<=1')))
+        cuts.append(MyCut('btag', inc_cut & Cut('n_bjets>=1 && n_jets<=1')))
         # cuts.append(MyCut('1bjet', inc_cut & Cut('n_bjets==1')))
         # # cuts.append(MyCut('0jet', inc_cut & Cut('n_bjets==1 && n_jets==0')))
 
@@ -179,7 +179,8 @@ def getVariables(mode):
     if mode == 'control':
         variables = getVars(['_norm_', 'mvis', 'mt2', 'l1_pt', 'l2_pt', 'delta_phi_l1_l2', 'delta_eta_l1_l2', 'met_pt', 'mt_total', 'mt_total_mssm', 'mt_sum', 'pzeta_met', 'l2_mt', 'mt', 'pzeta_vis', 'pzeta_disc', 'pthiggs', 'jet1_pt', 'n_jets', 'dil_pt', 'l1_byCombinedIsolationDeltaBetaCorrRaw3Hits', 'l1_byIsolationMVArun2v1DBoldDMwLTraw', 'l1_dz_sig', 'l1_log_dz', 'l1_dxy_sig', 'l1_log_dxy', 'l1_decayMode', 'l1_chargedIsoPtSum', 'l1_neutralIsoPtSum', 'l1_puCorrPtSum', 'l1_photonPtSumOutsideSignalCone', 'l1_zImpact', 'l1_jet_charge', 'l1_jet_pt_div_l1_pt'], channel='tautau')
     if mode == 'mssm':
-        variables = getVars(['mt_total', 'mt_total_mssm', 'mt_total_mssm_fine', 'mvis_extended', 'l1_pt', 'dil_pt'], channel='tautau')
+        # variables = getVars(['mt_total', 'mt_total_mssm', 'mt_total_mssm_fine', 'mvis_extended', 'l1_pt', 'dil_pt'], channel='tautau')
+        variables = getVars(['mt_total_mssm_fine'], channel='tautau')
     # variables += [
     #     VariableCfg(name='mt2', binning={'nbinsx':15, 'xmin':0., 'xmax':150.}, unit='GeV', xtitle='m_{T2}')
     # ]
@@ -211,12 +212,12 @@ def makePlots(variables, cuts, total_weight, all_samples, samples, friend_func, 
     # def_iso_cut = inc_sig_tau1_iso & inc_sig_tau2_iso
     iso_cuts = {
         # 'vvtight':(Cut('l1_byIsolationMVArun2v1DBoldDMwLT>5.5') & Cut('l2_byIsolationMVArun2v1DBoldDMwLT>5.5'), Cut('l1_byIsolationMVArun2v1DBoldDMwLT>3.5') & Cut('l2_byIsolationMVArun2v1DBoldDMwLT>3.5')),
-        'vtight_relax2nd':(Cut('l1_byIsolationMVArun2v1DBoldDMwLT>4.5') & Cut('l2_byIsolationMVArun2v1DBoldDMwLT>4.5'), Cut('l1_byIsolationMVArun2v1DBoldDMwLT>4.5') & Cut('l2_byIsolationMVArun2v1DBoldDMwLT>2.5')),
-        'loose_not_vtight':(Cut('l1_byIsolationMVArun2v1DBoldDMwLT>1.5 && l1_byIsolationMVArun2v1DBoldDMwLT<4.5') & Cut('l2_byIsolationMVArun2v1DBoldDMwLT>1.5&&l2_byIsolationMVArun2v1DBoldDMwLT<4.5'), Cut('l1_byIsolationMVArun2v1DBoldDMwLT<1.5 && l1_byIsolationMVArun2v1DBoldDMwLT>0.5') & Cut('l2_byIsolationMVArun2v1DBoldDMwLT<1.5 && l2_byIsolationMVArun2v1DBoldDMwLT>0.5')),
-        'one_loose_other_vtight':(Cut('(l1_byIsolationMVArun2v1DBoldDMwLT>4.5 && (l2_byIsolationMVArun2v1DBoldDMwLT>1.5&&l2_byIsolationMVArun2v1DBoldDMwLT<4.5)) || (l2_byIsolationMVArun2v1DBoldDMwLT>4.5 && (l1_byIsolationMVArun2v1DBoldDMwLT>1.5&&l1_byIsolationMVArun2v1DBoldDMwLT<4.5)) '), Cut('l1_byIsolationMVArun2v1DBoldDMwLT<1.5 && l1_byIsolationMVArun2v1DBoldDMwLT>0.5') & Cut('l2_byIsolationMVArun2v1DBoldDMwLT<1.5 && l2_byIsolationMVArun2v1DBoldDMwLT>0.5')),
+        # 'vtight_relax2nd':(Cut('l1_byIsolationMVArun2v1DBoldDMwLT>4.5') & Cut('l2_byIsolationMVArun2v1DBoldDMwLT>4.5'), Cut('l1_byIsolationMVArun2v1DBoldDMwLT>4.5') & Cut('l2_byIsolationMVArun2v1DBoldDMwLT>2.5')),
+        # 'loose_not_vtight':(Cut('l1_byIsolationMVArun2v1DBoldDMwLT>1.5 && l1_byIsolationMVArun2v1DBoldDMwLT<4.5') & Cut('l2_byIsolationMVArun2v1DBoldDMwLT>1.5&&l2_byIsolationMVArun2v1DBoldDMwLT<4.5'), Cut('l1_byIsolationMVArun2v1DBoldDMwLT<1.5 && l1_byIsolationMVArun2v1DBoldDMwLT>0.5') & Cut('l2_byIsolationMVArun2v1DBoldDMwLT<1.5 && l2_byIsolationMVArun2v1DBoldDMwLT>0.5')),
+        # 'one_loose_other_vtight':(Cut('(l1_byIsolationMVArun2v1DBoldDMwLT>4.5 && (l2_byIsolationMVArun2v1DBoldDMwLT>1.5&&l2_byIsolationMVArun2v1DBoldDMwLT<4.5)) || (l2_byIsolationMVArun2v1DBoldDMwLT>4.5 && (l1_byIsolationMVArun2v1DBoldDMwLT>1.5&&l1_byIsolationMVArun2v1DBoldDMwLT<4.5)) '), Cut('l1_byIsolationMVArun2v1DBoldDMwLT<1.5 && l1_byIsolationMVArun2v1DBoldDMwLT>0.5') & Cut('l2_byIsolationMVArun2v1DBoldDMwLT<1.5 && l2_byIsolationMVArun2v1DBoldDMwLT>0.5')),
         # 'vtight':(Cut('l1_byIsolationMVArun2v1DBoldDMwLT>4.5') & Cut('l2_byIsolationMVArun2v1DBoldDMwLT>4.5'), Cut('l1_byIsolationMVArun2v1DBoldDMwLT>2.5') & Cut('l2_byIsolationMVArun2v1DBoldDMwLT>2.5')),
         # 'tight':(Cut('l1_byIsolationMVArun2v1DBoldDMwLT>3.5') & Cut('l2_byIsolationMVArun2v1DBoldDMwLT>3.5'), Cut('l1_byIsolationMVArun2v1DBoldDMwLT>3.5') & Cut('l2_byIsolationMVArun2v1DBoldDMwLT>1.5')),
-        # 'medium':(Cut('l1_byIsolationMVArun2v1DBoldDMwLT>2.5') & Cut('l2_byIsolationMVArun2v1DBoldDMwLT>2.5'), Cut('l1_byIsolationMVArun2v1DBoldDMwLT>0.5') & Cut('l2_byIsolationMVArun2v1DBoldDMwLT>0.5')),
+        'medium':(Cut('l1_byIsolationMVArun2v1DBoldDMwLT>2.5') & Cut('l2_byIsolationMVArun2v1DBoldDMwLT>2.5'), Cut('l1_byIsolationMVArun2v1DBoldDMwLT>0.5') & Cut('l2_byIsolationMVArun2v1DBoldDMwLT>0.5')),
         # 'loose':(Cut('l1_byIsolationMVArun2v1DBoldDMwLT>1.5') & Cut('l2_byIsolationMVArun2v1DBoldDMwLT>1.5'), Cut('1')),
         # 'vloose':(Cut('l1_byIsolationMVArun2v1DBoldDMwLT>0.5') & Cut('l2_byIsolationMVArun2v1DBoldDMwLT>0.5'), Cut('1')),
     }
@@ -238,6 +239,7 @@ def makePlots(variables, cuts, total_weight, all_samples, samples, friend_func, 
             iso_sideband_cut = (~iso_cut) & max_iso_cut
             charge_cut = Cut('l1_charge != l2_charge')
             isSS = 'SS' in cut.name
+            # all_samples_qcd = all_samples
             all_samples_qcd = qcd_estimation(
                 cut.cut & iso_sideband_cut & (charge_cut if not isSS else ~charge_cut),  # shape sideband
                 cut.cut & iso_cut & (~charge_cut),  # norm sideband 1
@@ -266,12 +268,16 @@ def makePlots(variables, cuts, total_weight, all_samples, samples, friend_func, 
             for variable in variables:
                 plot = plots[variable.name]
                 plot.Group('Single t', ['T_tWch', 'TBar_tWch', 'TToLeptons_tch_powheg', 'TBarToLeptons_tch_powheg'])  # 'TToLeptons_sch',
-                plot.Group('VV', ['VVTo2L2Nu', 'ZZTo2L2Q', 'WWTo1L1Nu2Q', 'WZTo1L3Nu', 'ZZTo4L',  'WZTo2L2Q', 'WZTo1L1Nu2Q', 'Single t'])  # 'WZTo3L',
+                plot.Group('VV', ['VVTo2L2Nu', 'ZZTo2L2Q', 'WWTo1L1Nu2Q', 'WZTo1L3Nu', 'ZZTo4L',  'WZTo2L2Q', 'WZTo1L1Nu2Q', 'Single t', 'VVTo2L2Nu_ext', 'WZJToLLLNu'])  # 'WZTo3L',
+                plot.Group('Single t T', ['T_tWch_T', 'TBar_tWch_T', 'TToLeptons_tch_powheg_T', 'TBarToLeptons_tch_powheg_T'])
+                plot.Group('Single t J', ['T_tWch_J', 'TBar_tWch_J', 'TToLeptons_tch_powheg_J', 'TBarToLeptons_tch_powheg_J'])
+                plot.Group('VVT', ['VVTo2L2Nu_T', 'ZZTo2L2Q_T', 'WWTo1L1Nu2Q_T', 'WZTo1L3Nu_T', 'ZZTo4L_T',  'WZTo2L2Q_T', 'WZTo1L1Nu2Q_T', 'Single t T', 'VVTo2L2Nu_ext_T', 'WZJToLLLNu_T'])
+                plot.Group('VVJ', ['VVTo2L2Nu_J', 'ZZTo2L2Q_J', 'WWTo1L1Nu2Q_J', 'WZTo1L3Nu_J', 'ZZTo4L_J',  'WZTo2L2Q_J', 'WZTo1L1Nu2Q_J', 'Single t J', 'VVTo2L2Nu_ext_J', 'WZJToLLLNu_J'])
                 plot.Group('ZTT', ['ZTT', 'ZTT1Jets', 'ZTT2Jets', 'ZTT3Jets', 'ZTT4Jets'])
                 plot.Group('ZJ', ['ZJ', 'ZJ1Jets', 'ZJ2Jets', 'ZJ3Jets', 'ZJ4Jets'])
                 plot.Group('ZL', ['ZL', 'ZL1Jets', 'ZL2Jets', 'ZL3Jets', 'ZL4Jets'])
-                plot.Group('W', ['WJetsToLNu', 'W1Jets', 'W2Jets', 'W3Jets', 'W4Jets'])
-                plot.Group('Electroweak', ['W', 'VV', 'Single t', 'ZJ'])
+                plot.Group('W', ['WJets', 'WJets_ext', 'W1Jets', 'W2Jets_ext' 'W2Jets', 'W3Jets_ext', 'W3Jets', 'W4Jets', 'W4Jets_ext', 'W4Jets_ext2'])
+                # plot.Group('Electroweak', ['W', 'VV', 'Single t', 'ZJ'])
 
                 if optimisation:
                     plot.DrawStack('HIST')
@@ -306,8 +312,8 @@ def makePlots(variables, cuts, total_weight, all_samples, samples, friend_func, 
                 HistDrawer.draw(plot, channel='#tau_{h}#tau_{h}', plot_dir=plot_dir, blindxmin=blindxmin, blindxmax=blindxmax)
                 # HistDrawer.drawRatio(plot, channel='#tau_{h}#tau_{h}')
 
-                plot.UnGroup('Electroweak')#, ['W', 'VV', 'Single t', 'ZJ'])
-                plot.Group('VV', ['VV', 'Single t'])
+                # plot.UnGroup('Electroweak')#, ['W', 'VV', 'Single t', 'ZJ'])
+                # plot.Group('VV', ['VV', 'Single t'])
                 if variable.name in ['mt_total', 'svfit_mass', 'mt_total_mssm', 'mt_total_mssm_fine']:
                     plot.WriteDataCard(filename=plot_dir+'/htt_tt.inputs-sm-13TeV_{var}{postfix}.root'.format(var=variable.name, postfix=dc_postfix), dir='tt_' + cut.name, mode='UPDATE')
 
@@ -335,10 +341,10 @@ def makePlots(variables, cuts, total_weight, all_samples, samples, friend_func, 
 
 
 if __name__ == '__main__':
-    mode = 'susy' # 'control' 'mssm' 'mva_train' 'susy' 'sm'
+    mode = 'mssm' # 'control' 'mssm' 'mva_train' 'susy' 'sm'
 
     int_lumi = lumi
-    analysis_dir = '/data1/steggema/Gael3/MC/'
+    analysis_dir = '/eos/user/g/gtouquet/Prod/MSSM_Samples'
     verbose = True
     total_weight = 'weight'
 
@@ -350,7 +356,7 @@ if __name__ == '__main__':
 
     total_weight = 'weight*getTauWeight(l1_gen_match, l1_pt, l1_eta, l1_decayMode)*getTauWeight(l2_gen_match, l2_pt, l2_eta, l2_decayMode)'
 
-    optimisation = True
+    optimisation = False
     make_plots = True
 
     # Check whether friend trees need to be added
