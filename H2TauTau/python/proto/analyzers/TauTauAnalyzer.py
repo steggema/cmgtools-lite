@@ -1,5 +1,6 @@
 import os
 import ROOT
+import copy
 from PhysicsTools.HeppyCore.utils.deltar import deltaR
 from PhysicsTools.Heppy.analyzers.core.AutoHandle import AutoHandle
 from PhysicsTools.Heppy.physicsobjects.PhysicsObjects import Tau, Muon
@@ -56,6 +57,12 @@ class TauTauAnalyzer(DiLeptonAnalyzer):
             'std::vector<l1extra::L1JetParticle>'   
         )
 
+        if hasattr(self.cfg_ana, 'tauEnergyScale') and self.cfg_ana.tauEnergyScale:
+            self.handles['genParticles'] = AutoHandle( 
+            'prunedGenParticles', 
+            'std::vector<reco::GenParticle'
+            )
+
     def process(self, event):
 
         # method inherited from parent class DiLeptonAnalyzer
@@ -73,6 +80,10 @@ class TauTauAnalyzer(DiLeptonAnalyzer):
         event.isSignal = False
         if result:
             event.isSignal = True
+
+        if hasattr(self.cfg_ana, 'tauEnergyScale') and self.cfg_ana.tauEnergyScale and self.cfg_comp.isMC:
+            self.TauEnergyScale(event.diLeptons, event)
+
         # trying to get a dilepton from the control region.
         # it must have well id'ed and trig matched legs,
         # di-lepton and tri-lepton veto must pass
@@ -93,6 +104,13 @@ class TauTauAnalyzer(DiLeptonAnalyzer):
             event.pfmet = event.calibratedPfMet
         else:
             event.pfmet = self.handles['pfMET'].product()[0]
+
+        if hasattr(self.cfg_ana, 'tauEnergyScale') and \
+                self.cfg_ana.tauEnergyScale and self.cfg_comp.isMC:
+            # correct pfmet for selected leptons scaling
+            for lep in [event.diLepton.leg1(),event.diLepton.leg2()]:
+                event.pfmet.setP4(event.pfmet.p4()-(lep.p4()-lep.unscaledP4))
+            event.diLepton.met().setP4(event.pfmet.p4())
 
         if hasattr(event, 'calibratedPuppiMet'):
             event.puppimet = event.calibratedPuppiMet
@@ -166,7 +184,7 @@ class TauTauAnalyzer(DiLeptonAnalyzer):
             pyl = Muon(lep)
             pyl.associatedVertex = event.goodVertices[0]
             pyl.event = event.input.object()
-            if not pyl.muonIDMoriond17():
+            if not pyl.muonID("POG_ID_Medium_Moriond"):
                 continue
             if not pyl.relIsoR(R=0.4, dBetaFactor=0.5, allCharged=0) < 0.3:
                 continue
@@ -358,3 +376,45 @@ class TauTauAnalyzer(DiLeptonAnalyzer):
             met.setP4(metP4)
                     
         return True
+
+    def TauEnergyScale(self, diLeptons, event):
+        # get genmatch-needed informations, needs to be done in this analyzer to scale, though information is usually gathered afterwards in HTTGenAnalyzer
+        genParticles = self.handles['genParticles'].product()
+
+        ptSelGentauleps = [p for p in genParticles if abs(p.pdgId()) in [11, 13] and p.statusFlags().isDirectPromptTauDecayProduct() and p.pt() > 8.]
+
+        ptSelGenleps = [p for p in genParticles if abs(p.pdgId()) in [11, 13] and p.statusFlags().isPrompt() and p.pt() > 8.]
+
+        event.gentaus = [p for p in event.genParticles if abs(p.pdgId()) == 15 and p.statusFlags().isPrompt() and not any(abs(HTTGenAnalyzer.getFinalTau(p).daughter(i_d).pdgId()) in [11, 13] for i_d in xrange(HTTGenAnalyzer.getFinalTau(p).numberOfDaughters()))]
+
+        # create a list of all used leptons without duplicates, using the ROOT.pat::Tau objects as discriminant
+        leps = []
+        
+        for dilep in diLeptons:
+            if dilep.leg1().tau not in [lep.tau for lep in leps]:
+                leps.append(dilep.leg1())
+            if dilep.leg2().tau not in [lep.tau for lep in leps]:
+                leps.append(dilep.leg2())
+
+        # scale leptons
+        for lep in leps:
+            self.Scale(lep, ptSelGentauleps, ptSelGenleps, event)
+        
+
+    def Scale(self, tau, ptSelGentauleps, ptSelGenleps, event):
+        # this function should take values of scales from a file
+        tau.unscaledP4 = copy.deepcopy(tau.p4())
+        HTTGenAnalyzer.genMatch(event, tau, ptSelGentauleps, ptSelGenleps, [])
+        HTTGenAnalyzer.attachGenStatusFlag(tau)
+        if tau.gen_match==5:
+            if tau.decayMode() == 0:
+                tau.scaleEnergy(0.995)
+            elif tau.decayMode() == 1:
+                tau.scaleEnergy(1.011)
+            elif tau.decayMode() == 10:
+                tau.scaleEnergy(1.006)
+        elif tau.gen_match==1:
+            if tau.decayMode() == 0:
+                tau.scaleEnergy(1.024)
+            elif tau.decayMode() == 1:
+                tau.scaleEnergy(1.076)

@@ -65,7 +65,7 @@ class LeptonWeighter(Analyzer):
            not getattr(self.cfg_ana, 'disable', False) and lep.pt() < 9999.:
 
             isFake = False
-            if hasattr(lep, 'tau') and lep.gen_match == 6:
+            if hasattr(lep, 'tau') and lep.gen_match in [1,2,3,4,6]:
                 isFake = True
 
             iso = None
