@@ -30,7 +30,7 @@ def getHeppyOption(option, default):
 # Get all heppy options; set via '-o production' or '-o production=True'
 
 # production = True run on batch, production = False (or unset) run locally
-production = getHeppyOption('production', False)
+production = getHeppyOption('production', True)
 pick_events = getHeppyOption('pick_events', False)
 syncntuple = getHeppyOption('syncntuple', True)
 cmssw = getHeppyOption('cmssw', True)
@@ -255,10 +255,17 @@ from CMGTools.H2TauTau.proto.samples.summer16.sms import samples_susy
 from CMGTools.H2TauTau.proto.samples.summer16.triggers_tauTau import mc_triggers, mc_triggerfilters, data_triggers, data_triggerfilters
 
 data_list = data_tau
-samples = backgrounds + sm_signals + sync_list + mssm_signals 
+# data_list = [dat for dat in data_tau if dat.name in ['Tau_Run2016D_03Feb2017', 'Tau_Run2016F_03Feb2017', 'Tau_Run2016H_03Feb2017_v2', 'Tau_Run2016H_03Feb2017_v3']]
+# for dat in data_list:
+#     dat.files = ['root://cms-xrd-global.cern.ch/'+f[30:] for f in dat.files]
+
+# import pdb;pdb.set_trace()
+samples = [b for b in backgrounds if b.name in ['W1JetsToLNu_LO']]#['WJetsToLNu_LO','W1JetsToLNu_LO','W2JetsToLNu_LO','W2JetsToLNu_LO_ext','W3JetsToLNu_LO','W3JetsToLNu_LO_ext','W4JetsToLNu_LO','W4JetsToLNu_LO_ext','W4JetsToLNu_LO_ext2','WJetsToLNu_LO_ext']] #+ sm_signals + sync_list + mssm_signals
+# samples[0].files = ['/store/mc/RunIISummer16MiniAODv2/ST_t-channel_top_4f_inclusiveDecays_13TeV-powhegV2-madspin-pythia8_TuneCUETP8M1/MINIAODSIM/PUMoriond17_80X_mcRun2_asymptotic_2016_TrancheIV_v6-v1/80000/C8E3D90F-50B9-E611-9D8B-B083FED14CE0.root']
+# samples = [sync_list[0]]
 if doSUSY:
     samples = samples_susy #+ SignalSUSY[:1]
-split_factor = 1e5
+split_factor = 1e4
 
 for sample in data_list:
     sample.triggers = data_triggers
@@ -342,15 +349,21 @@ if doSUSY:
 ###################################################
 ###            SET BATCH OR LOCAL               ###
 ###################################################
+# selectedComponents = [selectedComponents[0]]
+# selectedComponents[0].files = [selectedComponents[0].files[0]]
+# for comp in selectedComponents:
+#         comp.files = ['root://cms-xrd-global.cern.ch/'+f[30:] for f in comp.files]
 if not production:
     # comp = data_list[0] if data else sync_list[0]
     # comp = SMS
     # comp = samples_susy[1]
-    selectedComponents = [samples_susy[2]] if doSUSY else sync_list
+    # selectedComponents = [samples_susy[2]] if doSUSY else sync_list
     if data:
         selectedComponents = [data_list[0]]
     selectedComponents = [selectedComponents[0]]
+    selectedComponents[0].files = [selectedComponents[0].files[0]]
     for comp in selectedComponents:
+        comp.files = ['root://cms-xrd-global.cern.ch/'+f[30:] for f in comp.files]
         comp.splitFactor = 1
         comp.fineSplitFactor = 1
     # comp.files = comp.files[13:20]
