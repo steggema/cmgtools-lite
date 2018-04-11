@@ -103,7 +103,7 @@ class NJetsAnalyzer(Analyzer):
 
         for status, pdg, moth, mom in zip(hep.ISTUP, hep.IDUP, hep.MOTHUP, hep.PUP):
 
-            if status == 1 and abs(pdg) in [21, 1, 2, 3, 4, 5]:
+            if status == 1 and abs(pdg) in [21, 1, 2, 3, 4, 5, 6]:
                 sumpt += math.sqrt(mom.x[0]**2 + mom.x[1]**2)
                 outgoing.append(pdg)
 
@@ -113,6 +113,7 @@ class NJetsAnalyzer(Analyzer):
 
         njets = len(outgoing)
         event.NUP = njets
+        # event.NUP = 1
 
         if len(leptons) == 2:
             event.geninvmass = (leptons[0] + leptons[1]).M()

@@ -126,7 +126,8 @@ def createHistograms(hist_cfg, all_stack=False, verbose=False, friend_func=None,
                 hist.Scale(scale/hist.Integral())
 
             stack = all_stack or (not cfg.is_data and not cfg.is_signal)
-
+            # if cfg.name=='WJets':
+            #     import pdb;pdb.set_trace()
             # Loop again over the variables and add histograms to plots one by one
             for vcfg in vcfgs:
                 hist = hists[vcfg.name]
@@ -138,12 +139,16 @@ def createHistograms(hist_cfg, all_stack=False, verbose=False, friend_func=None,
                     print 'Histogram', cfg.name, 'already exists; adding...', cfg.dir_name
                     hist_to_add = Histogram(cfg.name, hist)
                     if not cfg.is_data:
+                        # if cfg.name in ['WJets','ZTT']:
+                        #     import pdb;pdb.set_trace()
                         hist_to_add.SetWeight(hist_cfg.lumi*cfg.xsec/cfg.sumweights)
                     plot[cfg.name].Add(hist_to_add)
                 else:
                     plot_hist = plot.AddHistogram(cfg.name, hist, stack=stack)
 
                     if not cfg.is_data:
+                        # if cfg.name in ['WJets','ZTT']:
+                        #     import pdb;pdb.set_trace()
                         plot_hist.SetWeight(hist_cfg.lumi*cfg.xsec/cfg.sumweights)
 
     for plot in plots.itervalues():
