@@ -38,7 +38,9 @@ common = [
     'keep patPATTauDiscriminator_*_*_H2TAUTAU',
     # 'keep *_mvaMETTauMu_*_H2TAUTAU'
     'keep *_BadPFMuonFilter_*_H2TAUTAU',
-    'keep *_BadChargedCandidateFilter_*_H2TAUTAU'
+    'keep *_BadChargedCandidateFilter_*_H2TAUTAU',
+    'keep *_badGlobalMuonTaggerMAOD_*_*',
+    'keep *_cloneGlobalMuonTaggerMAOD_*_*',
     ]
 
 commonDebug = copy.deepcopy(common) 

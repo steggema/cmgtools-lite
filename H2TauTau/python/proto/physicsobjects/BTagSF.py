@@ -91,10 +91,10 @@ class BTagSF(object):
         if SFb < 1.:
             demoteProb_btag = abs(1. - SFb)
         else:
-            if eff_b == 0.:
+            if eff_b in [0.,1.]:
                 promoteProb_btag = 0.
             else:
-                promoteProb_btag = abs(SFb - 1.)/((SFb/eff_b) - 1.)
+                promoteProb_btag = abs(SFb - 1.)/((1./eff_b) - 1.)
 
         if csv > csv_cut:
             btagged = True
