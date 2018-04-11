@@ -7,16 +7,7 @@ from ROOT import gSystem, gROOT
 from CMGTools.H2TauTau.proto.plotter.PlotConfigs import SampleCfg, HistogramCfg
 from CMGTools.H2TauTau.proto.samples.spring16.sms_xsec import get_xsec
 
-from CMGTools.H2TauTau.proto.samples.summer16.htt_common import TT_pow, DYJetsToLL_M50_LO, DYJetsToLL_M50_LO_ext2, DYNJets, WJetsToLNu, WJetsToLNu_LO_ext, WNJets, WWTo2L2Nu, T_tWch, TBar_tWch, VVTo2L2Nu, VVTo2L2Nu_ext, WZJToLLLNu, ZZTo4L, WZTo1L3Nu, WWTo1L1Nu2Q, ZZTo2L2Q, WZTo2L2Q, WZTo1L1Nu2Q, TBar_tch_powheg, T_tch_powheg, HiggsGGH125, HiggsVBF125, mssm_signals, dy_weight_dict, w_weight_dict, data_tau
-
-from CMGTools.H2TauTau.proto.plotter.SampleStitching import StitchingWeightForW
-
-
-w_weights = StitchingWeightForW(Ninc=29705748+57026058,#WJetsToLNu.nGenEvents+WJetsToLNu_LO_ext.nGenEvents,
-                                N1=45367044,#WNJets[0].nGenEvents,
-                                N2=29878415+30319351,#WNJets[1].nGenEvents+WNJets[2].nGenEvents,
-                                N3=19798117+39269431,#WNJets[3].nGenEvents+WNJets[4].nGenEvents,
-                                N4=9170576+2073275+18751462)#WNJets[5].nGenEvents+WNJets[6].nGenEvents+WNJets[7].nGenEvents)
+from CMGTools.H2TauTau.proto.samples.summer16.htt_common import TT_pow, DYJetsToLL_M50_LO, DYJetsToLL_M50_LO_ext2, DYJetsToLL_M10to50_LO, DYNJets, WJetsToLNu, WJetsToLNu_LO_ext, WNJets, WWTo2L2Nu, T_tWch, TBar_tWch, VVTo2L2Nu, VVTo2L2Nu_ext, WZJToLLLNu, ZZTo4L, WZTo1L3Nu, WWTo1L1Nu2Q, ZZTo2L2Q, WZTo2L2Q, WZTo1L1Nu2Q, TBar_tch_powheg, T_tch_powheg, HiggsGGH125, HiggsVBF125, mssm_signals, dy_weight_dict, w_weight_dict, data_tau
 
 
 # WJetsToLNu_LO, TToLeptons_tch_amcatnlo, WZTo3LNu_amcatnlo, , WJetsToLNu_HT100to200, WJetsToLNu_HT200to400, WJetsToLNu_HT400to600, WJetsToLNu_HT600toInf, QCD_Mu15, DYJetsToTauTau_M150_LO, DYJetsToLL_M10to50_ext1
@@ -53,8 +44,10 @@ for njet in xrange(0, 5):
     weight = w_weight_dict[njet]
     w_exps.append('(geninfo_nup == {njet})*{weight}'.format(njet=njet, weight=weight))
 
+
 w_exp = '({w})'.format(w=' + '.join(w_exps))
 
+print 'Using W expression', w_exp
 
 def createSampleLists(analysis_dir='/afs/cern.ch/user/s/steggema/work/public/mt/NewProd',
                       channel='mt',
@@ -98,6 +91,14 @@ def createSampleLists(analysis_dir='/afs/cern.ch/user/s/steggema/work/public/mt/
             ###GAEL
             samples_essential += [
                 SampleCfg(name='ZLL', dir_name=sample.name, ana_dir=analysis_dir, tree_prod_name=tree_prod_name, xsec=1., sumweights=1., weight_expr='((l1_gen_match<6&&l2_gen_match<6&&!(l1_gen_match==5&&l2_gen_match==5)) || (l2_gen_match==6 || l1_gen_match==6))'+dy_exp)]
+        samples_essential += [
+            SampleCfg(name='ZTT_10_50', dir_name='DYJetsToLL_M10to50_LO', ana_dir=analysis_dir, tree_prod_name=tree_prod_name, xsec=1., sumweights=1., weight_expr=ztt_cut),
+            SampleCfg(name='ZL_10_50', dir_name='DYJetsToLL_M10to50_LO', ana_dir=analysis_dir, tree_prod_name=tree_prod_name,
+                      xsec=1., sumweights=1., weight_expr=zl_cut),
+            SampleCfg(name='ZJ_10_50', dir_name='DYJetsToLL_M10to50_LO', ana_dir=analysis_dir, tree_prod_name=tree_prod_name,
+                          xsec=1., sumweights=1., weight_expr=zj_cut),
+            SampleCfg(name='ZLL_10_50', dir_name='DYJetsToLL_M10to50_LO', ana_dir=analysis_dir, tree_prod_name=tree_prod_name, xsec=1., sumweights=1., weight_expr='((l1_gen_match<6&&l2_gen_match<6&&!(l1_gen_match==5&&l2_gen_match==5)) || (l2_gen_match==6 || l1_gen_match==6))')
+            ]
             ###GAEL
         
     else:
@@ -157,8 +158,8 @@ def createSampleLists(analysis_dir='/afs/cern.ch/user/s/steggema/work/public/mt/
             samples_essential += [
                 SampleCfg(name='ZLL'+n_jet_name, dir_name=sample.name, ana_dir=analysis_dir, tree_prod_name=tree_prod_name, xsec=1., sumweights=1., weight_expr='('+zl_cut+' || '+zj_cut+')'+dy_exp)]
     samples_essential += [
-        SampleCfg(name='WJets', dir_name='WJetsToLNu_LO', ana_dir=analysis_dir, tree_prod_name=tree_prod_name, xsec=sample.xSection, weight_expr=str(w_weights.returnWeight(0))), #, sumweights=WJetsToLNu_LO.nevents[0]) #, weight_expr=w_exp)
-        SampleCfg(name='WJets_ext', dir_name='WJetsToLNu_LO_ext', ana_dir=analysis_dir, tree_prod_name=tree_prod_name, xsec=sample.xSection, weight_expr=str(w_weights.returnWeight(0)))] #, sumweights=WJetsToLNu_LO.nevents[0]) #, weight_expr=w_exp)
+        SampleCfg(name='WJets', dir_name='WJetsToLNu_LO', ana_dir=analysis_dir, tree_prod_name=tree_prod_name, xsec=1., sumweights=1., weight_expr=w_exp), #, sumweights=WJetsToLNu_LO.nevents[0]) #, weight_expr=w_exp)
+        SampleCfg(name='WJets_ext', dir_name='WJetsToLNu_LO_ext', ana_dir=analysis_dir, tree_prod_name=tree_prod_name, xsec=1., sumweights=1., weight_expr=w_exp)] #, sumweights=WJetsToLNu_LO.nevents[0]) #, weight_expr=w_exp)
             ###GAEL
     for sample in WNJets:
         n_jet_name = str(sample.name[sample.name.find('Jets')-1])+'Jets'
@@ -168,7 +169,7 @@ def createSampleLists(analysis_dir='/afs/cern.ch/user/s/steggema/work/public/mt/
             n_jet_name += '_ext'
         # print 'WARNING - W - using n(gen events)', WJetsToLNu_LO.nevents[0], 'for W n(jets)', n_jet_name, 'xsec', sample.xSection
         samples_essential += [
-            SampleCfg(name='W'+n_jet_name, dir_name=sample.name, ana_dir=analysis_dir, tree_prod_name=tree_prod_name, xsec=sample.xSection, weight_expr=str(w_weights.returnWeight(int(sample.name[sample.name.find('Jets')-1])))) #, sumweights=WJetsToLNu_LO.nevents[0]) #, weight_expr=w_exp)
+            SampleCfg(name='W'+n_jet_name, dir_name=sample.name, ana_dir=analysis_dir, tree_prod_name=tree_prod_name, xsec=1., sumweights=1., weight_expr=w_exp) #, sumweights=WJetsToLNu_LO.nevents[0]) #, weight_expr=w_exp)
             ]
         
     samples_data = []
@@ -347,7 +348,7 @@ def createSampleLists(analysis_dir='/afs/cern.ch/user/s/steggema/work/public/mt/
         weighted_list += ['ZTT', 'ZTT1Jets', 'ZTT2Jets', 'ZTT3Jets', 'ZTT4Jets',
                           'ZJ', 'ZJ1Jets', 'ZJ2Jets', 'ZJ3Jets', 'ZJ4Jets',
                           'ZL', 'ZL1Jets', 'ZL2Jets', 'ZL3Jets', 'ZL4Jets',
-                          'ZTTM150', 'ZJM150', 'ZLM150']
+                          'ZTTM150', 'ZJM150', 'ZLM150','ZLL1Jets','ZLL2Jets','ZLL3Jets','ZLL4Jets','W2Jets','W2Jets_ext']
 
     for sample in samples_mc:
         if sample.name not in weighted_list:
@@ -377,5 +378,5 @@ def setSumWeights(sample, weight_dir='MCWeighter'):
         if 'Sum Weights' in counters:
             sample.sumweights = counters['Sum Weights']
     except IOError:
-        # print 'Warning: could not find sum weights information for sample', sample.name
+        print 'Warning: could not find sum weights information for sample', sample.name
         pass

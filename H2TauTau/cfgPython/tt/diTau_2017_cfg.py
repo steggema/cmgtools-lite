@@ -54,7 +54,7 @@ if tes_up:
 
 # Just to be sure
 if production:
-    # syncntuple = False
+    syncntuple = False
     pick_events = False
 
 if reapplyJEC:
@@ -260,12 +260,12 @@ data_list = data_tau
 #     dat.files = ['root://cms-xrd-global.cern.ch/'+f[30:] for f in dat.files]
 
 # import pdb;pdb.set_trace()
-samples = [sync_list[0]]#[b for b in backgrounds if b.name=='T_tch_powheg'] #+ sm_signals + sync_list + mssm_signals
+samples = [b for b in backgrounds if b.name in ['W1JetsToLNu_LO']]#['WJetsToLNu_LO','W1JetsToLNu_LO','W2JetsToLNu_LO','W2JetsToLNu_LO_ext','W3JetsToLNu_LO','W3JetsToLNu_LO_ext','W4JetsToLNu_LO','W4JetsToLNu_LO_ext','W4JetsToLNu_LO_ext2','WJetsToLNu_LO_ext']] #+ sm_signals + sync_list + mssm_signals
 # samples[0].files = ['/store/mc/RunIISummer16MiniAODv2/ST_t-channel_top_4f_inclusiveDecays_13TeV-powhegV2-madspin-pythia8_TuneCUETP8M1/MINIAODSIM/PUMoriond17_80X_mcRun2_asymptotic_2016_TrancheIV_v6-v1/80000/C8E3D90F-50B9-E611-9D8B-B083FED14CE0.root']
 # samples = [sync_list[0]]
 if doSUSY:
     samples = samples_susy #+ SignalSUSY[:1]
-split_factor = 1e3
+split_factor = 1e4
 
 for sample in data_list:
     sample.triggers = data_triggers
@@ -349,14 +349,19 @@ if doSUSY:
 ###################################################
 ###            SET BATCH OR LOCAL               ###
 ###################################################
+# selectedComponents = [selectedComponents[0]]
+# selectedComponents[0].files = [selectedComponents[0].files[0]]
+# for comp in selectedComponents:
+#         comp.files = ['root://cms-xrd-global.cern.ch/'+f[30:] for f in comp.files]
 if not production:
     # comp = data_list[0] if data else sync_list[0]
     # comp = SMS
     # comp = samples_susy[1]
-    selectedComponents = [samples_susy[2]] if doSUSY else sync_list
+    # selectedComponents = [samples_susy[2]] if doSUSY else sync_list
     if data:
         selectedComponents = [data_list[0]]
     selectedComponents = [selectedComponents[0]]
+    selectedComponents[0].files = [selectedComponents[0].files[0]]
     for comp in selectedComponents:
         comp.files = ['root://cms-xrd-global.cern.ch/'+f[30:] for f in comp.files]
         comp.splitFactor = 1

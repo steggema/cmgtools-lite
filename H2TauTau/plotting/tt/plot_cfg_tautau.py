@@ -55,9 +55,9 @@ def prepareCuts(mode):
         # cuts.append(MyCut('mva_met_sig_1_low_deta', inc_cut & Cut('met_pt/sqrt(met_cov00 + met_cov11) > 1. && delta_eta_l1_l2 < 2.')))
 
     if mode == 'mssm':
-        cuts.append(MyCut('nobtag', inc_cut & Cut('n_bjets==0')))
+        # cuts.append(MyCut('nobtag', inc_cut & Cut('n_bjets==0')))
         cuts.append(MyCut('inclusive', inc_cut & Cut('1')))
-        cuts.append(MyCut('btag', inc_cut & Cut('n_bjets>=1 && n_jets<=1')))
+        # cuts.append(MyCut('btag', inc_cut & Cut('n_bjets>=1 && n_jets<=1')))
         # cuts.append(MyCut('1bjet', inc_cut & Cut('n_bjets==1')))
         # # cuts.append(MyCut('0jet', inc_cut & Cut('n_bjets==1 && n_jets==0')))
 
@@ -239,7 +239,7 @@ def makePlots(variables, cuts, total_weight, all_samples, samples, friend_func, 
             iso_sideband_cut = (~iso_cut) & max_iso_cut
             charge_cut = Cut('l1_charge != l2_charge')
             isSS = 'SS' in cut.name
-            # all_samples_qcd = all_samples
+            # all_samples_qcd = [x for x in all_samples if x.name in ['WJets','ZTT']]
             all_samples_qcd = qcd_estimation(
                 cut.cut & iso_sideband_cut & (charge_cut if not isSS else ~charge_cut),  # shape sideband
                 cut.cut & iso_cut & (~charge_cut),  # norm sideband 1
@@ -268,14 +268,15 @@ def makePlots(variables, cuts, total_weight, all_samples, samples, friend_func, 
             for variable in variables:
                 plot = plots[variable.name]
                 plot.Group('Single t', ['T_tWch', 'TBar_tWch', 'TToLeptons_tch_powheg', 'TBarToLeptons_tch_powheg'])  # 'TToLeptons_sch',
-                plot.Group('VV', ['VVTo2L2Nu', 'ZZTo2L2Q', 'WWTo1L1Nu2Q', 'WZTo1L3Nu', 'ZZTo4L',  'WZTo2L2Q', 'WZTo1L1Nu2Q', 'Single t', 'VVTo2L2Nu_ext', 'WZJToLLLNu'])  # 'WZTo3L',
+                plot.Group('VV', ['VVTo2L2Nu', 'ZZTo2L2Q', 'WWTo1L1Nu2Q', 'WZTo1L3Nu', 'ZZTo4L',  'WZTo2L2Q', 'WZTo1L1Nu2Q', 'Single t', 'VVTo2L2Nu_ext', 'WZJToLLLNu', 'Single t'])  # 'WZTo3L',
                 plot.Group('Single t T', ['T_tWch_T', 'TBar_tWch_T', 'TToLeptons_tch_powheg_T', 'TBarToLeptons_tch_powheg_T'])
                 plot.Group('Single t J', ['T_tWch_J', 'TBar_tWch_J', 'TToLeptons_tch_powheg_J', 'TBarToLeptons_tch_powheg_J'])
-                plot.Group('VVT', ['VVTo2L2Nu_T', 'ZZTo2L2Q_T', 'WWTo1L1Nu2Q_T', 'WZTo1L3Nu_T', 'ZZTo4L_T',  'WZTo2L2Q_T', 'WZTo1L1Nu2Q_T', 'Single t T', 'VVTo2L2Nu_ext_T', 'WZJToLLLNu_T'])
-                plot.Group('VVJ', ['VVTo2L2Nu_J', 'ZZTo2L2Q_J', 'WWTo1L1Nu2Q_J', 'WZTo1L3Nu_J', 'ZZTo4L_J',  'WZTo2L2Q_J', 'WZTo1L1Nu2Q_J', 'Single t J', 'VVTo2L2Nu_ext_J', 'WZJToLLLNu_J'])
-                plot.Group('ZTT', ['ZTT', 'ZTT1Jets', 'ZTT2Jets', 'ZTT3Jets', 'ZTT4Jets'])
-                plot.Group('ZJ', ['ZJ', 'ZJ1Jets', 'ZJ2Jets', 'ZJ3Jets', 'ZJ4Jets'])
-                plot.Group('ZL', ['ZL', 'ZL1Jets', 'ZL2Jets', 'ZL3Jets', 'ZL4Jets'])
+                plot.Group('VVT', ['VVTo2L2Nu_T', 'ZZTo2L2Q_T', 'WWTo1L1Nu2Q_T', 'WZTo1L3Nu_T', 'ZZTo4L_T',  'WZTo2L2Q_T', 'WZTo1L1Nu2Q_T', 'Single t T', 'VVTo2L2Nu_ext_T', 'WZJToLLLNu_T', 'Single t T'])
+                plot.Group('VVJ', ['VVTo2L2Nu_J', 'ZZTo2L2Q_J', 'WWTo1L1Nu2Q_J', 'WZTo1L3Nu_J', 'ZZTo4L_J',  'WZTo2L2Q_J', 'WZTo1L1Nu2Q_J', 'Single t J', 'VVTo2L2Nu_ext_J', 'WZJToLLLNu_J', 'Single t J'])
+                plot.Group('ZTT', ['ZTT', 'ZTT1Jets', 'ZTT2Jets', 'ZTT3Jets', 'ZTT4Jets','ZTT_10_50'])
+                plot.Group('ZJ', ['ZJ', 'ZJ1Jets', 'ZJ2Jets', 'ZJ3Jets', 'ZJ4Jets','ZJ_10_50'])
+                plot.Group('ZL', ['ZL', 'ZL1Jets', 'ZL2Jets', 'ZL3Jets', 'ZL4Jets','ZL_10_50'])
+                plot.Group('ZLL', ['ZLL', 'ZLL1Jets', 'ZLL2Jets', 'ZLL3Jets', 'ZLL4Jets','ZLL_10_50'])
                 plot.Group('W', ['WJets', 'WJets_ext', 'W1Jets', 'W2Jets_ext' 'W2Jets', 'W3Jets_ext', 'W3Jets', 'W4Jets', 'W4Jets_ext', 'W4Jets_ext2'])
                 # plot.Group('Electroweak', ['W', 'VV', 'Single t', 'ZJ'])
 

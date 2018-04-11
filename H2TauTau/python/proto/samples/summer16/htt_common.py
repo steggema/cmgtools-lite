@@ -60,8 +60,8 @@ DYJetsToLL_M50_LO_ext2.xSection = dy_xsec
 #     (4, 150): 0.001226594/dy_xsec,
 # }
 
-n_ev_dy_incl = 49144274.0 + 96658943.0
-n_ev_dy_1jet = 62627174.0
+n_ev_dy_incl = 49144274.0 + 96658943.0# + 35291566.0
+n_ev_dy_1jet = 62627174.0#65485168.0
 n_ev_dy_2jet = 19970551.0
 n_ev_dy_3jet = 5856110.0
 n_ev_dy_4jet = 4197868.0
@@ -95,12 +95,28 @@ for sample in [DYJetsToLL_M50_LO, DYJetsToLL_M50_LO_ext2] + DYNJets: # + [DYJets
     sample.xSection = dy_xsec
 
 # From https://twiki.cern.ch/twiki/pub/CMS/HiggsToTauTauWorking2015/DYNjetWeights.xls r3
+
+n_ev_w_incl = 29705748.0+57026058.0
+n_ev_w_1jet = 45367044.0
+n_ev_w_2jet = 29878415.0+30319351.0
+n_ev_w_3jet = 19798117.0+39269431.0
+n_ev_w_4jet = 9170576.0+2073275.0+18751462.0
+
+
+k_factor = w_xsec/50380.0
+w_xsec_incl = 50380.0 * k_factor
+w_xsec_1jet = 9644.5 * k_factor
+w_xsec_2jet = 3144.5 * k_factor
+w_xsec_3jet = 954.8 * k_factor
+w_xsec_4jet = 485.6 * k_factor
+
+
 w_weight_dict = {
-    0:1.304600668/w_xsec,
-    1:0.216233816/w_xsec,
-    2:0.115900663/w_xsec,
-    3:0.058200264/w_xsec,
-    4:0.06275589/w_xsec
+    0:w_xsec_incl/n_ev_w_incl,
+    1:w_xsec_1jet/(n_ev_w_incl*w_xsec_1jet/w_xsec_incl + n_ev_w_1jet),
+    2:w_xsec_2jet/(n_ev_w_incl*w_xsec_2jet/w_xsec_incl  + n_ev_w_2jet),
+    3:w_xsec_3jet/(n_ev_w_incl*w_xsec_3jet/w_xsec_incl  + n_ev_w_3jet),
+    4:w_xsec_4jet/(n_ev_w_incl*w_xsec_4jet/w_xsec_incl  + n_ev_w_4jet),
 }
 
 def getWWeight(n_jets):
@@ -109,7 +125,7 @@ def getWWeight(n_jets):
 for sample in [WJetsToLNu_LO] + WNJets: # 
 
     sample.weight_func = getWWeight
-    # sample.xSection = w_xsec
+    sample.xSection = w_xsec
 
 WJetsHT = [] # WJetsToLNu_HT100to200, WJetsToLNu_HT200to400, WJetsToLNu_HT400to600, WJetsToLNu_HT600toInf
 
