@@ -30,6 +30,7 @@ lumi = 35900.
 # Set cross sections to HTT values
 
 VVTo2L2Nu.xSection = 11.95
+VVTo2L2Nu_ext.xSection = 11.95
 WWTo1L1Nu2Q.xSection = 49.997
 ZZTo2L2Q.xSection = 3.22
 ZZTo4L.xSection = 1.212
@@ -38,11 +39,16 @@ WZTo2L2Q.xSection = 5.595
 WZTo1L3Nu.xSection = 3.05
 WZTo1L1Nu2Q.xSection = 10.71
 
+TBar_tWch.xSection = 35.6
+T_tWch.xSection = 35.6
+TBar_tch_powheg.xSection = 80.95
+T_tch_powheg.xSection = 136.02
+
 w_xsec = 61526.7
 dy_xsec = 5765.4
 
-DYJetsToLL_M50_LO.xSection = dy_xsec
-DYJetsToLL_M50_LO_ext2.xSection = dy_xsec
+# DYJetsToLL_M50_LO.xSection = dy_xsec
+# DYJetsToLL_M50_LO_ext2.xSection = dy_xsec
 # DYJetsToLL_M50.xSection = dy_xsec
 
 
@@ -122,7 +128,7 @@ w_weight_dict = {
 def getWWeight(n_jets):
     return w_weight_dict[n_jets]
 
-for sample in [WJetsToLNu_LO] + WNJets: # 
+for sample in [WJetsToLNu_LO, WJetsToLNu_LO_ext] + WNJets: # 
 
     sample.weight_func = getWWeight
     sample.xSection = w_xsec
