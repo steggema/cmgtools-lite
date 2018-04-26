@@ -34,25 +34,30 @@ data_triggerfilters = [
     TFM(leg1_names=['hltPFTau140TrackPt50LooseAbsOrRelVLooseIso'], leg2_names=['hltPFTau140TrackPt50LooseAbsOrRelVLooseIso'], match_both_legs=False)
 ]
 
+#TODO https://twiki.cern.ch/twiki/bin/viewauth/CMS/MSSMAHTauTauFull2016#Triggers
 mc_triggers = [
-    'HLT_IsoMu24_v4',
-    'HLT_IsoTkMu24_v4',
-    'HLT_IsoMu19_eta2p1_LooseIsoPFTau20_v5',
-    'HLT_IsoMu19_eta2p1_LooseIsoPFTau20_SingleL1_v5',
-    'HLT_IsoMu21_eta2p1_LooseIsoPFTau20_SingleL1_v5',
+    'HLT_IsoMu22_v5',# 'HLT_IsoMu24_v4',
+    'HLT_IsoTkMu22_v5',#'HLT_IsoTkMu24_v4',
+    'HLT_IsoMu22_eta2p1_v4',#'HLT_IsoMu19_eta2p1_LooseIsoPFTau20_v5',
+    #'HLT_IsoMu19_eta2p1_LooseIsoPFTau20_SingleL1_v5',
+    #'HLT_IsoMu21_eta2p1_LooseIsoPFTau20_SingleL1_v5',
+    'HLT_IsoTkMu22_eta2p1_v4',
     'HLT_VLooseIsoPFTau140_Trk50_eta2p1_v5',
     'HLT_VLooseIsoPFTau120_Trk50_eta2p1_v5',
     ]
 
 mc_triggerfilters = [
-    TFM(leg1_names=['hltL3crIsoL1sMu22L1f0L2f10QL3f24QL3trkIsoFiltered0p09'], leg2_names=[], triggers=['HLT_IsoMu24_v4']), # IsoMu24
-    TFM(leg1_names=['hltL3fL1sMu22L1f0Tkf24QL3trkIsoFiltered0p09'], leg2_names=[], triggers=['HLT_IsoTkMu24_v4']), # IsoTkMu24
-    TFM(leg1_names=['hltL3crIsoL1sMu18erTauJet20erL1f0L2f10QL3f19QL3trkIsoFiltered0p09'], leg2_names=['hltOverlapFilterIsoMu19LooseIsoPFTau20'], triggers=['HLT_IsoMu19_eta2p1_LooseIsoPFTau20_v5']), # IsoMu19_eta2p1_LooseIsoPFTau20
-    TFM(leg1_names=['hltL3crIsoL1sSingleMu18erIorSingleMu20erL1f0L2f10QL3f19QL3trkIsoFiltered0p09'], leg2_names=['hltOverlapFilterIsoMu19LooseIsoPFTau20'], triggers=['HLT_IsoMu19_eta2p1_LooseIsoPFTau20_SingleL1_v5']), # IsoMu19_eta2p1_LooseIsoPFTau20
-    TFM(leg1_names=['hltL3crIsoL1sSingleMu20erIorSingleMu22erL1f0L2f10QL3f21QL3trkIsoFiltered0p09'], leg2_names=['hltOverlapFilterIsoMu19LooseIsoPFTau20'], triggers=['HLT_IsoMu21_eta2p1_LooseIsoPFTau20_SingleL1_v5']), # IsoMu21_eta2p1_LooseIsoPFTau20
+    #TFM(leg1_names=['hltL3crIsoL1sMu22L1f0L2f10QL3f24QL3trkIsoFiltered0p09'], leg2_names=[], triggers=['HLT_IsoMu24_v4']), # IsoMu24
+    #TFM(leg1_names=['hltL3fL1sMu22L1f0Tkf24QL3trkIsoFiltered0p09'], leg2_names=[], triggers=['HLT_IsoTkMu24_v4']), # IsoTkMu24
+    #TFM(leg1_names=['hltL3crIsoL1sMu18erTauJet20erL1f0L2f10QL3f19QL3trkIsoFiltered0p09'], leg2_names=['hltOverlapFilterIsoMu19LooseIsoPFTau20'], triggers=['HLT_IsoMu19_eta2p1_LooseIsoPFTau20_v5']), # IsoMu19_eta2p1_LooseIsoPFTau20
+    #TFM(leg1_names=['hltL3crIsoL1sSingleMu18erIorSingleMu20erL1f0L2f10QL3f19QL3trkIsoFiltered0p09'], leg2_names=['hltOverlapFilterIsoMu19LooseIsoPFTau20'], triggers=['HLT_IsoMu19_eta2p1_LooseIsoPFTau20_SingleL1_v5']), # IsoMu19_eta2p1_LooseIsoPFTau20
+    #TFM(leg1_names=['hltL3crIsoL1sSingleMu20erIorSingleMu22erL1f0L2f10QL3f21QL3trkIsoFiltered0p09'], leg2_names=['hltOverlapFilterIsoMu19LooseIsoPFTau20'], triggers=['HLT_IsoMu21_eta2p1_LooseIsoPFTau20_SingleL1_v5']), # IsoMu21_eta2p1_LooseIsoPFTau20
     TFM(leg1_names=['hltPFTau140TrackPt50LooseAbsOrRelVLooseIso'], leg2_names=['hltPFTau140TrackPt50LooseAbsOrRelVLooseIso'], match_both_legs=False, triggers=['HLT_VLooseIsoPFTau140_Trk50_eta2p1_v5']),
-    TFM(leg1_names=['hltPFTau120TrackPt50LooseAbsOrRelVLooseIso'], leg2_names=['hltPFTau120TrackPt50LooseAbsOrRelVLooseIso'], match_both_legs=False, triggers=['HLT_VLooseIsoPFTau120_Trk50_eta2p1_v5'])
-
+    TFM(leg1_names=['hltPFTau120TrackPt50LooseAbsOrRelVLooseIso'], leg2_names=['hltPFTau120TrackPt50LooseAbsOrRelVLooseIso'], match_both_legs=False, triggers=['HLT_VLooseIsoPFTau120_Trk50_eta2p1_v5']),
+    TFM(leg1_names=['hltL3crIsoL1sMu20L1f0L2f10QL3f22QL3trkIsoFiltered0p09'], leg2_names=[], triggers=['HLT_IsoMu22_v5']),
+    TFM(leg1_names=['hltL3crIsoL1sSingleMu20erL1f0L2f10QL3f22QL3trkIsoFiltered0p09'], leg2_names=[], triggers=['HLT_IsoMu22_eta2p1_v4']),
+    TFM(leg1_names=['hltL3fL1sMu20L1f0Tkf22QL3trkIsoFiltered0p09'], leg2_names=[], triggers=['HLT_IsoTkMu22_v5']),
+    TFM(leg1_names=['hltL3fL1sMu20erL1f0Tkf22QL3trkIsoFiltered0p09'], leg2_names=[], triggers=['HLT_IsoTkMu22_eta2p1_v4']),
 ]
 
 embed_triggers = [

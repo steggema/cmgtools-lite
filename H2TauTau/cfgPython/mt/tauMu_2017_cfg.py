@@ -13,10 +13,13 @@ from CMGTools.H2TauTau.proto.analyzers.TauDecayModeWeighter import TauDecayModeW
 from CMGTools.H2TauTau.proto.analyzers.TauFakeRateWeighter import TauFakeRateWeighter
 from CMGTools.H2TauTau.proto.analyzers.MuTauFakeReweighter import MuTauFakeReweighter
 from CMGTools.H2TauTau.proto.analyzers.LeptonWeighter import LeptonWeighter
+from CMGTools.H2TauTau.proto.analyzers.TauP4Scaler import TauP4Scaler
 from CMGTools.H2TauTau.proto.analyzers.SVfitProducer import SVfitProducer
 from CMGTools.H2TauTau.proto.analyzers.FileCleaner import FileCleaner
 from CMGTools.H2TauTau.proto.analyzers.TauIsolationCalculator import TauIsolationCalculator
 from CMGTools.H2TauTau.proto.analyzers.MuonIsolationCalculator import MuonIsolationCalculator
+from CMGTools.H2TauTau.proto.analyzers.MT2Analyzer import MT2Analyzer
+from CMGTools.H2TauTau.proto.analyzers.TauIDWeighter import TauIDWeighter
 from CMGTools.H2TauTau.proto.analyzers.METFilter import METFilter
 
 
@@ -32,14 +35,15 @@ from CMGTools.H2TauTau.htt_ntuple_base_cff import commonSequence, puFileData, pu
 # Get all heppy options; set via "-o production" or "-o production=True"
 
 # production = True run on batch, production = False (or unset) run locally
-production = getHeppyOption('production', False)
+production = getHeppyOption('production', True)
 pick_events = getHeppyOption('pick_events', False)
 syncntuple = getHeppyOption('syncntuple', True)
-cmssw = getHeppyOption('cmssw', False)
+cmssw = getHeppyOption('cmssw', True)
 computeSVfit = getHeppyOption('computeSVfit', False)
 data = getHeppyOption('data', False)
 tes_string = getHeppyOption('tes_string', '') # '_tesup' '_tesdown'
-reapplyJEC = getHeppyOption('reapplyJEC', True)
+reapplyJEC = getHeppyOption('reapplyJEC', False)
+calibrateTaus = getHeppyOption('calibrateTaus', False) # done in taumuanalyzer because this way sucks.
 correct_recoil = getHeppyOption('correct_recoil', True)
 
 # For specific studies
@@ -48,7 +52,7 @@ add_tau_fr_info = getHeppyOption('add_tau_fr_info', False)
 
 # Just to be sure
 if production:
-    syncntuple = False
+    # syncntuple = False
     pick_events = False
 
 if reapplyJEC:
@@ -66,23 +70,40 @@ if not data:
 
 # Define mu-tau specific modules
 
+#TODO risk to apply to leg1 ? only for leg2 ?
+tauP4Scaler = cfg.Analyzer(
+    class_object=TauP4Scaler,
+    name='TauP4Scaler',
+)
+
 tauMuAna = cfg.Analyzer(
     TauMuAnalyzer,
     name='TauMuAnalyzer',
-    pt1=23,
-    eta1=2.4,
+    pt1=23.,
+    eta1=2.1,
     iso1=0.15,
     looseiso1=9999.,
-    pt2=20,
+    pt2=30.,
     eta2=2.3,
-    iso2=1.5,
+    iso2=1., #1.5
     looseiso2=9999.,
     m_min=10,
     m_max=99999,
     dR_min=0.5,
     from_single_objects=False if cmssw else True,
     ignoreTriggerMatch=True, # best dilepton doesn't need trigger match
-    verbose=False
+    verbose=False,
+    tauEnergyScale=True,
+)
+
+#TODO changes to do with respect to the tauTauMT2Ana ?
+tauMuMT2Ana = cfg.Analyzer(
+    MT2Analyzer, name='MT2Analyzer',
+    metCollection="slimmedMETs",
+    doOnlyDefault=False,
+    jetPt=40.,
+    collectionPostFix="",
+    verbose=True
 )
 
 tauDecayModeWeighter = cfg.Analyzer(
@@ -110,13 +131,14 @@ tauWeighter = cfg.Analyzer(
     disable=True,
 )
 
+#TODO weights to be modified
 muonWeighter = cfg.Analyzer(
     LeptonWeighter,
     name='LeptonWeighter_mu',
     scaleFactorFiles={
-        'trigger':('$CMSSW_BASE/src/CMGTools/H2TauTau/data/htt_scalefactors_v16_2.root', 'm_trgIsoMu24_desy'),
-        'idiso':('$CMSSW_BASE/src/CMGTools/H2TauTau/data/htt_scalefactors_v16_2.root', 'm_idiso0p15_desy'),
-        'tracking':('$CMSSW_BASE/src/CMGTools/H2TauTau/data/htt_scalefactors_v16_2.root', 'm_trk'),
+        'trigger':('$CMSSW_BASE/src/CMGTools/H2TauTau/data/htt_scalefactors_v16_5.root', 'm_trgIsoMu24_desy'),
+        'idiso':('$CMSSW_BASE/src/CMGTools/H2TauTau/data/htt_scalefactors_v16_5.root', 'm_idiso0p15_desy'),
+        'tracking':('$CMSSW_BASE/src/CMGTools/H2TauTau/data/htt_scalefactors_v16_5.root', 'm_trk'),
     },
     dataEffFiles={
         # 'trigger':('$CMSSW_BASE/src/CMGTools/H2TauTau/data/htt_scalefactors_v16_2.root', 'm_trgIsoMu22orTkIsoMu22_desy'),
@@ -137,7 +159,7 @@ syncTreeProducer = cfg.Analyzer(
     H2TauTauTreeProducerTauMu,
     name='H2TauTauSyncTreeProducerTauMu',
     varStyle='sync',
-    # skimFunction='event.isSignal'
+    skimFunction=' and '.join(['event.'+met_filter for met_filter in ['Flag_HBHENoiseFilter', 'Flag_HBHENoiseIsoFilter', 'Flag_EcalDeadCellTriggerPrimitiveFilter', 'Flag_goodVertices', 'Flag_eeBadScFilter', 'Flag_globalTightHalo2016Filter', 'passBadMuonFilter', 'passBadChargedHadronFilter', 'passBadGlobalMuonFilter', 'passcloneGlobalMuonFilter']])#
 )
 
 svfitProducer = cfg.Analyzer(
@@ -167,6 +189,13 @@ metFilter = cfg.Analyzer(
     ]
 )
 
+# seems like leg1 == muon and leg2 == tauh ?
+tauIDWeighter = cfg.Analyzer(
+    TauIDWeighter,
+    name='TauIDWeighter',
+    legs=['leg2']
+)
+
 tauIsoCalc = cfg.Analyzer(
     TauIsolationCalculator,
     name='TauIsolationCalculator',
@@ -185,20 +214,25 @@ fileCleaner = cfg.Analyzer(
 )
 
 
-# Processing order
-
+###################################################
+###                  SEQUENCE                   ###
+###################################################
 sequence = commonSequence
-sequence.insert(sequence.index(httGenAna), tauMuAna)
-sequence.append(metFilter)
+if calibrateTaus:
+    sequence.insert(sequence.index(httGenAna), tauP4Scaler)
+sequence.insert(sequence.index(httGenAna)+1, tauMuAna) # sequence.insert(sequence.index(httGenAna), tauTauAna) initially
 sequence.append(tauDecayModeWeighter)
-sequence.append(tauFakeRateWeighter)
+sequence.append(tauFakeRateWeighter) # summer 2013 ??
 sequence.append(muTauFakeWeighter)
 sequence.append(tauWeighter)
 sequence.append(muonWeighter)
-sequence.append(treeProducer)
-
 if syncntuple:
-    sequence.append(syncTreeProducer)
+    sequence.append(tauIDWeighter) # adapt ?!
+
+sequence.append(tauMuMT2Ana)
+sequence.append(metFilter)
+
+#TODO insert if dosusy part from ttana
 
 if computeSVfit:
     sequence.insert(sequence.index(muonWeighter), svfitProducer)
@@ -207,11 +241,17 @@ if add_iso_info:
     sequence.insert(sequence.index(treeProducer), muonIsoCalc)
     sequence.insert(sequence.index(treeProducer), tauIsoCalc)
 
+sequence.append(treeProducer)
+
+if syncntuple:
+    sequence.append(syncTreeProducer)
+
+###################################################
 
 # Minimal list of samples
-samples = backgrounds_mu + sm_signals + sync_list + mssm_signals
+samples = [sync_list[0]] # backgrounds_mu + sm_signals + sync_list + mssm_signals
 
-split_factor = 1e5
+split_factor = 1e4
 
 if computeSVfit:
     split_factor = 5e3
@@ -233,13 +273,14 @@ for sample in data_list:
 
 # Samples to be processed
 
-selectedComponents = data_list if data else backgrounds_mu + sm_signals #+ mssm_signals
+selectedComponents = samples # data_list if data else backgrounds_mu + sm_signals #+ mssm_signals
 
 if pick_events:
     eventSelector.toSelect = [1310750]
     sequence.insert(0, eventSelector)
 
 
+#TODO seems OK but compare to tautaucfg : changes to do here ?
 if not cmssw:
     module = [s for s in sequence if s.name == 'MCWeighter'][0]
     sequence.remove(module)
@@ -249,12 +290,12 @@ if not cmssw:
 # Batch or local
 if not production:
     cache = True
-    selectedComponents = [selectedComponents[-1]] if data else sync_list
+    # selectedComponents = [selectedComponents[-1]] if data else sync_list
     selectedComponents = [selectedComponents[-1]]
     for comp in selectedComponents:
         comp.splitFactor = 1
         comp.fineSplitFactor = 1
-    # comp.files = comp.files[]
+        comp.files = [comp.files[0]]
 
 preprocessor = None
 if cmssw:

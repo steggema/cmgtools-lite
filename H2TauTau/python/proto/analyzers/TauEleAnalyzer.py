@@ -1,3 +1,5 @@
+import ROOT
+import copy
 from PhysicsTools.Heppy.analyzers.core.AutoHandle import AutoHandle
 from PhysicsTools.Heppy.physicsobjects.Muon import Muon
 from PhysicsTools.Heppy.physicsobjects.Electron import Electron
@@ -5,7 +7,7 @@ from PhysicsTools.Heppy.physicsobjects.Tau import Tau
 
 from CMGTools.H2TauTau.proto.analyzers.DiLeptonAnalyzer import DiLeptonAnalyzer
 from CMGTools.H2TauTau.proto.physicsobjects.DiObject import TauElectron, DirectDiTau
-import ROOT
+from CMGTools.H2TauTau.proto.analyzers.HTTGenAnalyzer import HTTGenAnalyzer
 
 
 class TauEleAnalyzer(DiLeptonAnalyzer):
@@ -50,6 +52,13 @@ class TauEleAnalyzer(DiLeptonAnalyzer):
             'slimmedMETs',
             'std::vector<pat::MET>'
         )
+        
+        # for tau energy scale !
+        if hasattr(self.cfg_ana, 'tauEnergyScale') and self.cfg_ana.tauEnergyScale:
+            self.handles['genParticles'] = AutoHandle( 
+            'prunedGenParticles', 
+            'std::vector<reco::GenParticle'
+            )
 
     def buildDiLeptons(self, cmgDiLeptons, event):
         '''Build di-leptons, associate best vertex to both legs,
@@ -58,7 +67,8 @@ class TauEleAnalyzer(DiLeptonAnalyzer):
         '''
         diLeptons = []
         for index, dil in enumerate(cmgDiLeptons):
-            pydil = self.__class__.DiObjectClass(dil)
+            #pydil = self.__class__.DiObjectClass(dil)
+            pydil = TauElectron(dil)
             pydil.leg2().associatedVertex = event.goodVertices[0]
             pydil.leg1().associatedVertex = event.goodVertices[0]
             pydil.leg1().rho = event.rho
@@ -137,6 +147,9 @@ class TauEleAnalyzer(DiLeptonAnalyzer):
         if result:
             event.isSignal = True
 
+        if hasattr(self.cfg_ana, 'tauEnergyScale') and self.cfg_ana.tauEnergyScale and self.cfg_comp.isMC:
+            self.TauEnergyScale(event.diLeptons, event)
+
         # trying to get a dilepton from the control region.
         # it must have well id'ed and trig matched legs,
         # and di-lepton veto must pass
@@ -153,6 +166,26 @@ class TauEleAnalyzer(DiLeptonAnalyzer):
 
         event.pfmet = self.handles['pfMET'].product()[0]
         event.puppimet = self.handles['puppiMET'].product()[0]
+
+        if hasattr(event, 'calibratedPfMet'):
+            event.pfmet = event.calibratedPfMet
+        else:
+            event.pfmet = self.handles['pfMET'].product()[0]
+
+        if hasattr(self.cfg_ana, 'tauEnergyScale') and \
+                self.cfg_ana.tauEnergyScale and self.cfg_comp.isMC:
+            # correct pfmet for selected taus (only leg2) scaling
+            for lep in [event.diLepton.leg2()]:
+                event.pfmet.setP4(event.pfmet.p4()-(lep.p4()-lep.unscaledP4))
+            event.diLepton.met().setP4(event.pfmet.p4())
+
+        if hasattr(event, 'calibratedPuppiMet'):
+            event.puppimet = event.calibratedPuppiMet
+        else:
+            event.puppimet = self.handles['puppiMET'].product()[0]
+
+        if getattr(self.cfg_ana, 'scaleTaus', False):
+            self.scaleMet(event, event.diLepton)
 
         return True
 
@@ -238,7 +271,7 @@ class TauEleAnalyzer(DiLeptonAnalyzer):
     def otherLeptonVeto(self, leptons, otherLeptons, isoCut=0.3):
         # count veto muons
         vOtherLeptons = [muon for muon in otherLeptons if
-                         muon.muonIDMoriond17() and
+                         muon.muonID("POG_ID_Medium_Moriond") and # muon.muonIDMoriond17() and
                          self.testVertex(muon) and
                          self.testLegKine(muon, ptcut=10, etacut=2.4) and
                          muon.relIsoR(R=0.4, dBetaFactor=0.5, allCharged=0) < 0.3]
@@ -297,3 +330,73 @@ class TauEleAnalyzer(DiLeptonAnalyzer):
             matched = False
 
         return matched
+
+    def scaleMet(self, event, diLep):
+       
+        pfmet = event.pfmet
+        puppimet = event.pfmet
+        met = diLep.met()
+
+        taus =[diLep.leg2()]
+
+        for tau in taus:
+            if not hasattr(tau, 'deltaMet'):
+                # tau wasn't scaled
+                continue
+            pfmetP4    = pfmet.p4()
+            puppimetP4 = puppimet.p4()
+            metP4      = met.p4()
+            # remove pre-calibrated tau from met computation
+            pfmetP4    += tau.deltaMet
+            puppimetP4 += tau.deltaMet
+            metP4      += tau.deltaMet
+        
+            pfmet.setP4(pfmetP4)
+            puppimet.setP4(puppimetP4)
+            met.setP4(metP4)
+                    
+        return True
+
+    def TauEnergyScale(self, diLeptons, event):
+        # get genmatch-needed informations, needs to be done in this analyzer to scale, though information is usually gathered afterwards in HTTGenAnalyzer
+        genParticles = self.handles['genParticles'].product()
+
+        ptSelGentauleps = [p for p in genParticles if abs(p.pdgId()) in [11, 13] and p.statusFlags().isDirectPromptTauDecayProduct() and p.pt() > 8.]
+
+        ptSelGenleps = [p for p in genParticles if abs(p.pdgId()) in [11, 13] and p.statusFlags().isPrompt() and p.pt() > 8.]
+
+        event.gentaus = [p for p in event.genParticles if abs(p.pdgId()) == 15 and p.statusFlags().isPrompt() and not any(abs(HTTGenAnalyzer.getFinalTau(p).daughter(i_d).pdgId()) in [11, 13] for i_d in xrange(HTTGenAnalyzer.getFinalTau(p).numberOfDaughters()))]
+
+        # create a list of all used leptons without duplicates, using the ROOT.pat::Tau objects as discriminant
+        leps = []
+        
+        for dilep in diLeptons:
+            if dilep.leg2().tau not in [lep.tau for lep in leps]:
+                leps.append(dilep.leg2())
+
+        # scale leptons
+        for lep in leps:
+            self.Scale(lep, ptSelGentauleps, ptSelGenleps, event)
+            # issue on unscaledP4 for same taus being in two different legs
+            for dilep in diLeptons:
+                if dilep.leg2().tau == lep.tau:
+                    dilep.leg2().unscaledP4 = lep.unscaledP4
+        
+
+    def Scale(self, tau, ptSelGentauleps, ptSelGenleps, event):
+        # this function should take values of scales from a file
+        tau.unscaledP4 = copy.deepcopy(tau.p4())
+        HTTGenAnalyzer.genMatch(event, tau, ptSelGentauleps, ptSelGenleps, [])
+        HTTGenAnalyzer.attachGenStatusFlag(tau)
+        if tau.gen_match==5:
+            if tau.decayMode() == 0:
+                tau.scaleEnergy(0.995)
+            elif tau.decayMode() == 1:
+                tau.scaleEnergy(1.011)
+            elif tau.decayMode() == 10:
+                tau.scaleEnergy(1.006)
+        elif tau.gen_match==1:
+            if tau.decayMode() == 0:
+                tau.scaleEnergy(1.024)
+            elif tau.decayMode() == 1:
+                tau.scaleEnergy(1.076)

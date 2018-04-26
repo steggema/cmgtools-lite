@@ -215,6 +215,8 @@ vars['bjet2_id_pu'] = {'std': 'bjet2_id_pu', 'sync': 'bpuid_2'}
 vars['bjet2_csv'] = {'std': 'bjet2_csv', 'sync': 'bcsv_2'}
 
 # trigger names
+vars['trigger_matched_isomu22'] = {'std':'trigger_matched_isomu22', 'sync':'trg_singlemuon'} #?
+
 vars['trigger_ditau35'] = {'std':'trigger_ditau35', 'sync':'trg_fired_doubletau'}
 vars['trigger_ditau35_combiso'] = {'std':'trigger_ditau35_combiso', 'sync':'trg_fired_doubletau_combiso'}
 vars['trigger_singletau140'] = {'std':'trigger_singletau140', 'sync':'trg_fired_singletau'}
