@@ -9,6 +9,9 @@ from CMGTools.H2TauTau.proto.analyzers.DiLeptonAnalyzer import DiLeptonAnalyzer
 from CMGTools.H2TauTau.proto.physicsobjects.DiObject import TauElectron, DirectDiTau
 from CMGTools.H2TauTau.proto.analyzers.HTTGenAnalyzer import HTTGenAnalyzer
 
+from PhysicsTools.HeppyCore.utils.deltar import deltaR
+
+import FWCore.ParameterSet.Config as cms
 
 class TauEleAnalyzer(DiLeptonAnalyzer):
 
@@ -231,7 +234,8 @@ class TauEleAnalyzer(DiLeptonAnalyzer):
         return electron.mvaIDRun2('Spring16', 'POG90')
 
     def testVetoElectronID(self, electron):
-        return electron.mvaIDRun2('Spring16', 'POG90')
+        #return cms.InputTag('egmGsfElectronIDs:cutBasedElectronID-Summer16-80X-V1-veto')
+        return electron.mvaIDRun2('Spring16', 'POG_SPRING16_25ns_v1_Veto') # cut based Summer 16 veto ID for di-electron-veto on twiki MSSM # POG Spring15 25ns cut-based "Veto" ID on twiki HTTT
 
     def testLeg1ID(self, electron):
         '''Tight electron selection, no isolation requirement.
@@ -268,7 +272,7 @@ class TauEleAnalyzer(DiLeptonAnalyzer):
             muon.pt() > 10. and \
             muon.relIsoR(R=0.4, dBetaFactor=0.5, allCharged=0) < 0.3
 
-    def otherLeptonVeto(self, leptons, otherLeptons, isoCut=0.3):
+    def thirdLeptonVeto(self, leptons, otherLeptons, isoCut=0.3):
         # count veto muons
         vOtherLeptons = [muon for muon in otherLeptons if
                          muon.muonID("POG_ID_Medium_Moriond") and # muon.muonIDMoriond17() and
@@ -281,14 +285,15 @@ class TauEleAnalyzer(DiLeptonAnalyzer):
 
         return True
 
-    def thirdLeptonVeto(self, leptons, otherLeptons, isoCut=0.3):
+    def otherLeptonVeto(self, leptons, otherLeptons, isoCut=0.3):
         # count electrons
         vLeptons = [electron for electron in leptons if
                     self.testLegKine(electron, ptcut=10, etacut=2.5) and
                     self.testVertex(electron) and
                     self.testElectronID(electron) and
+                    electron.passConversionVeto() and
+                    electron.physObj.gsfTrack().hitPattern().numberOfHits(ROOT.reco.HitPattern.MISSING_INNER_HITS) <= 1 and
                     electron.relIsoR(R=0.3, dBetaFactor=0.5, allCharged=0) < 0.3]
-
         if len(vLeptons) > 1:
             return False
 
@@ -299,16 +304,23 @@ class TauEleAnalyzer(DiLeptonAnalyzer):
         looseLeptons = [l for l in leptons if self.testLooseleg1(l)]
         nLeptons = len(looseLeptons)
 
-        if event.leg1 not in looseLeptons:
-            looseLeptons.append(event.leg1)
-
+        if event.leg1 not in looseLeptons: 
+            looseLeptons.append(event.leg1) #TODO why ?
+        
         if nLeptons < 2:
             return True
-
-        # Reject if OS
+        
+        # if there is an opposite-charge electron pair in the event with electrons separated by dR>0.15 and both passing the loose selection
         if any(l.charge() > 0 for l in looseLeptons) and \
            any(l.charge() < 0 for l in looseLeptons):
-            return False
+            looseLeptons_positives = [l for l in looseLeptons if l.charge() > 0]
+            looseLeptons_negatives = [l for l in looseLeptons if l.charge() < 0]
+            for l_pos in looseLeptons_positives :
+                for l_neg in looseLeptons_negatives :
+                    dR = deltaR(l_pos.eta(), l_pos.phi(),
+                                l_neg.eta(), l_neg.phi())
+                    if dR>0.15 :
+                        return False
 
         return True
 
@@ -324,7 +336,7 @@ class TauEleAnalyzer(DiLeptonAnalyzer):
 
     def trigMatched(self, event, diL, requireAllMatched=False):
 
-        matched = super(TauEleAnalyzer, self).trigMatched(event, diL, requireAllMatched=requireAllMatched, ptMin=23., relaxIds=[11])
+        matched = super(TauEleAnalyzer, self).trigMatched(event, diL, requireAllMatched=requireAllMatched, ptMin=23.)#, relaxIds=[11])
 
         if matched and len(diL.matchedPaths) == 1 and diL.leg1().pt() <= 33. and 'Ele32' in list(diL.matchedPaths)[0]:
             matched = False
