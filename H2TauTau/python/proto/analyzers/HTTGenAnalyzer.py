@@ -4,7 +4,7 @@ import ROOT
 
 from PhysicsTools.Heppy.analyzers.core.AutoHandle import AutoHandle
 from PhysicsTools.Heppy.analyzers.core.Analyzer import Analyzer
-from PhysicsTools.HeppyCore.utils.deltar import bestMatch
+from PhysicsTools.HeppyCore.utils.deltar import bestMatch, deltaR
 
 from PhysicsTools.Heppy.physicsobjects.PhysicsObject import PhysicsObject
 from PhysicsTools.Heppy.physicsobjects.GenParticle import GenParticle
@@ -154,6 +154,8 @@ class HTTGenAnalyzer(Analyzer):
             genjet.decayMode = tauDecayModes.genDecayModeInt(c_genjet)
 
             if p4_genjet.pt() > 15.:
+                if any(deltaR(p4_genjet, stored_genjet)<0.002 for stored_genjet in event.genTauJets):
+                    continue # Remove duplicates
                 event.genTauJets.append(genjet)
                 event.genTauJetConstituents.append(c_genjet)
 
@@ -258,8 +260,8 @@ class HTTGenAnalyzer(Analyzer):
 
                 if dR2best < dR2:
                     leg.genp.detFlavour = jet.partonFlavour()
-                else:
-                    print 'no match found', leg.pt(), leg.eta()
+                # else:
+                #     print 'no match found', leg.pt(), leg.eta()
 
     @staticmethod
     def getTopPtWeight(event):

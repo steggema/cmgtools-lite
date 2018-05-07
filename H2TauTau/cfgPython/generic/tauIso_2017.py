@@ -7,7 +7,7 @@ from CMGTools.H2TauTau.proto.analyzers.TauIsoAnalyzer import TauIsoAnalyzer
 from CMGTools.H2TauTau.proto.analyzers.TauIsoTreeProducer import TauIsoTreeProducer
 from CMGTools.H2TauTau.proto.samples.fall17.htt_common import DYJetsToLL_M50_LO
 
-production = getHeppyOption('production', False)
+production = getHeppyOption('production', True)
 
 selected_components = [DYJetsToLL_M50_LO]
 
@@ -18,7 +18,9 @@ tau_iso_ana = cfg.Analyzer(
 
 tau_iso_tree = cfg.Analyzer(
     TauIsoTreeProducer,
-    name='TauIsoTreeProducer'
+    name='TauIsoTreeProducer',
+    defaultFloatType='F', #save storage space
+    reject_gen_leptons=True
 )
 
 sequence = cfg.Sequence([
@@ -35,7 +37,7 @@ if not production:
     # comp.files = comp.files[:1]
 else:
     for comp in selected_components:
-        comp.splitFactor = 200
+        comp.splitFactor = 500
 
 config = cfg.Config(components=selected_components,
                     sequence=sequence,
