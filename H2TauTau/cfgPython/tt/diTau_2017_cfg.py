@@ -30,10 +30,11 @@ def getHeppyOption(option, default):
 # Get all heppy options; set via '-o production' or '-o production=True'
 
 # production = True run on batch, production = False (or unset) run locally
-production = getHeppyOption('production', True)
+production = getHeppyOption('production', False)
 pick_events = getHeppyOption('pick_events', False)
-syncntuple = getHeppyOption('syncntuple', True)
+syncntuple = getHeppyOption('syncntuple', False)
 cmssw = getHeppyOption('cmssw', True)
+cmssw_reuse = getHeppyOption('cmssw_reuse', True)
 doSUSY = getHeppyOption('susy', False)
 computeSVfit = getHeppyOption('computeSVfit', False)
 data = getHeppyOption('data', False)
@@ -46,6 +47,9 @@ correct_recoil = getHeppyOption('correct_recoil', True)
 if doSUSY:
     cmssw = False
 
+if (not cmssw) or production:
+    cmssw_reuse = False
+
 tes_up = False
 tes_scale = 1.0
 if tes_up:
@@ -54,8 +58,10 @@ if tes_up:
 
 # Just to be sure
 if production:
-    syncntuple = False
+    # syncntuple = False
     pick_events = False
+
+httGenAna.filepath = '$CMSSW_BASE/src/CMGTools/H2TauTau/data/htt_scalefactors_v16_5.root'
 
 if reapplyJEC:
     if cmssw:
@@ -132,7 +138,8 @@ tauTauMT2Ana = cfg.Analyzer(
 
 fileCleaner = cfg.Analyzer(
     FileCleaner,
-    name='FileCleaner'
+    name='FileCleaner',
+    savepreproc = True if cmssw_reuse else False
 )
 
 # tau1Calibration = cfg.Analyzer(
@@ -260,12 +267,20 @@ data_list = data_tau
 #     dat.files = ['root://cms-xrd-global.cern.ch/'+f[30:] for f in dat.files]
 
 # import pdb;pdb.set_trace()
-samples = [b for b in backgrounds if b.name in ['W1JetsToLNu_LO']]#['WJetsToLNu_LO','W1JetsToLNu_LO','W2JetsToLNu_LO','W2JetsToLNu_LO_ext','W3JetsToLNu_LO','W3JetsToLNu_LO_ext','W4JetsToLNu_LO','W4JetsToLNu_LO_ext','W4JetsToLNu_LO_ext2','WJetsToLNu_LO_ext']] #+ sm_signals + sync_list + mssm_signals
+samples = [b for b in backgrounds if b.name in ['VVTo2L2Nu',
+                                                'VVTo2L2Nu_ext',
+                                                'WWTo1L1Nu2Q',
+                                                'WZTo2L2Q',
+                                                'WZTo1L3Nu',
+                                                'WZTo1L1Nu2Q',
+                                                'WZJToLLLNu',
+                                                'ZZTo4L',
+                                                'ZZTo2L2Q']]#['WJetsToLNu_LO','W1JetsToLNu_LO','W2JetsToLNu_LO','W2JetsToLNu_LO_ext','W3JetsToLNu_LO','W3JetsToLNu_LO_ext','W4JetsToLNu_LO','W4JetsToLNu_LO_ext','W4JetsToLNu_LO_ext2','WJetsToLNu_LO_ext']] #+ sm_signals + sync_list + mssm_signals
 # samples[0].files = ['/store/mc/RunIISummer16MiniAODv2/ST_t-channel_top_4f_inclusiveDecays_13TeV-powhegV2-madspin-pythia8_TuneCUETP8M1/MINIAODSIM/PUMoriond17_80X_mcRun2_asymptotic_2016_TrancheIV_v6-v1/80000/C8E3D90F-50B9-E611-9D8B-B083FED14CE0.root']
 # samples = [sync_list[0]]
 if doSUSY:
     samples = samples_susy #+ SignalSUSY[:1]
-split_factor = 1e4
+split_factor = 1e5
 
 for sample in data_list:
     sample.triggers = data_triggers
@@ -328,7 +343,7 @@ if not cmssw:
 ###             CHERRY PICK EVENTS              ###
 ###################################################
 if pick_events:
-    evtsToPick = [88930, 26229, 66496, 30256, 57121, 75121, 61113]
+    evtsToPick = [31945888]
 
     eventSelector.toSelect = evtsToPick
     sequence.insert(0, eventSelector)
@@ -363,7 +378,7 @@ if not production:
     selectedComponents = [selectedComponents[0]]
     selectedComponents[0].files = [selectedComponents[0].files[0]]
     for comp in selectedComponents:
-        comp.files = ['root://cms-xrd-global.cern.ch/'+f[30:] for f in comp.files]
+        # comp.files = ['root://cms-xrd-global.cern.ch/'+f[30:] for f in comp.files]
         comp.splitFactor = 1
         comp.fineSplitFactor = 1
     # comp.files = comp.files[13:20]
@@ -375,9 +390,14 @@ if doSUSY:
 
 preprocessor = None
 if cmssw:
-    sequence.append(fileCleaner)
-    cfg_name = "$CMSSW_BASE/src/CMGTools/H2TauTau/prod/h2TauTauMiniAOD_ditau_data_cfg.py" if data else "$CMSSW_BASE/src/CMGTools/H2TauTau/prod/h2TauTauMiniAOD_ditau_cfg.py"
-    preprocessor = CmsswPreprocessor(cfg_name, addOrigAsSecondary=False)
+    if cmssw_reuse and all([os.path.isfile('preprocessed_files/'+comp.name+'/cmsswPreProcessing.root') for comp in selectedComponents]):
+        print "Using Preprocessed files! Make sure you don't need to re-run preprocessor!"
+        for comp in selectedComponents:
+            comp.files = ['preprocessed_files/'+comp.name+'/cmsswPreProcessing.root']
+    else:
+        sequence.append(fileCleaner)
+        cfg_name = "$CMSSW_BASE/src/CMGTools/H2TauTau/prod/h2TauTauMiniAOD_ditau_data_cfg.py" if data else "$CMSSW_BASE/src/CMGTools/H2TauTau/prod/h2TauTauMiniAOD_ditau_cfg.py"
+        preprocessor = CmsswPreprocessor(cfg_name, addOrigAsSecondary=False)
 
 # the following is declared in case this cfg is used in input to the
 # heppy.py script
