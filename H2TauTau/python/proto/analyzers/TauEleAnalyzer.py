@@ -256,13 +256,7 @@ class TauEleAnalyzer(DiLeptonAnalyzer):
             used in the di-electron veto.
             pt 15, eta 2.5, dB relIso 0.3
         '''
-        if (leg.relIsoR(R=0.3, dBetaFactor=0.5, allCharged=0) > 0.3 or
-                abs(leg.eta()) > 2.5 or
-                leg.pt() < 15 or
-                not self.testVetoElectronID(leg) or
-                not self.testVertex(leg)):
-            return False
-        return True
+        return (leg.pt() > 15 and abs(leg.eta()) < 2.5 and self.testVetoElectronID(leg) and self.testVertex(leg) and leg.relIsoR(R=0.3, dBetaFactor=0.5, allCharged=0) < 0.3)
 
     def testTightOtherLepton(self, muon):
         '''Tight muon selection, no isolation requirement'''

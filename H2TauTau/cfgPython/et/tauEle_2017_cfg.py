@@ -43,11 +43,14 @@ production = getHeppyOption('production', False)
 pick_events = getHeppyOption('pick_events', False)
 syncntuple = getHeppyOption('syncntuple', True)
 cmssw = getHeppyOption('cmssw', True)
+cmssw_reuse = getHeppyOption('cmssw_reuse', True)
+doSUSY = getHeppyOption('susy', False)
 computeSVfit = getHeppyOption('computeSVfit', False)
 data = getHeppyOption('data', False)
 tes_string = getHeppyOption('tes_string', '') # '_tesup' '_tesdown'
 reapplyJEC = getHeppyOption('reapplyJEC', False)
 calibrateTaus = getHeppyOption('calibrateTaus', False) # done in taueleanalyzer because this way sucks.
+scaleTaus = getHeppyOption('scaleTaus', False)
 correct_recoil = getHeppyOption('correct_recoil', True)
 
 # For specific studies
@@ -55,6 +58,18 @@ add_iso_info = getHeppyOption('add_iso_info', False)
 add_tau_fr_info = getHeppyOption('add_tau_fr_info', False)
 
 shift = None # ??
+
+if doSUSY:
+    cmssw = False
+
+if (not cmssw) or production:
+    cmssw_reuse = False
+
+tes_up = False
+tes_scale = 1.0
+if tes_up:
+    scaleTaus = True
+    tes_scale = 1.03
 
 # Just to be sure
 if production:
@@ -147,12 +162,16 @@ eleWeighter = cfg.Analyzer(
     LeptonWeighter,
     name='LeptonWeighter_ele',
     scaleFactorFiles={
+        'trigger':('$CMSSW_BASE/src/CMGTools/H2TauTau/data/htt_scalefactors_v16_5.root', 'e_trg_binned'),
+        'iso':('$CMSSW_BASE/src/CMGTools/H2TauTau/data/htt_scalefactors_v16_5.root', 'e_iso_binned'),
+        'id':('$CMSSW_BASE/src/CMGTools/H2TauTau/data/htt_scalefactors_v16_5.root', 'e_id'),
+        'tracking':('$CMSSW_BASE/src/CMGTools/H2TauTau/data/htt_scalefactors_v16_5.root', 'e_trk'),
         # 'trigger':('$CMSSW_BASE/src/CMGTools/H2TauTau/data/htt_scalefactors_v3.root', 'trgIsoMu22_desy'),
-        'idiso':('$CMSSW_BASE/src/CMGTools/H2TauTau/data/htt_scalefactors_v5.root', 'e_idiso0p10_desy'),
-        'tracking':('$CMSSW_BASE/src/CMGTools/H2TauTau/data/htt_scalefactors_v5.root', 'e_trk'),
+        #'idiso':('$CMSSW_BASE/src/CMGTools/H2TauTau/data/htt_scalefactors_v5.root', 'e_idiso0p10_desy'),
+        #'tracking':('$CMSSW_BASE/src/CMGTools/H2TauTau/data/htt_scalefactors_v5.root', 'e_trk'),
     },
     dataEffFiles={
-        'trigger':('$CMSSW_BASE/src/CMGTools/H2TauTau/data/htt_scalefactors_v5.root', 'e_trgEle25eta2p1WPTight_desy'),
+        #'trigger':('$CMSSW_BASE/src/CMGTools/H2TauTau/data/htt_scalefactors_v5.root', 'e_trgEle25eta2p1WPTight_desy'),
     },
     lepton='leg1',
     disable=False
@@ -223,9 +242,9 @@ electronIsoCalc = cfg.Analyzer(
 
 fileCleaner = cfg.Analyzer(
     FileCleaner,
-    name='FileCleaner'
+    name='FileCleaner',
+    savepreproc = True if cmssw_reuse else False
 )
-
 
 ###################################################
 ###                  SEQUENCE                   ###
@@ -315,8 +334,13 @@ if not production:
 
 preprocessor = None
 if cmssw:
-    sequence.append(fileCleaner)
-    preprocessor = CmsswPreprocessor("$CMSSW_BASE/src/CMGTools/H2TauTau/prod/h2TauTauMiniAOD_etau_cfg.py", addOrigAsSecondary=False)
+    if cmssw_reuse and all([os.path.isfile('preprocessed_files/'+comp.name+'/cmsswPreProcessing.root') for comp in selectedComponents]):
+        print "Using Preprocessed files! Make sure you don't need to re-run preprocessor!"
+        for comp in selectedComponents:
+            comp.files = ['preprocessed_files/'+comp.name+'/cmsswPreProcessing.root']
+    else:
+        sequence.append(fileCleaner)
+        preprocessor = CmsswPreprocessor("$CMSSW_BASE/src/CMGTools/H2TauTau/prod/h2TauTauMiniAOD_etau_cfg.py", addOrigAsSecondary=False)
 
 # the following is declared in case this cfg is used in input to the
 # heppy.py script

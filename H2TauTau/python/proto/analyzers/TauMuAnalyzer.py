@@ -10,6 +10,7 @@ from CMGTools.H2TauTau.proto.analyzers.DiLeptonAnalyzer import DiLeptonAnalyzer
 from CMGTools.H2TauTau.proto.physicsobjects.DiObject import TauMuon, DirectDiTau
 from CMGTools.H2TauTau.proto.analyzers.HTTGenAnalyzer import HTTGenAnalyzer
 
+from PhysicsTools.HeppyCore.utils.deltar import deltaR
 
 
 class TauMuAnalyzer(DiLeptonAnalyzer):
@@ -260,16 +261,30 @@ class TauMuAnalyzer(DiLeptonAnalyzer):
                         muon.isGlobalMuon() and
                         muon.isTrackerMuon() and
                         muon.isPFMuon() and
-                        abs(muon.dz()) < 0.2 and
+                        self.testVertex(muon) and
                         self.testLeg1Iso(muon, 0.3)
                         ]
+        nLeptons = len(looseLeptons)
 
-        if event.leg1 not in looseLeptons:
-            looseLeptons.append(event.leg1)
-
+        if event.leg1 not in looseLeptons: 
+            looseLeptons.append(event.leg1) #TODO why ?
+        
+        # by comparison with TauEleAnalyser.py
+        if nLeptons < 2:
+            return True
+        ##
+        
+        # if there is an opposite-charge muon pair in the event with muons separated by dR>0.15 and both passing the loose selection
         if any(l.charge() > 0 for l in looseLeptons) and \
            any(l.charge() < 0 for l in looseLeptons):
-            return False
+            looseLeptons_positives = [l for l in looseLeptons if l.charge() > 0]
+            looseLeptons_negatives = [l for l in looseLeptons if l.charge() < 0]
+            for l_pos in looseLeptons_positives :
+                for l_neg in looseLeptons_negatives :
+                    dR = deltaR(l_pos.eta(), l_pos.phi(),
+                                l_neg.eta(), l_neg.phi())
+                    if dR>0.15 :
+                        return False
 
         return True
 
