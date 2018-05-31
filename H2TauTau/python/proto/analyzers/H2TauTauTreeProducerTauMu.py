@@ -37,6 +37,8 @@ class H2TauTauTreeProducerTauMu(H2TauTauTreeProducer):
         self.var(self.tree, 'trigger_matched_isotkmu22')
         self.var(self.tree, 'trigger_matched_isomu19tau20')
 
+        self.var(self.tree, 'trigger_matched_singlemuon')
+
         if hasattr(self.cfg_ana, 'addIsoInfo') and self.cfg_ana.addIsoInfo:
             self.var(self.tree, 'l1_puppi_iso_pt')
             self.var(self.tree, 'l1_puppi_iso04_pt')
@@ -181,6 +183,8 @@ class H2TauTauTreeProducerTauMu(H2TauTauTreeProducer):
         self.fill(self.tree, 'trigger_matched_isomu22', any('IsoMu22_v' in name for name in matched_paths))
         self.fill(self.tree, 'trigger_matched_isotkmu22', any('IsoTkMu22_v' in name for name in matched_paths))
         self.fill(self.tree, 'trigger_matched_isomu19tau20', any('IsoMu19_eta2p1_LooseIsoPFTau20_v' in name for name in matched_paths))
+
+        self.fill(self.tree, 'trigger_matched_singlemuon', any('Mu22' in name for name in matched_paths))
 
         if hasattr(self.cfg_ana, 'addTauTrackInfo') and self.cfg_ana.addTauTrackInfo:
             # Leading CH part
