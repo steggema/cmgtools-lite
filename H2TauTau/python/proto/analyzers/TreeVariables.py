@@ -61,7 +61,9 @@ event_vars = [
     Variable('passBadMuonFilter', type=int),
     Variable('passBadChargedHadronFilter', type=int),
     Variable('badMuonMoriond2017', type=int),
-    Variable('badCloneMuonMoriond2017', type=int)
+    Variable('badCloneMuonMoriond2017', type=int),
+    Variable('passBadGlobalMuonFilter', type=int),
+    Variable('passcloneGlobalMuonFilter', type=int)
 ]
 
 # di-tau object variables

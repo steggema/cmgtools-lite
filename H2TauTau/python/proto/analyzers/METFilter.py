@@ -15,6 +15,8 @@ class METFilter(Analyzer):
 
         self.handles['badChargedHadronFilter'] = AutoHandle('BadChargedCandidateFilter', 'bool', mayFail=True)
         self.handles['badPFMuonFilter'] = AutoHandle('BadPFMuonFilter', 'bool', mayFail=True)
+        self.handles['badGlobalMuonTagger'] = AutoHandle('badGlobalMuonTaggerMAOD', 'bool', mayFail=True)
+        self.handles['cloneGlobalMuonTagger'] = AutoHandle('cloneGlobalMuonTaggerMAOD', 'bool', mayFail=True)
 
     def beginLoop(self, setup):
         super(METFilter, self).beginLoop(setup)
@@ -26,6 +28,8 @@ class METFilter(Analyzer):
 
         self.count.register('pass bad muon')
         self.count.register('pass bad charged hadron')
+        self.count.register('bad global muon')
+        self.count.register('clone global muon')
 
     def process(self, event):
         if self.autoAccept:
@@ -60,12 +64,29 @@ class METFilter(Analyzer):
             event.passBadMuonFilter = True
             event.passBadChargedHadronFilter = True
             return True
-
+        
         event.passBadMuonFilter = self.handles['badPFMuonFilter'].product()[0]
         event.passBadChargedHadronFilter = self.handles['badChargedHadronFilter'].product()[0]
         if event.passBadMuonFilter:
             self.count.inc('pass bad muon')
         if event.passBadChargedHadronFilter:
             self.count.inc('pass bad charged hadron')
+        
+
+        self.handles['badGlobalMuonTagger'].ReallyLoad(self.handles['badGlobalMuonTagger'].event)
+        self.handles['cloneGlobalMuonTagger'].ReallyLoad(self.handles['cloneGlobalMuonTagger'].event)
+
+        if not self.handles['badGlobalMuonTagger'].isValid() or not self.handles['cloneGlobalMuonTagger'].isValid():
+            print 'WARNING: Bad global muon filter and clone global muon filters only work with CMSSW pre-sequence'
+            event.passBadGlobalMuonFilter = True
+            event.passcloneGlobalMuonFilter = True
+            return True
+
+        event.passBadGlobalMuonFilter = not self.handles['badGlobalMuonTagger'].product()[0]
+        event.passcloneGlobalMuonFilter = not self.handles['cloneGlobalMuonTagger'].product()[0]
+        if event.passBadGlobalMuonFilter:
+            self.count.inc('bad global muon')
+        if event.passcloneGlobalMuonFilter:
+            self.count.inc('clone global muon')
         
         return True

@@ -43,6 +43,11 @@ def addMETFilters(process):
     process.BadChargedCandidateFilter.PFCandidates = cms.InputTag("packedPFCandidates")
     process.BadChargedCandidateFilter.taggingMode = cms.bool(True)
 
+    process.load('RecoMET.METFilters.badGlobalMuonTaggersMiniAOD_cff')
+    #switch on tagging mode:
+    process.badGlobalMuonTaggerMAOD.taggingMode = cms.bool(True)
+    process.cloneGlobalMuonTaggerMAOD.taggingMode = cms.bool(True)
+
 def addNewTauID(process):
     process.load('RecoTauTag.Configuration.loadRecoTauTagMVAsFromPrepDB_cfi')
     
