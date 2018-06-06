@@ -46,6 +46,26 @@ double getTauIDWeight(double pt, double eta, double dm) { // yeah double dm
     return 0.97;
 }
 
+double getTauIDWeightVLoose(double pt, double eta, double dm) {
+  return 0.99;
+}
+
+double getTauIDWeightLoose(double pt, double eta, double dm) {
+  return 0.99;
+}
+
+double getTauIDWeightMedium(double pt, double eta, double dm) {
+  return 0.97;
+}
+
+double getTauIDWeightTight(double pt, double eta, double dm) {
+  return 0.95;
+}
+
+double getTauIDWeightVTight(double pt, double eta, double dm) {
+  return 0.93;
+}
+
 double getMuToTauWeightLoose(double eta) {
     auto aeta = std::abs(eta);
     if (aeta < 0.4)
@@ -61,12 +81,63 @@ double getMuToTauWeightLoose(double eta) {
     return 1.;
 }
 
+double getMuToTauWeightTight(double eta) {
+    auto aeta = std::abs(eta);
+    if (aeta < 0.4)
+        return 1.47;
+    if (aeta < 0.8)
+        return 1.55;
+    if (aeta < 1.2)
+        return 1.33;
+    if (aeta < 1.7)
+        return 1.72;
+    if (aeta < 2.3)
+        return 2.50;
+    return 1.;
+}
+
 double getEToTauWeightVLoose(double eta) {
     auto aeta = std::abs(eta);
     if (aeta < 1.5)
         return 1.21;
     if (aeta > 1.5)
         return 1.38;
+    return 1.;
+}
+
+double getEToTauWeightLoose(double eta) {
+    auto aeta = std::abs(eta);
+    if (aeta < 1.5)
+        return 1.32;
+    if (aeta > 1.5)
+        return 1.38;
+    return 1.;
+}
+
+double getEToTauWeightMedium(double eta) {
+    auto aeta = std::abs(eta);
+    if (aeta < 1.5)
+        return 1.32;
+    if (aeta > 1.5)
+        return 1.53;
+    return 1.;
+}
+
+double getEToTauWeightTight(double eta) {
+    auto aeta = std::abs(eta);
+    if (aeta < 1.5)
+        return 1.40;
+    if (aeta > 1.5)
+        return 1.90;
+    return 1.;
+}
+
+double getEToTauWeightVTight(double eta) {
+    auto aeta = std::abs(eta);
+    if (aeta < 1.5)
+        return 1.21;
+    if (aeta > 1.5)
+        return 1.97;
     return 1.;
 }
 
