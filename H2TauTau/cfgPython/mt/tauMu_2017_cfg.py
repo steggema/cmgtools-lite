@@ -39,7 +39,7 @@ production = getHeppyOption('production', True)
 pick_events = getHeppyOption('pick_events', False)
 syncntuple = getHeppyOption('syncntuple', True)
 cmssw = getHeppyOption('cmssw', True)
-cmssw_reuse = getHeppyOption('cmssw_reuse', True)
+cmssw_reuse = getHeppyOption('cmssw_reuse', False)
 computeSVfit = getHeppyOption('computeSVfit', False)
 data = getHeppyOption('data', False)
 tes_string = getHeppyOption('tes_string', '') # '_tesup' '_tesdown'
@@ -132,10 +132,10 @@ tauWeighter = cfg.Analyzer(
     name='LeptonWeighter_tau',
     scaleFactorFiles={},
     lepton='leg2',
-    disable=True,
+    disable=False,
 )
 
-#TODO weights to be modified
+
 muonWeighter = cfg.Analyzer(
     LeptonWeighter,
     name='LeptonWeighter_mu',
@@ -199,11 +199,12 @@ metFilter = cfg.Analyzer(
     ]
 )
 
-# seems like leg1 == muon and leg2 == tauh ?
+
 tauIDWeighter = cfg.Analyzer(
     TauIDWeighter,
     name='TauIDWeighter',
-    legs=['leg2']
+    legs=['leg2'],
+    channel = 'mt'
 )
 
 tauIsoCalc = cfg.Analyzer(
@@ -287,7 +288,7 @@ for sample in data_list:
 selectedComponents = samples # data_list if data else backgrounds_mu + sm_signals #+ mssm_signals
 
 if pick_events:
-    eventSelector.toSelect = [1310750]
+    eventSelector.toSelect = [71838,55848]
     sequence.insert(0, eventSelector)
 
 
@@ -315,7 +316,7 @@ if cmssw:
         for comp in selectedComponents:
             comp.files = ['preprocessed_files/'+comp.name+'/cmsswPreProcessing.root']
     else:
-        sequence.append(fileCleaner)
+        #sequence.append(fileCleaner)
         fname = "$CMSSW_BASE/src/CMGTools/H2TauTau/prod/h2TauTauMiniAOD_mutau_data_cfg.py" if data else "$CMSSW_BASE/src/CMGTools/H2TauTau/prod/h2TauTauMiniAOD_mutau{tes_string}_cfg.py".format(tes_string=tes_string)
         preprocessor = CmsswPreprocessor(fname, addOrigAsSecondary=False)
         #selectedComponents[0].files = ['2018-05-22-02/HiggsSUSYBB1000/cmsswPreProcessing.root']
@@ -323,6 +324,20 @@ if cmssw:
 # the following is declared in case this cfg is used in input to the
 # heppy.py script
 from PhysicsTools.HeppyCore.framework.eventsfwlite import Events
+
+hack_evt_sel = False
+
+if hack_evt_sel:
+    #import pdb; pdb.set_trace()
+    #from CMGTools.RootTools.samples.ComponentCreator import ComponentCreator
+    #mycreator = ComponentCreator()
+    #HiggsSUSYBB1000_picked = mycreator.makeMCComponent(
+    #"HiggsSUSYBB1000_picked", "/SUSYGluGluToBBHToTauTau_M-1000_TuneCUETP8M1_13TeV-pythia8/RunIISummer16MiniAODv2-PUMoriond17_80X_mcRun2_asymptotic_2016_TrancheIV_v6-v1/MINIAODSIM", "CMS", ".*root", 1.0)
+    
+    selectedComponents = [selectedComponents[0]]
+    selectedComponents[0].files = ['/afs/cern.ch/user/l/ltortero/H2TauTau_weights_debug/picked_events.root']
+
+
 config = cfg.Config(components=selectedComponents,
                     sequence=sequence,
                     services=[],
