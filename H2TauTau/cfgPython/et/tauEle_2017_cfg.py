@@ -39,7 +39,7 @@ from CMGTools.H2TauTau.htt_ntuple_base_cff import commonSequence, puFileData, pu
 # Get all heppy options; set via "-o production" or "-o production=True"
 
 # production = True run on batch, production = False (or unset) run locally
-production = getHeppyOption('production', False)
+production = getHeppyOption('production', True)
 pick_events = getHeppyOption('pick_events', False)
 syncntuple = getHeppyOption('syncntuple', True)
 cmssw = getHeppyOption('cmssw', True)
@@ -224,7 +224,11 @@ metFilter = cfg.Analyzer(
 tauIDWeighter = cfg.Analyzer(
     TauIDWeighter,
     name='TauIDWeighter',
-    legs=['leg2']
+    legs=['leg2'],
+    channel = 'et',
+    ele_WP = 4,
+    mu_WP = 2,
+    tau_WP = 4,
 )
 
 tauIsoCalc = cfg.Analyzer(
@@ -254,13 +258,12 @@ if calibrateTaus:
     sequence.insert(sequence.index(httGenAna), tauP4Scaler)
 sequence.insert(sequence.index(httGenAna)+1, tauEleAna)
 sequence.append(tauDecayModeWeighter)
-sequence.append(tauFakeRateWeighter) # summer 2013 ??
-#sequence.append(eleTauFakeWeighter)
+#sequence.append(tauFakeRateWeighter) # summer 2013 ??
 sequence.append(tauWeighter)
 sequence.append(eleWeighter)
-sequence.insert(sequence.index(tauEleAna) + 1, dyLLReweighterTauEle)
+#sequence.insert(sequence.index(tauEleAna) + 1, dyLLReweighterTauEle)
 if syncntuple:
-    sequence.append(tauIDWeighter) # adapt ?!
+    sequence.append(tauIDWeighter)
 sequence.append(eleMuMT2Ana)
 sequence.append(metFilter)
 

@@ -204,7 +204,10 @@ tauIDWeighter = cfg.Analyzer(
     TauIDWeighter,
     name='TauIDWeighter',
     legs=['leg2'],
-    channel = 'mt'
+    channel = 'mt',
+    ele_WP = 1,
+    mu_WP = 4,
+    tau_WP = 4,
 )
 
 tauIsoCalc = cfg.Analyzer(
@@ -234,12 +237,12 @@ if calibrateTaus:
     sequence.insert(sequence.index(httGenAna), tauP4Scaler)
 sequence.insert(sequence.index(httGenAna)+1, tauMuAna) # sequence.insert(sequence.index(httGenAna), tauTauAna) initially
 sequence.append(tauDecayModeWeighter)
-sequence.append(tauFakeRateWeighter) # summer 2013 ??
-sequence.append(muTauFakeWeighter)
+#sequence.append(tauFakeRateWeighter) # summer 2013 ??
+#sequence.append(muTauFakeWeighter) # included in TauIDWeighter
 sequence.append(tauWeighter)
 sequence.append(muonWeighter)
 if syncntuple:
-    sequence.append(tauIDWeighter) # adapt ?!
+    sequence.append(tauIDWeighter)
 
 sequence.append(tauMuMT2Ana)
 sequence.append(metFilter)

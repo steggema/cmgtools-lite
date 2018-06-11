@@ -86,7 +86,7 @@ class LeptonWeighter(Analyzer):
 
                 if sf_name in self.cfg_ana.scaleFactorFiles:
                     lep.weight *= getattr(lep, 'weight_'+sf_name)
-                import pdb; pdb.set_trace()
+
             for sf_name, sf in self.dataEffs.items():
                 pt = lep.pt()
                 eta = lep.eta()

@@ -62,5 +62,5 @@ class MuTauFakeReweighter(Analyzer):
         
         setattr(event,'MuTauFakeRateSF',event.zllWeight)
 
-        #event.eventWeight = event.eventWeight * event.zllWeight
+        event.eventWeight = event.eventWeight * event.zllWeight
         return True

@@ -37,15 +37,6 @@ double getDYWeightWS(double genMass, double genpT) {
     return zpt_weight->eval(args.data());
 }
 
-double getTauIDWeight(double pt, double eta, double dm) { // yeah double dm
-    // auto ws = EffProvider::instance().ws();
-    // RooFunctor* tau_id_weight = ws.function("t_iso_mva_t_pt40_eta2p1_sf")->functor(ws.argSet("t_pt,t_eta,t_dm"));
-    // auto args = std::vector<double>{pt, eta, dm};
-    // auto weight = tau_id_weight->eval(args.data());
-    // std::cout << "Tau ID weight for pt, eta, dm" << pt << ", " << eta << ", " << dm << " is " << weight << std::endl;
-  return 0.97;
-}
-
 double getTauIDWeightVLoose(double pt, double eta, double dm) {
   return 0.99;
 }
@@ -66,7 +57,27 @@ double getTauIDWeightVTight(double pt, double eta, double dm) {
   return 0.93;
 }
 
-double getMuToTauWeightLoose(double eta) {
+double getTauIDWeight(double pt, double eta, double dm, int WP) { // yeah double dm
+    // auto ws = EffProvider::instance().ws();
+    // RooFunctor* tau_id_weight = ws.function("t_iso_mva_t_pt40_eta2p1_sf")->functor(ws.argSet("t_pt,t_eta,t_dm"));
+    // auto args = std::vector<double>{pt, eta, dm};
+    // auto weight = tau_id_weight->eval(args.data());
+    // std::cout << "Tau ID weight for pt, eta, dm" << pt << ", " << eta << ", " << dm << " is " << weight << std::endl;
+  //return 0.97;    
+  if (WP == 1)
+    return getTauIDWeightVLoose(pt, eta, dm);
+  if (WP == 2)
+    return getTauIDWeightLoose(pt, eta, dm);
+  if (WP == 3)
+    return getTauIDWeightMedium(pt, eta, dm);
+  if (WP == 4)
+    return getTauIDWeightTight(pt, eta, dm);
+  if (WP == 5)
+    return getTauIDWeightVTight(pt, eta, dm);
+  return 1.; // default = medium ?
+}
+
+double getMuToTauWeightLoose(double pt, double eta, double dm) {
     auto aeta = std::abs(eta);
     if (aeta < 0.4)
         return 1.22;
@@ -81,7 +92,7 @@ double getMuToTauWeightLoose(double eta) {
     return 1.;
 }
 
-double getMuToTauWeightTight(double eta) {
+double getMuToTauWeightTight(double pt, double eta, double dm) {
     auto aeta = std::abs(eta);
     if (aeta < 0.4)
         return 1.47;
@@ -96,7 +107,15 @@ double getMuToTauWeightTight(double eta) {
     return 1.;
 }
 
-double getEToTauWeightVLoose(double eta) {
+double getMuToTauWeight(double pt, double eta, double dm, int WP) {
+  if (WP == 2)
+    return getMuToTauWeightLoose(pt, eta, dm);
+  if (WP == 4)
+    return getMuToTauWeightTight(pt, eta, dm);
+  return 1.; // default = 1 ?
+}
+
+double getEToTauWeightVLoose(double pt, double eta, double dm) {
     auto aeta = std::abs(eta);
     if (aeta < 1.5)
         return 1.21;
@@ -105,7 +124,7 @@ double getEToTauWeightVLoose(double eta) {
     return 1.;
 }
 
-double getEToTauWeightLoose(double eta) {
+double getEToTauWeightLoose(double pt, double eta, double dm) {
     auto aeta = std::abs(eta);
     if (aeta < 1.5)
         return 1.32;
@@ -114,7 +133,7 @@ double getEToTauWeightLoose(double eta) {
     return 1.;
 }
 
-double getEToTauWeightMedium(double eta) {
+double getEToTauWeightMedium(double pt, double eta, double dm) {
     auto aeta = std::abs(eta);
     if (aeta < 1.5)
         return 1.32;
@@ -123,7 +142,7 @@ double getEToTauWeightMedium(double eta) {
     return 1.;
 }
 
-double getEToTauWeightTight(double eta) {
+double getEToTauWeightTight(double pt, double eta, double dm) {
     auto aeta = std::abs(eta);
     if (aeta < 1.5)
         return 1.40;
@@ -132,7 +151,7 @@ double getEToTauWeightTight(double eta) {
     return 1.;
 }
 
-double getEToTauWeightVTight(double eta) {
+double getEToTauWeightVTight(double pt, double eta, double dm) {
     auto aeta = std::abs(eta);
     if (aeta < 1.5)
         return 1.21;
@@ -141,12 +160,27 @@ double getEToTauWeightVTight(double eta) {
     return 1.;
 }
 
-double getTauWeight(int gen_match, double pt, double eta, double dm) {
+double getEToTauWeight(double pt, double eta, double dm, int WP) {
+  if (WP == 1)
+    return getEToTauWeightVLoose(pt, eta, dm);
+  if (WP == 2)
+    return getEToTauWeightLoose(pt, eta, dm);
+  if (WP == 3)
+    return getEToTauWeightMedium(pt, eta, dm);
+  if (WP == 4)
+    return getEToTauWeightTight(pt, eta, dm);
+  if (WP == 5)
+    return getEToTauWeightVTight(pt, eta, dm);
+  return 1.; // default = 1 ?
+}
+
+double getTauWeight(int gen_match, double pt, double eta, double dm, int ele_WP, int mu_WP, int tau_WP) {
+  // 1 = VLoose .... 5 = VTight
     if (gen_match == 5)
-        return getTauIDWeight(pt, eta, dm);
+        return getTauIDWeight(pt, eta, dm, tau_WP);
     if (gen_match == 2 || gen_match == 4)
-        return getMuToTauWeightLoose(eta);
+        return getMuToTauWeight(pt, eta, dm, mu_WP);
     if (gen_match == 1 || gen_match == 3)
-        return getEToTauWeightVLoose(eta);
+        return getEToTauWeight(pt, eta, dm, ele_WP);
     return 1.;
 }

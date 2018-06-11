@@ -88,9 +88,9 @@ class H2TauTauTreeProducerTauEle(H2TauTauTreeProducer):
             if pt_charged > 0.:
                 self.fill(self.tree, 'l2_nc_ratio', (pt_charged - pt_neutral)/(pt_charged + pt_neutral))
 
-        self.fill(self.tree, 'l2_weight_fakerate', event.tauFakeRateWeightUp)
-        self.fill(self.tree, 'l2_weight_fakerate_up', event.tauFakeRateWeightDown)
-        self.fill(self.tree, 'l2_weight_fakerate_down', event.tauFakeRateWeight)
+        self.fill(self.tree, 'l2_weight_fakerate', getattr(event, 'tauFakeRateWeight', -99))
+        self.fill(self.tree, 'l2_weight_fakerate_up', getattr(event, 'tauFakeRateWeightUp', -99))
+        self.fill(self.tree, 'l2_weight_fakerate_down', getattr(event, 'tauFakeRateWeightDown', -99))
 
         fired_triggers = [info.name for info in getattr(event, 'trigger_infos', []) if info.fired]
 
@@ -121,6 +121,6 @@ class H2TauTauTreeProducerTauEle(H2TauTauTreeProducer):
                 track = tau.isolationChargedHadrCands()[i_lead_ch].get()
                 self.fillTrackInfo(track, 'tau_leadiso_ch')
 
-        self.fill(self.tree, 'weight_zll', event.zllWeight)
+        self.fill(self.tree, 'weight_zll', getattr(event, 'zllWeight', -99))
 
         self.fillTree(event)

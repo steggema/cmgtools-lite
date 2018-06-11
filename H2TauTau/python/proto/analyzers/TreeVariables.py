@@ -38,8 +38,9 @@ event_vars = [
     Variable('rho', lambda ev : ev.rho),
     Variable('weight', lambda ev : ev.eventWeight),
     Variable('weight_vertex', lambda ev : ev.puWeight),
-    Variable('TauID_weight_l1', lambda ev : ev.IDweightleg1 if hasattr(ev, 'IDweightleg1') else 1.),
-    Variable('TauID_weight_l2', lambda ev : ev.IDweightleg2 if hasattr(ev, 'IDweightleg2') else 1.),
+    Variable('TauID_weight_l1', lambda ev : getattr(ev, 'IDweightleg1', -99.)),
+    Variable('TauID_weight_l2', lambda ev : getattr(ev, 'IDweightleg2', -99.)),
+    Variable('MuTauFakeRateSF', lambda ev : getattr(ev, 'MuTauFakeRateSF', -99.)),
     # # Add back for embedded samples once needed
     # Variable('weight_embed', lambda ev : getattr(ev, 'embedWeight', 1.)),
     Variable('weight_njet', lambda ev : ev.NJetWeight),

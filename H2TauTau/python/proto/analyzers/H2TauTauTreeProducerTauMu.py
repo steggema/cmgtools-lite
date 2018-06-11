@@ -168,10 +168,9 @@ class H2TauTauTreeProducerTauMu(H2TauTauTreeProducer):
             if pt_charged > 0.:
                 self.fill(self.tree, 'l2_nc_ratio', (pt_charged - pt_neutral)/(pt_charged + pt_neutral))
 
-
-        self.fill(self.tree, 'l2_weight_fakerate', event.tauFakeRateWeightUp)
-        self.fill(self.tree, 'l2_weight_fakerate_up', event.tauFakeRateWeightDown)
-        self.fill(self.tree, 'l2_weight_fakerate_down', event.tauFakeRateWeight)
+        self.fill(self.tree, 'l2_weight_fakerate', getattr(event, 'tauFakeRateWeight', -99))
+        self.fill(self.tree, 'l2_weight_fakerate_up', getattr(event, 'tauFakeRateWeightUp', -99))
+        self.fill(self.tree, 'l2_weight_fakerate_down', getattr(event, 'tauFakeRateWeightDown', -99))
 
         fired_triggers = [info.name for info in getattr(event, 'trigger_infos', []) if info.fired]
 
@@ -246,3 +245,4 @@ class H2TauTauTreeProducerTauMu(H2TauTauTreeProducer):
                 self.fillParticle(self.tree, 'l2_hltL2Tau30eta2p2', tau.hltL2Tau30eta2p2)
 
         self.fillTree(event)
+        #import pdb; pdb.set_trace() # weight lt test
