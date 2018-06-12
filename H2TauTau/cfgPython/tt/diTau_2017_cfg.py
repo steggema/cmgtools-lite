@@ -266,14 +266,7 @@ from CMGTools.H2TauTau.proto.samples.summer16.sms import samples_susy
 from CMGTools.H2TauTau.proto.samples.summer16.triggers_tauTau import mc_triggers, mc_triggerfilters, data_triggers, data_triggerfilters
 
 data_list = data_tau
-# data_list = [dat for dat in data_tau if dat.name in ['Tau_Run2016D_03Feb2017', 'Tau_Run2016F_03Feb2017', 'Tau_Run2016H_03Feb2017_v2', 'Tau_Run2016H_03Feb2017_v3']]
-# for dat in data_list:
-#     dat.files = ['root://cms-xrd-global.cern.ch/'+f[30:] for f in dat.files]
-
-# import pdb;pdb.set_trace()
-samples = [sync_list[0]] # [b for b in backgrounds if b.name in ['W1JetsToLNu_LO']]#['WJetsToLNu_LO','W1JetsToLNu_LO','W2JetsToLNu_LO','W2JetsToLNu_LO_ext','W3JetsToLNu_LO','W3JetsToLNu_LO_ext','W4JetsToLNu_LO','W4JetsToLNu_LO_ext','W4JetsToLNu_LO_ext2','WJetsToLNu_LO_ext']] #+ sm_signals + sync_list + mssm_signals
-# samples[0].files = ['/store/mc/RunIISummer16MiniAODv2/ST_t-channel_top_4f_inclusiveDecays_13TeV-powhegV2-madspin-pythia8_TuneCUETP8M1/MINIAODSIM/PUMoriond17_80X_mcRun2_asymptotic_2016_TrancheIV_v6-v1/80000/C8E3D90F-50B9-E611-9D8B-B083FED14CE0.root']
-# samples = [sync_list[0]]
+samples = backgrounds + sm_signals + sync_list + mssm_signals 
 if doSUSY:
     samples = samples_susy #+ SignalSUSY[:1]
 split_factor = 1e4
@@ -339,7 +332,7 @@ if not cmssw:
 ###             CHERRY PICK EVENTS              ###
 ###################################################
 if pick_events:
-    evtsToPick = [31945888]
+    evtsToPick = [88930, 26229, 66496, 30256, 57121, 75121, 61113]
 
     eventSelector.toSelect = evtsToPick
     sequence.insert(0, eventSelector)
