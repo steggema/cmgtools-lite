@@ -63,6 +63,7 @@ vars['l1_eid_tight'] = {'std': 'l1_eid_tight', 'sync': 'id_e_cut_tight_1'}
 vars['l1_weight_trigger'] = {'std': 'l1_weight_trigger', 'sync': 'trigweight_1'}
 vars['l1_weight_tracking'] = {'std': 'l1_weight_tracking', 'sync': 'trackingweight_1'}
 vars['l1_weight_idiso'] = {'std': 'l1_weight_idiso', 'sync': 'idisoweight_1'}
+#vars['l1_weight'] = {'std': 'l1_weight', 'sync': 'effweight'}
 vars['l1_againstElectronLooseMVA5'] = {'std': 'l1_againstElectronLooseMVA5', 'sync': 'againstElectronLooseMVA5_1'}
 vars['l1_againstElectronMediumMVA5'] = {'std': 'l1_againstElectronMediumMVA5', 'sync': 'againstElectronMediumMVA5_1'}
 vars['l1_againstElectronTightMVA5'] = {'std': 'l1_againstElectronTightMVA5', 'sync': 'againstElectronTightMVA5_1'}
@@ -215,6 +216,9 @@ vars['bjet2_id_pu'] = {'std': 'bjet2_id_pu', 'sync': 'bpuid_2'}
 vars['bjet2_csv'] = {'std': 'bjet2_csv', 'sync': 'bcsv_2'}
 
 # trigger names
+#vars['trigger_matched_isomu22'] = {'std':'trigger_matched_isomu22', 'sync':'trg_singlemuon'} #?
+vars['trigger_matched_singlemuon'] = {'std':'trigger_matched_singlemuon', 'sync':'trg_singlemuon'}
+
 vars['trigger_ditau35'] = {'std':'trigger_ditau35', 'sync':'trg_fired_doubletau'}
 vars['trigger_ditau35_combiso'] = {'std':'trigger_ditau35_combiso', 'sync':'trg_fired_doubletau_combiso'}
 vars['trigger_singletau140'] = {'std':'trigger_singletau140', 'sync':'trg_fired_singletau'}

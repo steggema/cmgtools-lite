@@ -138,6 +138,7 @@ class EmbedWeighter( Analyzer ):
         if self.cfg_ana.verbose:
             print self.name, 'efficiency =', self.weight
         event.eventWeight *= self.weight
+
         event.embedWeight = self.weight
         self.averages['weight'].add( self.weight )
         return True

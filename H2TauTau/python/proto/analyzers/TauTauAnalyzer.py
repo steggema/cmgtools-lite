@@ -190,6 +190,10 @@ class TauTauAnalyzer(DiLeptonAnalyzer):
                 continue
             if not self.testLegKine(pyl, ptcut=10, etacut=2.4):
                 continue
+            if not abs(pyl.dxy()) <0.045:
+                continue
+            if not abs(pyl.dz()) <0.2:
+                continue
             leptons.append(pyl)
         return leptons
 
@@ -207,6 +211,14 @@ class TauTauAnalyzer(DiLeptonAnalyzer):
                 continue
             if not self.testLegKine(pyl, ptcut=10, etacut=2.5):
                 continue
+            if not pyl.physObj.passConversionVeto():
+                continue
+            if not pyl.lostInner()<=1:
+                continue
+            if not abs(pyl.dxy()) <0.045:
+                continue
+            if not abs(pyl.dz()) <0.2:
+                continue
             otherLeptons.append(pyl)
         return otherLeptons
 
@@ -215,10 +227,10 @@ class TauTauAnalyzer(DiLeptonAnalyzer):
         # RIC: relaxed
         return (abs(leg.charge()) == 1 and  # RIC: ensure that taus have abs(charge) == 1
                 self.testTauVertex(leg) and
-                leg.tauID(iso) < isocut and
-                leg.pt() > leg_pt and
-                abs(leg.eta()) < leg_eta and
-                leg.tauID('decayModeFinding') > 0.5)
+                leg.tauID(iso) <= isocut and
+                leg.pt() >= leg_pt and
+                abs(leg.eta()) <= leg_eta and
+                leg.tauID('decayModeFinding') >= 0.5)
 
     def testLeg1(self, leg, isocut):
         leg_pt = self.cfg_ana.pt1
@@ -237,7 +249,7 @@ class TauTauAnalyzer(DiLeptonAnalyzer):
         # Just checks if the primary vertex the tau was reconstructed with
         # corresponds to the one used in the analysis
         # isPV = abs(tau.vertex().z() - tau.associatedVertex.z()) < 0.2
-        isPV = abs(tau.leadChargedHadrCand().dz()) < 0.2
+        isPV = abs(tau.leadChargedHadrCand().dz()) <= 0.2
         return isPV
 
     def testVertex(self, lepton, dxy=0.045, dz=0.2):
@@ -399,7 +411,10 @@ class TauTauAnalyzer(DiLeptonAnalyzer):
         # scale leptons
         for lep in leps:
             self.Scale(lep, ptSelGentauleps, ptSelGenleps, event)
-        
+            for dilep in diLeptons:
+                for leg in [dilep.leg1(), dilep.leg2()]:
+                    if leg.tau==lep.tau and (not hasattr(leg, 'unscaledP4')):
+                            leg.unscaledP4 = lep.unscaledP4
 
     def Scale(self, tau, ptSelGentauleps, ptSelGenleps, event):
         # this function should take values of scales from a file
