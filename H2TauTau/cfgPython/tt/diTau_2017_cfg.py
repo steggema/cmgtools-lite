@@ -30,9 +30,9 @@ def getHeppyOption(option, default):
 # Get all heppy options; set via '-o production' or '-o production=True'
 
 # production = True run on batch, production = False (or unset) run locally
-production = getHeppyOption('production', False)
+production = getHeppyOption('production', True)
 pick_events = getHeppyOption('pick_events', False)
-syncntuple = getHeppyOption('syncntuple', False)
+syncntuple = getHeppyOption('syncntuple', True)
 cmssw = getHeppyOption('cmssw', True)
 cmssw_reuse = getHeppyOption('cmssw_reuse', True)
 doSUSY = getHeppyOption('susy', False)
@@ -249,7 +249,11 @@ metFilter = cfg.Analyzer(
 tauIDWeighter = cfg.Analyzer(
     TauIDWeighter,
     name='TauIDWeighter',
-    legs=['leg1', 'leg2']
+    legs=['leg1', 'leg2'],
+    channel = 'tt',
+    ele_WP = 1,
+    mu_WP = 2,
+    tau_WP = 3,
 )
 
 ###################################################
@@ -265,7 +269,7 @@ data_list = data_tau
 samples = backgrounds + sm_signals + sync_list + mssm_signals 
 if doSUSY:
     samples = samples_susy #+ SignalSUSY[:1]
-split_factor = 1e5
+split_factor = 1e4
 
 for sample in data_list:
     sample.triggers = data_triggers

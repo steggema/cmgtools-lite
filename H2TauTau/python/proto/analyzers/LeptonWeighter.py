@@ -69,7 +69,7 @@ class LeptonWeighter(Analyzer):
                 isFake = True
 
             iso = None
-            if hasattr(lep, 'muonId'): # muon
+            if hasattr(lep, 'muonID'): # muon
                 iso = lep.relIsoR(R=0.4, dBetaFactor=0.5)
 
             if hasattr(lep, 'mvaNonTrigV0'): # electron
@@ -92,10 +92,18 @@ class LeptonWeighter(Analyzer):
                 eta = lep.eta()
                 dm = lep.decayMode() if hasattr(lep, 'decayMode') else None
                 setattr(lep, 'weight_'+sf_name, sf.getEfficiencyData(pt, eta, isFake, iso=iso, dm=dm))
-
+                
                 if sf_name in self.cfg_ana.dataEffFiles:
-                    lep.weight *= getattr(lep, 'weight_'+sf_name)
-
+                    lep.weight *= getattr(lep, 'weight_'+sf_name,1.)
+        
+        # no idisoweight ?
+        if 'idiso' not in self.scaleFactors and 'idiso' not in self.dataEffs : #if not hasattr(lep,'weight_idiso'):
+            lep.weight_idiso = 1.
+            if hasattr(lep,'weight_id'):
+                lep.weight_idiso *= lep.weight_id
+            if hasattr(lep,'weight_iso'):
+                lep.weight_idiso *= lep.weight_iso
+        
         event.triggerWeight = getattr(event, 'triggerWeight', 1.)
 
         if 'trigger' in self.scaleFactors:
@@ -114,4 +122,5 @@ class LeptonWeighter(Analyzer):
 
         for sf_name in self.dataEffs:
             self.averages['weight_'+sf_name].add(getattr(lep, 'weight_'+sf_name))
+        
 

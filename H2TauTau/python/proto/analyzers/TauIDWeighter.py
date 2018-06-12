@@ -11,11 +11,20 @@ class TauIDWeighter(Analyzer):
 
     def process(self, event):
         legs_to_process = self.cfg_ana.legs
+        channel = self.cfg_ana.channel
+        ele_WP  = self.cfg_ana.ele_WP
+        mu_WP   = self.cfg_ana.mu_WP
+        tau_WP  = self.cfg_ana.tau_WP
         for legname in legs_to_process:
             leg = getattr(event, legname)
             weight = getTauWeight(leg.gen_match,
                                   leg.pt(),
                                   leg.eta(),
-                                  leg.decayMode())
+                                  leg.decayMode(),
+                                  ele_WP,
+                                  mu_WP,
+                                  tau_WP)
+
             setattr(event,'IDweight'+legname,weight)
             event.eventWeight*=weight
+            

@@ -21,16 +21,10 @@ class DiObject(object):
         # self.diobject.setP4(self.p4())
         
     def leg1(self):
-        if self.daughter(0).pt() > self.daughter(1).pt():
-            return self.daughter(0)
-        else:
-            return self.daughter(1)
+        return self.daughter(0)
 
     def leg2(self):
-        if self.daughter(0).pt() < self.daughter(1).pt():
-            return self.daughter(0)
-        else:
-            return self.daughter(1)
+        return self.daughter(1)
 
     def mass(self):
         return self.p4().mass()
@@ -177,6 +171,7 @@ class DirectDiTau(DiTau):
         self.leg1_ = leg1
         self.leg2_ = leg2
         self.met_ = met
+        self.p4_ = (leg1.p4() + leg2.p4())
 
     def mass(self):
         return self.p4_.mass()
