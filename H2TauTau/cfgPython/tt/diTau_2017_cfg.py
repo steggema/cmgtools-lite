@@ -32,8 +32,9 @@ def getHeppyOption(option, default):
 # production = True run on batch, production = False (or unset) run locally
 production = getHeppyOption('production', False)
 pick_events = getHeppyOption('pick_events', False)
-syncntuple = getHeppyOption('syncntuple', True)
+syncntuple = getHeppyOption('syncntuple', False)
 cmssw = getHeppyOption('cmssw', True)
+cmssw_reuse = getHeppyOption('cmssw_reuse', True)
 doSUSY = getHeppyOption('susy', False)
 computeSVfit = getHeppyOption('computeSVfit', False)
 data = getHeppyOption('data', False)
@@ -46,6 +47,9 @@ correct_recoil = getHeppyOption('correct_recoil', True)
 if doSUSY:
     cmssw = False
 
+if (not cmssw) or production:
+    cmssw_reuse = False
+
 tes_up = False
 tes_scale = 1.0
 if tes_up:
@@ -54,8 +58,10 @@ if tes_up:
 
 # Just to be sure
 if production:
-    syncntuple = False
+    # syncntuple = False
     pick_events = False
+
+httGenAna.filepath = '$CMSSW_BASE/src/CMGTools/H2TauTau/data/htt_scalefactors_v16_5.root'
 
 if reapplyJEC:
     if cmssw:
@@ -132,7 +138,8 @@ tauTauMT2Ana = cfg.Analyzer(
 
 fileCleaner = cfg.Analyzer(
     FileCleaner,
-    name='FileCleaner'
+    name='FileCleaner',
+    savepreproc = True if cmssw_reuse else False
 )
 
 # tau1Calibration = cfg.Analyzer(
@@ -342,15 +349,21 @@ if doSUSY:
 ###################################################
 ###            SET BATCH OR LOCAL               ###
 ###################################################
+# selectedComponents = [selectedComponents[0]]
+# selectedComponents[0].files = [selectedComponents[0].files[0]]
+# for comp in selectedComponents:
+#         comp.files = ['root://cms-xrd-global.cern.ch/'+f[30:] for f in comp.files]
 if not production:
     # comp = data_list[0] if data else sync_list[0]
     # comp = SMS
     # comp = samples_susy[1]
-    selectedComponents = [samples_susy[2]] if doSUSY else sync_list
+    # selectedComponents = [samples_susy[2]] if doSUSY else sync_list
     if data:
         selectedComponents = [data_list[0]]
     selectedComponents = [selectedComponents[0]]
+    selectedComponents[0].files = [selectedComponents[0].files[0]]
     for comp in selectedComponents:
+        # comp.files = ['root://cms-xrd-global.cern.ch/'+f[30:] for f in comp.files]
         comp.splitFactor = 1
         comp.fineSplitFactor = 1
     # comp.files = comp.files[13:20]
@@ -362,9 +375,14 @@ if doSUSY:
 
 preprocessor = None
 if cmssw:
-    sequence.append(fileCleaner)
-    cfg_name = "$CMSSW_BASE/src/CMGTools/H2TauTau/prod/h2TauTauMiniAOD_ditau_data_cfg.py" if data else "$CMSSW_BASE/src/CMGTools/H2TauTau/prod/h2TauTauMiniAOD_ditau_cfg.py"
-    preprocessor = CmsswPreprocessor(cfg_name, addOrigAsSecondary=False)
+    if cmssw_reuse and all([os.path.isfile('preprocessed_files/'+comp.name+'/cmsswPreProcessing.root') for comp in selectedComponents]):
+        print "Using Preprocessed files! Make sure you don't need to re-run preprocessor!"
+        for comp in selectedComponents:
+            comp.files = ['preprocessed_files/'+comp.name+'/cmsswPreProcessing.root']
+    else:
+        sequence.append(fileCleaner)
+        cfg_name = "$CMSSW_BASE/src/CMGTools/H2TauTau/prod/h2TauTauMiniAOD_ditau_data_cfg.py" if data else "$CMSSW_BASE/src/CMGTools/H2TauTau/prod/h2TauTauMiniAOD_ditau_cfg.py"
+        preprocessor = CmsswPreprocessor(cfg_name, addOrigAsSecondary=False)
 
 # the following is declared in case this cfg is used in input to the
 # heppy.py script

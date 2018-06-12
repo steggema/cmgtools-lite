@@ -18,7 +18,7 @@ public:
 
 private:
     EffProvider() {
-        TFile f_in("/afs/cern.ch/user/s/steggema/work/80/CMSSW_8_0_25/src/CMGTools/H2TauTau/data/htt_scalefactors_v16_4.root");
+        TFile f_in("/afs/cern.ch/user/s/steggema/work/80/CMSSW_8_0_25/src/CMGTools/H2TauTau/data/htt_scalefactors_v16_5.root");
         std::cout << "Creating EffProvider instance in HTTWeighter" << std::endl;
         ws_ = (RooWorkspace*) f_in.Get("w");
         f_in.Close();
@@ -65,8 +65,9 @@ double getEToTauWeightVLoose(double eta) {
     auto aeta = std::abs(eta);
     if (aeta < 1.5)
         return 1.21;
-    else
+    if (aeta > 1.5)
         return 1.38;
+    return 1.;
 }
 
 double getTauWeight(int gen_match, double pt, double eta, double dm) {
