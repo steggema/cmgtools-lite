@@ -3,7 +3,7 @@ import imp, os, json
 from optparse import OptionParser,OptionGroup
 
 ### auto-monitoring tool
-os.system("python crabMonitoring.py 1")
+os.system("python crabMonitoring.py 0")
 
 parser = OptionParser()
 

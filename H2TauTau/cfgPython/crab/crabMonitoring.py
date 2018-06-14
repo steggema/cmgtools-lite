@@ -39,6 +39,6 @@ def crabMonitoring(initProxy=False):
     os.system("acrontab < crontab.txt")
 
 if len(sys.argv) > 1:
-    crabMonitoring( bool(sys.argv[1]) )
+    crabMonitoring( int(sys.argv[1]) )
 else:
     crabMonitoring()
