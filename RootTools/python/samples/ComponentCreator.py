@@ -4,9 +4,13 @@ from CMGTools.Production.dataset import createDataset, createMyDataset
 import re
 
 class ComponentCreator(object):
+
+    useAAA = None
+
     def makeMCComponent(self,name,dataset,user,pattern,xSec=1,useAAA=True,unsafe=False):
-        
-         component = cfg.MCComponent(
+        if self.__class__.useAAA is not None:
+            useAAA = self.__class__.useAAA
+        component = cfg.MCComponent(
              dataset=dataset,
              name = name,
              files = self.getFiles(dataset,user,pattern,useAAA=useAAA,unsafe=unsafe),
@@ -16,8 +20,8 @@ class ComponentCreator(object):
              effCorrFactor = 1,
          )
 
-         component.dataset_entries = self.getPrimaryDatasetEntries(dataset,user,pattern,useAAA=useAAA)
-         return component
+        component.dataset_entries = self.getPrimaryDatasetEntries(dataset,user,pattern,useAAA=useAAA)
+        return component
 
     def makePrivateMCComponent(self,name,dataset,files,xSec=1, prefix="auto"):
          if len(files) == 0:
@@ -54,7 +58,8 @@ class ComponentCreator(object):
          return component
 
     def makeMyPrivateMCComponent(self,name,dataset,user,pattern,dbsInstance, xSec=1,useAAA=False):
-
+        if self.__class__.useAAA is not None:
+            useAAA = self.__class__.useAAA
         component = cfg.MCComponent(
             dataset=dataset,
             name = name,
@@ -158,6 +163,8 @@ class ComponentCreator(object):
         return component
 
     def makeDataComponent(self,name,dataset,user,pattern,json=None,run_range=None,triggers=[],vetoTriggers=[],useAAA=True,jsonFilter=False):
+        if self.__class__.useAAA is not None:
+            useAAA = self.__class__.useAAA
         component = cfg.DataComponent(
             #dataset = dataset,
             name = name,
