@@ -4,19 +4,19 @@ tar xzf python.tar.gz --directory $CMSSW_BASE
 tar xzf cafpython.tar.gz --directory $CMSSW_BASE
 
 # uncomment for debuging purposes
-#ls -lR .
-#echo "ARGS:"
-#echo $@
-#echo "ENV..................................."
-#env
-#echo "VOMS"
-#voms-proxy-info -all
-#echo "CMSSW BASE, python path, pwd, home"
-#echo $CMSSW_BASE
-#echo $PYTHONPATH
-#echo $PWD
-#echo $HOME
-#echo $ROOTSYS
+ls -lR .
+echo "ARGS:"
+echo $@
+echo "ENV..................................."
+env
+echo "VOMS"
+voms-proxy-info -all
+echo "CMSSW BASE, python path, pwd, home"
+echo $CMSSW_BASE
+echo $PYTHONPATH
+echo $PWD
+echo $HOME
+echo $ROOTSYS
 
 # copy auxiliarity data to the right place (json, pu, lep eff, jet corr, ...)
 cp -r lib/* $CMSSW_BASE/lib/
