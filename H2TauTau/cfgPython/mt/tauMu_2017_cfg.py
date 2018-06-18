@@ -28,7 +28,13 @@ from CMGTools.H2TauTau.proto.analyzers.METFilter import METFilter
 
 
 from CMGTools.RootTools.utils.splitFactor import splitFactor
-from CMGTools.H2TauTau.proto.samples.summer16.htt_common import backgrounds_mu, sm_signals, mssm_signals, data_single_muon, sync_list
+
+import  CMGTools.H2TauTau.proto.samples.summer16.htt_common as htt_common
+from CMGTools.H2TauTau.proto.samples.component_index import ComponentIndex
+compindex = ComponentIndex(htt_common)
+
+# from CMGTools.H2TauTau.proto.samples.summer16.htt_common import backgrounds_mu, sm_signals, mssm_signals, data_single_muon, sync_list
+
 from CMGTools.H2TauTau.proto.samples.summer16.triggers_tauMu import mc_triggers, mc_triggerfilters
 from CMGTools.H2TauTau.proto.samples.summer16.triggers_tauMu import data_triggers, data_triggerfilters
 
@@ -268,7 +274,7 @@ if syncntuple:
 ###################################################
 
 # Minimal list of samples
-samples = [sync_list[0]] # backgrounds_mu + sm_signals + sync_list + mssm_signals
+samples = compindex.glob('*SUSYBB1000*') # backgrounds_mu + sm_signals + sync_list + mssm_signals
 
 split_factor = 1e4
 
@@ -282,7 +288,7 @@ for sample in samples:
     sample.puFileData = puFileData
     sample.puFileMC = puFileMC
 
-data_list = data_single_muon
+data_list = compindex.glob('data_single_muon')
 
 for sample in data_list:
     sample.triggers = data_triggers
