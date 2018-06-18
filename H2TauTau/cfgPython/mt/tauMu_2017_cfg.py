@@ -45,7 +45,7 @@ from CMGTools.H2TauTau.htt_ntuple_base_cff import commonSequence, puFileData, pu
 # Get all heppy options; set via "-o production" or "-o production=True"
 
 # production = True run on batch, production = False (or unset) run locally
-production = getHeppyOption('production', True)
+production = getHeppyOption('production', False)
 pick_events = getHeppyOption('pick_events', False)
 syncntuple = getHeppyOption('syncntuple', True)
 cmssw = getHeppyOption('cmssw', True)
@@ -247,7 +247,7 @@ if calibrateTaus:
     sequence.insert(sequence.index(httGenAna), tauP4Scaler)
 sequence.insert(sequence.index(httGenAna)+1, tauMuAna) # sequence.insert(sequence.index(httGenAna), tauTauAna) initially
 sequence.append(tauDecayModeWeighter)
-#sequence.append(tauFakeRateWeighter) # summer 2013 ??
+sequence.append(tauFakeRateWeighter) # summer 2013 ??
 #sequence.append(muTauFakeWeighter) # included in TauIDWeighter
 sequence.append(tauWeighter)
 sequence.append(muonWeighter)

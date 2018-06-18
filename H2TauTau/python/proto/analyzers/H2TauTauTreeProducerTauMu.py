@@ -168,9 +168,9 @@ class H2TauTauTreeProducerTauMu(H2TauTauTreeProducer):
             if pt_charged > 0.:
                 self.fill(self.tree, 'l2_nc_ratio', (pt_charged - pt_neutral)/(pt_charged + pt_neutral))
 
-        self.fill(self.tree, 'l2_weight_fakerate', event,tauFakeRateWeight)
-        self.fill(self.tree, 'l2_weight_fakerate_up', event,tauFakeRateWeightUp)
-        self.fill(self.tree, 'l2_weight_fakerate_down', event,tauFakeRateWeightDown)
+        self.fill(self.tree, 'l2_weight_fakerate', event.tauFakeRateWeight)
+        self.fill(self.tree, 'l2_weight_fakerate_up', event.tauFakeRateWeightUp)
+        self.fill(self.tree, 'l2_weight_fakerate_down', event.tauFakeRateWeightDown)
 
         fired_triggers = [info.name for info in getattr(event, 'trigger_infos', []) if info.fired]
 
