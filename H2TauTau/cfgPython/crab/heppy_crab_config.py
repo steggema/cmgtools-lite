@@ -7,7 +7,7 @@ config.General.transferLogs = True
 
 config.section_("JobType")
 config.JobType.pluginName = 'PrivateMC'
-config.JobType.psetName = 'heppy_crab_fake_pset.py'
+config.JobType.psetName = 'pick_cfg.py' #'heppy_crab_fake_pset.py'
 config.JobType.scriptExe = 'heppy_crab_script.sh'
 config.JobType.disableAutomaticOutputCollection = True
 # config.JobType.sendPythonFolder = True  #doesn't work, not supported yet? do it by hand
