@@ -33,6 +33,8 @@ class ComponentIndex(object):
     def glob(self, pattern):
         result = []
         for name, comp in self.components.iteritems():
+            if comp in result:
+                continue
             if fnmatch.fnmatch(name, pattern) or \
                     fnmatch.fnmatch(comp.dataset, pattern):
                 result.append(comp)
@@ -40,6 +42,9 @@ class ComponentIndex(object):
         for name, lst in self.lists.iteritems():
             if fnmatch.fnmatch(name, pattern):
                 result.extend(lst)
+        # the following is important, as 
+        # a dataset could be present in several lists.
+        result = sorted(list(set(result)))
         return result
 
     def __str__(self):

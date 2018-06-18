@@ -8,7 +8,7 @@ from PhysicsTools.Heppy.utils.cmsswPreprocessor import CmsswPreprocessor
 
 # 
 from CMGTools.RootTools.samples.ComponentCreator import ComponentCreator
-ComponentCreator.useAAA = False
+ComponentCreator.useAAA = True
 
 # Tau-tau analyzers
 from CMGTools.H2TauTau.proto.analyzers.TauMuAnalyzer import TauMuAnalyzer
@@ -274,7 +274,7 @@ if syncntuple:
 ###################################################
 
 # Minimal list of samples
-samples = compindex.glob('*SUSYBB1000*') # backgrounds_mu + sm_signals + sync_list + mssm_signals
+samples = compindex.glob('DYJetsToLL_M50*') # backgrounds_mu + sm_signals + sync_list + mssm_signals
 
 split_factor = 1e4
 
@@ -298,7 +298,8 @@ for sample in data_list:
 
 # Samples to be processed
 
-selectedComponents = samples # data_list if data else backgrounds_mu + sm_signals #+ mssm_signals
+# selectedComponents = samples # data_list if data else backgrounds_mu + sm_signals #+ mssm_signals
+selectedComponents = samples[:1]
 
 if pick_events:
     eventSelector.toSelect = [71838,55848]
