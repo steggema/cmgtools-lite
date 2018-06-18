@@ -258,7 +258,7 @@ if calibrateTaus:
     sequence.insert(sequence.index(httGenAna), tauP4Scaler)
 sequence.insert(sequence.index(httGenAna)+1, tauEleAna)
 sequence.append(tauDecayModeWeighter)
-#sequence.append(tauFakeRateWeighter) # summer 2013 ??
+sequence.append(tauFakeRateWeighter) # summer 2013 ??
 sequence.append(tauWeighter)
 sequence.append(eleWeighter)
 #sequence.insert(sequence.index(tauEleAna) + 1, dyLLReweighterTauEle)
