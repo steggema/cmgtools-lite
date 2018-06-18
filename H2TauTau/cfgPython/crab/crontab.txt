@@ -1,1 +1,0 @@
-00	00,04,08,12,16,20     *	*	*	lxplus071.cern.ch	/afs/cern.ch/user/l/ltortero/CMSSW/cronJob.sh
