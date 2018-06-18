@@ -276,7 +276,8 @@ if syncntuple:
 # Minimal list of samples
 samples = compindex.glob('DYJetsToLL_M50*') # backgrounds_mu + sm_signals + sync_list + mssm_signals
 
-split_factor = 1e4
+# split_factor = 1e4
+split_factor = 5e5 
 
 if computeSVfit:
     split_factor = 5e3
@@ -300,7 +301,7 @@ for sample in data_list:
 
 # selectedComponents = samples # data_list if data else backgrounds_mu + sm_signals #+ mssm_signals
 selectedComponents = compindex.glob('DYJetsToLL_M50_LO_ext')
-selectedComponents[0].splitFactor=1
+# selectedComponents[0].splitFactor=1
 
 if pick_events:
     eventSelector.toSelect = [71838,55848]
@@ -322,7 +323,7 @@ if not production:
     for comp in selectedComponents:
         comp.splitFactor = 1
         comp.fineSplitFactor = 1
-        comp.files = [comp.files[0]]
+        comp.files = comp.files[:5]
 
 preprocessor = None
 if cmssw:
