@@ -1,14 +1,17 @@
 import PhysicsTools.HeppyCore.framework.config as cfg
 from CMGTools.RootTools.samples.ComponentCreator import ComponentCreator
 
-ComponentCreator.useAAA = True
+# ComponentCreator.useAAA = True
 kreator = ComponentCreator()
 comp = kreator.makeMCComponent(
     'HiggsSUSYBB1000',
     '/SUSYGluGluToBBHToTauTau_M-1000_TuneCUETP8M1_13TeV-pythia8/RunIISummer16MiniAODv2-PUMoriond17_80X_mcRun2_asymptotic_2016_TrancheIV_v6-v1/MINIAODSIM',
     'CMS',
     '.*root',
+    useAAA=False,
 )
+
+comp.splitFactor = len(comp.files)
 
 selectedComponents = [comp]
 
