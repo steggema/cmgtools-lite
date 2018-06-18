@@ -63,6 +63,8 @@ if options.production_label is None:
 # number of jobs to run per dataset decided based on splitFactor and fineSplitFactor from cfg file
 
 from PhysicsTools.HeppyCore.framework.heppy_loop import _heppyGlobalOptions
+from PhysicsTools.HeppyCore.framework.heppy_loop import split
+
 for opt in options.extraOptions:
     if "=" in opt:
         (key,val) = opt.split("=",1)
@@ -95,10 +97,10 @@ if len(options.filesToShip)>0: os.environ["FILESTOSHIP"] = ','.join(options.file
 if options.maxevents>0: os.environ["MAXNUMEVENTS"] = str(options.maxevents)
 os.environ["ONLYUNPACKED"] = str(options.only_unpacked)
 
-from PhysicsTools.HeppyCore.framework.heppy_loop import split
 for comp in conf.components:
     if getattr(comp,"useAAA",False):
-        raise RuntimeError, 'Components should have useAAA disabled in the cfg when running on crab - tune the behaviour of AAA in the crab submission instead!'
+        raise RuntimeError, 'Components should have useAAA disabled in the cfg when running on crab. \
+Tune the behaviour of AAA in the crab submission instead!'
     os.environ["DATASET"] = str(comp.name)
     os.environ["NJOBS"] = str(len(split([comp])))
     os.system("crab submit %s -c heppy_crab_config_env.py"%("--dryrun" if options.dryrun else ""))
