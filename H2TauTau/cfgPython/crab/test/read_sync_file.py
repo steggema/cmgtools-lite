@@ -11,6 +11,8 @@ comp = kreator.makeMCComponent(
     useAAA=False,
 )
 
+comp.splitFactor = len(comp.files)
+
 selectedComponents = [comp]
 
 from PhysicsTools.Heppy.analyzers.core.EventSelector import EventSelector
