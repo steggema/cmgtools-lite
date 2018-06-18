@@ -299,7 +299,8 @@ for sample in data_list:
 # Samples to be processed
 
 # selectedComponents = samples # data_list if data else backgrounds_mu + sm_signals #+ mssm_signals
-selectedComponents = samples[:1]
+selectedComponents = compindex.glob('DYJetsToLL_M50_LO_ext')
+selectedComponents[0].splitFactor=1
 
 if pick_events:
     eventSelector.toSelect = [71838,55848]
