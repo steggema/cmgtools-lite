@@ -79,6 +79,8 @@ class LeptonWeighter(Analyzer):
             for sf_name, sf in self.scaleFactors.items():
                 pt = lep.pt()
                 eta = lep.eta()
+                if hasattr(lep,'electronID'):
+                    eta = lep.superCluster().eta() # sc eta used for weights in case of electrons
                 dm = lep.decayMode() if hasattr(lep, 'decayMode') else None
                 setattr(lep, 'weight_'+sf_name, sf.getScaleFactor(pt, eta, isFake, iso=iso, dm=dm))
                 # setattr(lep, 'eff_data_'+sf_name, sf.getEfficiencyData(pt, eta, isFake))

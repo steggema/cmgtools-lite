@@ -6,6 +6,10 @@ from PhysicsTools.HeppyCore.framework.config import printComps
 from PhysicsTools.HeppyCore.framework.heppy_loop import getHeppyOption
 from PhysicsTools.Heppy.utils.cmsswPreprocessor import CmsswPreprocessor
 
+# 
+from CMGTools.RootTools.samples.ComponentCreator import ComponentCreator
+ComponentCreator.useAAA = False
+
 # Tau-tau analyzers
 from CMGTools.H2TauTau.proto.analyzers.TauMuAnalyzer import TauMuAnalyzer
 from CMGTools.H2TauTau.proto.analyzers.H2TauTauTreeProducerTauMu import H2TauTauTreeProducerTauMu
