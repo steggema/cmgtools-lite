@@ -31,7 +31,7 @@ class TauFakeRateWeighter( Analyzer ):
         event.tauFakeRateWeightUp = self.weight + 0.5 * (1. - self.weight)
         event.tauFakeRateWeightDown = self.weight - 0.5 * (1. - self.weight)
 
-        event.eventWeight *= self.weight
+        #event.eventWeight *= self.weight
         event.tauFakeRateWeight = self.weight
 
         if self.cfg_ana.verbose:
