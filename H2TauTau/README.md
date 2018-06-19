@@ -87,5 +87,42 @@ cd CMGTools/H2TauTau/cfgPython/crab
 ln -s ../mt/tauMu_2017_cfg.py
 ```
 
-Triple check your configuration! 
+Triple check your configuration! You should: 
+
+- execute your configuration file with python, and print the configuration: 
+
+```
+ipython tauMu_2017_cfg.py
+```
+
+- run a local test: 
+
+```
+heppy Trash tauMu_2017_cfg.py -N 500
+```
+
+After that, you can submit: 
+
+```
+./heppy_crab.py --AAAconfig=full -s T3_FR_IPNL tauMu_2017_cfg.py -o production 
+```
+
+Please check the documentation of the submission script: `./heppy_crab.py -h`.
+
+After submission, use the provided link to monitor your task in your web browser. 
+
+
+### Harvesting the results
+
+With the `-s T3_FR_IPNL` option, the results of heppy get stored in the Storage Element (SE) of IPNL. For new users, the output directory is automatically created. For example, to list the contents of Colin's output directory, do: 
+
+```
+gfal-ls srm://lyogrid06.in2p3.fr:8446/srm/managerv2?SFN=/dpm/in2p3.fr/home/cms/data/store/user/cbernet
+```
+
+We still miss a procedure to add all results together (`heppy_hadd` equivalent) that would work with the SE.
+
+
+
+
 
