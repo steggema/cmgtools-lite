@@ -37,6 +37,10 @@ scram b -j 8
 
 ## Running on the grid
 
+### Simple test 
+
+This test submission command submits 9 jobs reading the sync miniAOD files. 
+
 The environment must be set in the correct order. *Before doing cmsenv, do:*
 
 ```
@@ -44,11 +48,10 @@ cd CMGTools/H2TauTau/cfgPython/crab
 source ./init.sh
 ```
 
-This test submission command submits 9 jobs reading the sync miniAOD files. 
-
+Submit the jobs: 
 
 ```
-./heppy_crab.py --AAAconfig=local -s T3_FR_IPNL test/read_sync_file.py
+./heppy_crab.py --AAAconfig=full -s T3_FR_IPNL test/read_sync_file.py
 ```
 
 The samples that have been produced are stored on `T3_FR_IPNL`. To list these samples, do something like this (change your username and the paths):
@@ -71,3 +74,18 @@ heppyOutput_8.tgz
 heppyOutput_9.tgz
 log
 ```
+
+
+### Production
+
+e.g for the mu-tau channel: 
+
+Do this once to link your configuration file in the crab directory: 
+
+```
+cd CMGTools/H2TauTau/cfgPython/crab
+ln -s ../mt/tauMu_2017_cfg.py
+```
+
+Triple check your configuration! 
+
