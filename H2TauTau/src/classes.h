@@ -5,6 +5,7 @@
 #include "CMGTools/H2TauTau/interface/METSignificance.h"
 #include "CMGTools/H2TauTau/interface/HTTRecoilCorrector.h"
 #include "CMGTools/H2TauTau/interface/DYReweighting.h"
+#include "CMGTools/H2TauTau/interface/HTTEfficiencies.h"
 
 namespace {
   struct CMGTools_H2TauTau {

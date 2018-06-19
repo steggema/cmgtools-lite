@@ -12,9 +12,6 @@ from CMGTools.H2TauTau.proto.samples.summer16.htt_common import TT_pow, DYJetsTo
 
 # WJetsToLNu_LO, TToLeptons_tch_amcatnlo, WZTo3LNu_amcatnlo, , WJetsToLNu_HT100to200, WJetsToLNu_HT200to400, WJetsToLNu_HT400to600, WJetsToLNu_HT600toInf, QCD_Mu15, DYJetsToTauTau_M150_LO, DYJetsToLL_M10to50_ext1
 
-
-#if "/sDYReweighting_cc.so" not in gSystem.GetLibraries(): 
-#    gROOT.ProcessLine(".L %s/src/CMGTools/H2TauTau/python/proto/plotter/DYReweighting.cc+" % os.environ['CMSSW_BASE']);
 gSystem.Load("libCMGToolsH2TauTau")
 from ROOT import getDYWeight
 

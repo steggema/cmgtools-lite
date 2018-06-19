@@ -12,10 +12,12 @@ from PhysicsTools.Heppy.physicsutils.TauDecayModes import tauDecayModes
 
 from CMGTools.H2TauTau.proto.analyzers.TauGenTreeProducer import TauGenTreeProducer
 
-if "/sDYReweighting_cc.so" not in ROOT.gSystem.GetLibraries(): 
-    ROOT.gROOT.ProcessLine(".L %s/src/CMGTools/H2TauTau/python/proto/plotter/DYReweighting.cc+" % os.environ['CMSSW_BASE']);
-    from ROOT import getDYWeight
 
+# if "/sDYReweighting_cc.so" not in ROOT.gSystem.GetLibraries(): 
+#     ROOT.gROOT.ProcessLine(".L %s/src/CMGTools/H2TauTau/python/proto/plotter/DYReweighting.cc+" % os.environ['CMSSW_BASE']);
+ROOT.gSystem.Load("libCMGToolsH2TauTau")
+from ROOT import getDYWeight
+    
 
 class HTTGenAnalyzer(Analyzer):
 
