@@ -28,7 +28,7 @@ class H2TauTauTreeProducerTauEle(H2TauTauTreeProducer):
         self.var(self.tree, 'l2_weight_fakerate_up')
         self.var(self.tree, 'l2_weight_fakerate_down')
 
-        self.var( self.tree, 'weight_zll')
+        #self.var( self.tree, 'weight_zll')
 
     def process(self, event):
 
@@ -89,8 +89,8 @@ class H2TauTauTreeProducerTauEle(H2TauTauTreeProducer):
                 self.fill(self.tree, 'l2_nc_ratio', (pt_charged - pt_neutral)/(pt_charged + pt_neutral))
 
         self.fill(self.tree, 'l2_weight_fakerate', event.tauFakeRateWeight )
-        self.fill(self.tree, 'l2_weight_fakerate_up', event,tauFakeRateWeightUp)
-        self.fill(self.tree, 'l2_weight_fakerate_down', event,tauFakeRateWeightDown)
+        self.fill(self.tree, 'l2_weight_fakerate_up', event.tauFakeRateWeightUp)
+        self.fill(self.tree, 'l2_weight_fakerate_down', event.tauFakeRateWeightDown)
 
         fired_triggers = [info.name for info in getattr(event, 'trigger_infos', []) if info.fired]
 
@@ -121,6 +121,6 @@ class H2TauTauTreeProducerTauEle(H2TauTauTreeProducer):
                 track = tau.isolationChargedHadrCands()[i_lead_ch].get()
                 self.fillTrackInfo(track, 'tau_leadiso_ch')
 
-        self.fill(self.tree, 'weight_zll', event.zllWeight)
+        #self.fill(self.tree, 'weight_zll', event.zllWeight)
 
         self.fillTree(event)
