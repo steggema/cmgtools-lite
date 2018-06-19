@@ -7,8 +7,8 @@
 #include <string>
 
 HistProvider::HistProvider() {
-  std::string fname = std::getenv("$CMSSW_BASE");
-  fname += "src/CMGTools/H2TauTau/data/zpt_weights_summer2016_v2.root";
+  std::string fname = std::getenv("CMSSW_BASE");
+  fname += "/src/CMGTools/H2TauTau/data/zpt_weights_summer2016_v2.root";
   f_in = new TFile(fname.c_str());
   std::cout << "Creating HistProvider instance in DYReweighting" << std::endl;
   h_zptmass = dynamic_cast<TH2D*>(f_in->Get("zptmass_histo"));
