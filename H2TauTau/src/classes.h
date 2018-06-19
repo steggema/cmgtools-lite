@@ -4,6 +4,7 @@
 #include "CMGTools/H2TauTau/interface/TriggerEfficiency.h"
 #include "CMGTools/H2TauTau/interface/METSignificance.h"
 #include "CMGTools/H2TauTau/interface/HTTRecoilCorrector.h"
+#include "CMGTools/H2TauTau/interface/DYReweighting.h"
 
 namespace {
   struct CMGTools_H2TauTau {
