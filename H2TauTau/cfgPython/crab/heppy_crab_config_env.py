@@ -66,3 +66,4 @@ except KeyError: pass
 
 try: config.JobType.scriptArgs += ["nevents="+os.environ["MAXNUMEVENTS"]]
 except KeyError: pass
+

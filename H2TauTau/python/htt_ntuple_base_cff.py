@@ -28,7 +28,7 @@ from CMGTools.TTHAnalysis.analyzers.susyParameterScanAnalyzer import susyParamet
 from CMGTools.TTHAnalysis.analyzers.badMuonAnalyzerMoriond2017 import badMuonAnalyzerMoriond2017
 
 puFileMC = '$CMSSW_BASE/src/CMGTools/H2TauTau/data/MC_Moriond17_PU25ns_V1.root'
-puFileData = '/afs/cern.ch/user/a/anehrkor/public/Data_Pileup_2016_271036-284044_80bins.root'
+puFileData = '$CMSSW_BASE/src/CMGTools/H2TauTau/data/Data_Pileup_2016_271036-284044_80bins.root'
 
 badCloneMuonAnaMoriond2017 = cfg.Analyzer(
     badMuonAnalyzerMoriond2017, name='badCloneMuonMoriond2017',
