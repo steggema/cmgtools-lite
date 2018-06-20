@@ -332,7 +332,7 @@ if cmssw:
         for comp in selectedComponents:
             comp.files = ['preprocessed_files/'+comp.name+'/cmsswPreProcessing.root']
     else:
-        #sequence.append(fileCleaner)
+        sequence.append(fileCleaner)
         prepdir = '$CMSSW_BASE/python/CMGTools/H2TauTau/preprocessor'
         prepdata = '/'.join([prepdir, 'h2TauTauMiniAOD_mutau_data_cfg.py'])
         prepmc = '/'.join([prepdir, 'h2TauTauMiniAOD_mutau{tes_string}_cfg.py'.format(tes_string=tes_string)])
