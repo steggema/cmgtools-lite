@@ -213,8 +213,9 @@ def createProcess(runOnMC=True,
             'keep *_slimmedMuons_*_*',
             'keep *_slimmedMETs_*_*',
             'keep *_slimmedMETsPuppi_*_*',  # actually not used?
-            'keep *_reducedEgamma_reducedSuperClusters_*',
+            'keep *_reducedEgamma_*_*',
             'keep *_offline*PrimaryVertices_*_*',
+            'keep *_offlineBeamSpot_*_*',
             'keep *_slimmedAddPileupInfo_*_*',
             'keep *_fixedGrid*_*_*',
             'keep bool_*_*_*',
@@ -245,5 +246,5 @@ def createProcess(runOnMC=True,
     return process
 
 if __name__ == '__main__':
-    process = createProcess(maxevents=500)
+    process = createProcess(maxevents=10000)
     process.source.fileNames = ['file:miniaod_input_test.root']
