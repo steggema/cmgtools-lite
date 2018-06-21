@@ -48,7 +48,7 @@ from CMGTools.H2TauTau.htt_ntuple_base_cff import commonSequence, puFileData, pu
 production = getHeppyOption('production', False)
 pick_events = getHeppyOption('pick_events', False)
 syncntuple = getHeppyOption('syncntuple', True)
-cmssw = getHeppyOption('cmssw', True)
+cmssw = getHeppyOption('cmssw', False)
 cmssw_reuse = getHeppyOption('cmssw_reuse', False)
 computeSVfit = getHeppyOption('computeSVfit', False)
 data = getHeppyOption('data', False)
@@ -300,8 +300,6 @@ for sample in data_list:
 # Samples to be processed
 
 # selectedComponents = samples # data_list if data else backgrounds_mu + sm_signals #+ mssm_signals
-selectedComponents = compindex.glob('DYJetsToLL_M50_LO_ext')
-# selectedComponents[0].splitFactor=1
 
 if pick_events:
     eventSelector.toSelect = [71838,55848]
@@ -318,8 +316,8 @@ if not cmssw:
 # Batch or local
 if not production:
     cache = True
-    # selectedComponents = [selectedComponents[-1]] if data else sync_list
-    selectedComponents = [selectedComponents[-1]]
+    selectedComponents = compindex.glob('DYJetsToLL_M50_LO_ext')
+    # selectedComponents[0].files=['miniaodmod.root']
     for comp in selectedComponents:
         comp.splitFactor = 1
         comp.fineSplitFactor = 1
@@ -365,3 +363,4 @@ config = cfg.Config(components=selectedComponents,
                     )
 
 printComps(config.components, True)
+
