@@ -29,9 +29,9 @@ from CMGTools.H2TauTau.proto.analyzers.METFilter import METFilter
 
 from CMGTools.RootTools.utils.splitFactor import splitFactor
 
-import  CMGTools.H2TauTau.proto.samples.summer16.htt_common as htt_common
+import  CMGTools.H2TauTau.proto.samples.summer16.miniaod_CL.higgs_susy as higgs_susy
 from CMGTools.H2TauTau.proto.samples.component_index import ComponentIndex
-compindex = ComponentIndex(htt_common)
+compindex = ComponentIndex(higgs_susy)
 
 # from CMGTools.H2TauTau.proto.samples.summer16.htt_common import backgrounds_mu, sm_signals, mssm_signals, data_single_muon, sync_list
 
@@ -316,7 +316,7 @@ if not cmssw:
 # Batch or local
 if not production:
     cache = True
-    selectedComponents = compindex.glob('DYJetsToLL_M50_LO_ext')
+    selectedComponents = compindex.glob('*BB1000*')
     # selectedComponents[0].files=['miniaodmod.root']
     for comp in selectedComponents:
         comp.splitFactor = 1
