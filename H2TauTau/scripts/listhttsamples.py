@@ -1,3 +1,5 @@
+#!/usr/bin/env python
+
 from CMGTools.H2TauTau.proto.samples.component_index import ComponentIndex
 
 if __name__ == '__main__':
