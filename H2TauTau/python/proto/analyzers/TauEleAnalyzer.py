@@ -235,7 +235,7 @@ class TauEleAnalyzer(DiLeptonAnalyzer):
 
     def testVetoElectronID(self, electron):
         #return cms.InputTag('egmGsfElectronIDs:cutBasedElectronID-Summer16-80X-V1-veto')
-        return electron.mvaIDRun2('Spring16', 'POG_SPRING16_25ns_v1_Veto') # cut based Summer 16 veto ID for di-electron-veto on twiki MSSM # POG Spring15 25ns cut-based "Veto" ID on twiki HTTT
+        return electron.cutBasedId('POG_SPRING16_25ns_v1_Veto') # cut based Summer 16 veto ID for di-electron-veto on twiki MSSM # POG Spring15 25ns cut-based "Veto" ID on twiki HTTT
 
     def testLeg1ID(self, electron):
         '''Tight electron selection, no isolation requirement.
