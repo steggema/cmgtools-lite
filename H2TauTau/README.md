@@ -35,57 +35,10 @@ git co -t cmglite-colin/828patch1_HTT
 scram b -j 8
 ```
 
-## Running on the grid
+## Running our analysis in heppy
 
-### Simple test 
+to be written
 
-This test submission command submits 9 jobs reading the sync miniAOD files. 
+## Creation of MINIAOD_CL 
 
-The environment must be set in the correct order. *Before doing cmsenv, do:*
-
-```
-cd CMGTools/H2TauTau/cfgPython/crab
-source ./init.sh
-```
-
-Submit the jobs: 
-
-```
-./heppy_crab.py --AAAconfig=full -s T3_FR_IPNL test/read_sync_file.py
-```
-
-The samples that have been produced are stored on `T3_FR_IPNL`. To list these samples, do something like this (change your username and the paths):
-
-```
-gfal-ls srm://lyogrid06.in2p3.fr:8446/srm/managerv2?SFN=/dpm/in2p3.fr/home/cms/data/store/user/cbernet/heppyTrees/
->
-CMSSW_8_0_28_patch1
-```
-
-Finally: 
-
-```
-gfal-ls srm://lyogrid06.in2p3.fr:8446/srm/managerv2?SFN=/dpm/in2p3.fr/home/cms/data/store/user/cbernet/heppyTrees/CMSSW_8_0_28_patch1/read_sync_file/HiggsSUSYBB1000/180618_084522/0000
->
-heppyOutput_1.tgz
-heppyOutput_6.tgz
-heppyOutput_7.tgz
-heppyOutput_8.tgz
-heppyOutput_9.tgz
-log
-```
-
-
-### Production
-
-e.g for the mu-tau channel: 
-
-Do this once to link your configuration file in the crab directory: 
-
-```
-cd CMGTools/H2TauTau/cfgPython/crab
-ln -s ../mt/tauMu_2017_cfg.py
-```
-
-Triple check your configuration! 
-
+to be written
