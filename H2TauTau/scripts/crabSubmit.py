@@ -116,7 +116,7 @@ Example of use:
                       default=False,
                       help='verbose mode')
     parser.add_option("-e", "--nevents_per_job", dest="nevents_per_job",
-                      default=20e4,
+                      default=int(5e4),
                       type='int',
                       help='desired approximate number of events per job. Defaults to 20k. Be aware that the larger the number of jobs, the more probable it is that your job is killed on the GRID because it is using too much memory. We do not advise values larger than 500k events.')
     parser.add_option("-r", "--request_name", dest="request_name",
