@@ -65,6 +65,12 @@ Set up a link to the cmsRun configuration file for the production of MINIAOD_CL 
 ln -s ../python/h2TauTauMiniAOD_any_cfg.py preprocessor_cfg.py
 ```
 
+**The first thing to do is ALWAYS to check that cmsRun runs locally with this configuration before submitting any job:** 
+
+```
+cmsRun preprocessor_cfg.py
+```
+
 Initialize your proxy:
 
 ```
