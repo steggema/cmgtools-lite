@@ -7,13 +7,13 @@ class ComponentCreator(object):
 
     useAAA = None
 
-    def makeMCComponent(self,name,dataset,user,pattern,xSec=1,useAAA=True,unsafe=False):
+    def makeMCComponent(self,name,dataset,user,pattern,xSec=1,useAAA=True,unsafe=False, dbsInstance=None):
         if self.__class__.useAAA is not None:
             useAAA = self.__class__.useAAA
         component = cfg.MCComponent(
              dataset=dataset,
              name = name,
-             files = self.getFiles(dataset,user,pattern,useAAA=useAAA,unsafe=unsafe),
+             files = self.getFiles(dataset,user,pattern,useAAA=useAAA,unsafe=unsafe, dbsInstance=dbsInstance),
              xSection = xSec,
              nGenEvents = 1,
              triggers = [],
@@ -162,13 +162,13 @@ class ComponentCreator(object):
         )
         return component
 
-    def makeDataComponent(self,name,dataset,user,pattern,json=None,run_range=None,triggers=[],vetoTriggers=[],useAAA=True,jsonFilter=False):
+    def makeDataComponent(self,name,dataset,user,pattern,json=None,run_range=None,triggers=[],vetoTriggers=[],useAAA=True,jsonFilter=False, dbsInstance=None):
         if self.__class__.useAAA is not None:
             useAAA = self.__class__.useAAA
         component = cfg.DataComponent(
             #dataset = dataset,
             name = name,
-            files = self.getFiles(dataset,user,pattern,run_range=run_range,useAAA=useAAA,json=(json if jsonFilter else None)),
+            files = self.getFiles(dataset,user,pattern,run_range=run_range,useAAA=useAAA,json=(json if jsonFilter else None), dbsInstance=dbsInstance),
             intLumi = 1,
             triggers = triggers,
             json = (json if jsonFilter else None)
@@ -180,9 +180,12 @@ class ComponentCreator(object):
         component.run_range = run_range
         return component
 
-    def getFiles(self, dataset, user, pattern, useAAA=False, run_range=None, json=None, unsafe = False):
+    def getFiles(self, dataset, user, pattern, dbsInstance, useAAA=False, run_range=None, json=None, unsafe = False):
         # print 'getting files for', dataset,user,pattern
-        ds = createDataset( user, dataset, pattern, readcache=True, run_range=run_range, json=json, unsafe = unsafe )
+        ds = createDataset( user, dataset, pattern, readcache=True, 
+                            run_range=run_range, 
+                            json=json, unsafe = unsafe, 
+                            dbsInstance=dbsInstance )
         files = ds.listOfGoodFiles()
         mapping = 'root://eoscms.cern.ch//eos/cms%s'
         if useAAA: mapping = 'root://cms-xrd-global.cern.ch/%s'

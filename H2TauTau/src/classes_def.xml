@@ -6,5 +6,22 @@
  <class name="std::vector<cmg::METSignificance>" />
  <class name="edm::Wrapper<std::vector<cmg::METSignificance> >" />
  <class name="HTTRecoilCorrector"/>
-  
+ <function name="getDYWeight"/>  
+ <function name="getDYWeightWS"/>  
+ <function name="getTauIDWeightVLoose"/>  
+ <function name="getTauIDWeightLoose"/>  
+ <function name="getTauIDWeightMedium"/>  
+ <function name="getTauIDWeightTight"/>  
+ <function name="getTauIDWeightVTight"/>  
+ <function name="getTauIDWeight"/>  
+ <function name="getMuToTauWeightLoose"/>  
+ <function name="getMuToTauWeightTight"/>  
+ <function name="getMuToTauWeight"/>  
+ <function name="getEToTauWeightVLoose"/>  
+ <function name="getEToTauWeightLoose"/>  
+ <function name="getEToTauWeightMedium"/>  
+ <function name="getEToTauWeightTight"/>  
+ <function name="getEToTauWeightVTight"/>  
+ <function name="getEToTauWeight"/>  
+ <function name="getTauWeight"/>  
 </lcgdict>

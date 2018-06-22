@@ -3,9 +3,10 @@ import os
 from PhysicsTools.Heppy.analyzers.core.Analyzer import Analyzer
 
 from ROOT import gSystem, gROOT
-if "/sHTTEfficiencies_cc.so" not in gSystem.GetLibraries(): 
-    gROOT.ProcessLine(".L %s/src/CMGTools/H2TauTau/python/proto/plotter/HTTEfficiencies.cc+" % os.environ['CMSSW_BASE']);
-    from ROOT import getTauWeight
+# if "/sHTTEfficiencies_cc.so" not in gSystem.GetLibraries(): 
+#     gROOT.ProcessLine(".L %s/src/CMGTools/H2TauTau/python/proto/plotter/HTTEfficiencies.cc+" % os.environ['CMSSW_BASE']);
+# gSystem.Load("libCMGToolsH2TauTau")
+from ROOT import getTauWeight
 
 class TauIDWeighter(Analyzer):
 

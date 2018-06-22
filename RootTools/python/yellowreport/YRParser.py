@@ -11,11 +11,11 @@ class YRParser(object):
 
 
 yrparser7TeV = YRParser( '/'.join( [os.environ['CMSSW_BASE'],
-                                    'src/CMGTools/RootTools/python/yellowreport/YR_7TeV.json']))
+                                    'python/CMGTools/RootTools/yellowreport/YR_7TeV.json']))
 yrparser8TeV = YRParser( '/'.join( [os.environ['CMSSW_BASE'],
-                                    'src/CMGTools/RootTools/python/yellowreport/YR_8TeV.json']))
+                                    'python/CMGTools/RootTools/yellowreport/YR_8TeV.json']))
 yrparser13TeV = YRParser( '/'.join( [os.environ['CMSSW_BASE'],
-                                    'src/CMGTools/RootTools/python/yellowreport/YR_13TeV.json']))
+                                    'python/CMGTools/RootTools/yellowreport/YR_13TeV.json']))
 
 if __name__ == '__main__':
 

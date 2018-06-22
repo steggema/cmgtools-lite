@@ -8,7 +8,7 @@ from PhysicsTools.Heppy.utils.cmsswPreprocessor import CmsswPreprocessor
 
 # 
 from CMGTools.RootTools.samples.ComponentCreator import ComponentCreator
-ComponentCreator.useAAA = False
+ComponentCreator.useAAA = True
 
 # Tau-tau analyzers
 from CMGTools.H2TauTau.proto.analyzers.TauMuAnalyzer import TauMuAnalyzer
@@ -29,9 +29,8 @@ from CMGTools.H2TauTau.proto.analyzers.METFilter import METFilter
 
 from CMGTools.RootTools.utils.splitFactor import splitFactor
 
-import  CMGTools.H2TauTau.proto.samples.summer16.htt_common as htt_common
+import  CMGTools.H2TauTau.proto.samples.summer16.miniaod_CL.higgs_susy as higgs_susy
 from CMGTools.H2TauTau.proto.samples.component_index import ComponentIndex
-compindex = ComponentIndex(htt_common)
 
 # from CMGTools.H2TauTau.proto.samples.summer16.htt_common import backgrounds_mu, sm_signals, mssm_signals, data_single_muon, sync_list
 
@@ -44,11 +43,11 @@ from CMGTools.H2TauTau.htt_ntuple_base_cff import commonSequence, puFileData, pu
 
 # Get all heppy options; set via "-o production" or "-o production=True"
 
-# production = True run on batch, production = False (or unset) run locally
-production = getHeppyOption('production', False)
+# production = True run on batch, production = False run locally
+production = getHeppyOption('production', True)
 pick_events = getHeppyOption('pick_events', False)
 syncntuple = getHeppyOption('syncntuple', True)
-cmssw = getHeppyOption('cmssw', True)
+cmssw = getHeppyOption('cmssw', False)
 cmssw_reuse = getHeppyOption('cmssw_reuse', False)
 computeSVfit = getHeppyOption('computeSVfit', False)
 data = getHeppyOption('data', False)
@@ -60,6 +59,12 @@ correct_recoil = getHeppyOption('correct_recoil', True)
 # For specific studies
 add_iso_info = getHeppyOption('add_iso_info', False)
 add_tau_fr_info = getHeppyOption('add_tau_fr_info', False)
+
+compindex = ComponentIndex(higgs_susy)
+data_list = compindex.glob('data_single_muon')
+
+samples = compindex.glob('*BB1000*')
+nevts_per_file = 1e4
 
 if (not cmssw) or production:
     cmssw_reuse = False
@@ -274,9 +279,6 @@ if syncntuple:
 ###################################################
 
 # Minimal list of samples
-samples = compindex.glob('*SUSYBB1000*') # backgrounds_mu + sm_signals + sync_list + mssm_signals
-
-split_factor = 1e4
 
 if computeSVfit:
     split_factor = 5e3
@@ -284,11 +286,9 @@ if computeSVfit:
 for sample in samples:
     sample.triggers = mc_triggers
     sample.triggerobjects = mc_triggerfilters
-    sample.splitFactor = splitFactor(sample, split_factor)
+    sample.splitFactor = splitFactor(sample, nevts_per_file)
     sample.puFileData = puFileData
     sample.puFileMC = puFileMC
-
-data_list = compindex.glob('data_single_muon')
 
 for sample in data_list:
     sample.triggers = data_triggers
@@ -297,30 +297,26 @@ for sample in data_list:
 
 
 # Samples to be processed
-
-selectedComponents = samples # data_list if data else backgrounds_mu + sm_signals #+ mssm_signals
+selectedComponents = samples
 
 if pick_events:
     eventSelector.toSelect = [71838,55848]
     sequence.insert(0, eventSelector)
-
 
 #TODO seems OK but compare to tautaucfg : changes to do here ?
 if not cmssw:
     module = [s for s in sequence if s.name == 'MCWeighter'][0]
     sequence.remove(module)
 
-# selectedComponents = [s for s in selectedComponents if s.name=='DYJetsToLL_M50_LO' or ('W' in s.name and 'Jet' in s.name)]
-
 # Batch or local
 if not production:
     cache = True
-    # selectedComponents = [selectedComponents[-1]] if data else sync_list
-    selectedComponents = [selectedComponents[-1]]
+    selectedComponents = compindex.glob('*BB1000*')
+    # selectedComponents[0].files=['miniaodmod.root']
     for comp in selectedComponents:
         comp.splitFactor = 1
         comp.fineSplitFactor = 1
-        comp.files = [comp.files[0]]
+        # comp.files = comp.files[:5]
 
 preprocessor = None
 if cmssw:
@@ -329,8 +325,11 @@ if cmssw:
         for comp in selectedComponents:
             comp.files = ['preprocessed_files/'+comp.name+'/cmsswPreProcessing.root']
     else:
-        #sequence.append(fileCleaner)
-        fname = "$CMSSW_BASE/src/CMGTools/H2TauTau/prod/h2TauTauMiniAOD_mutau_data_cfg.py" if data else "$CMSSW_BASE/src/CMGTools/H2TauTau/prod/h2TauTauMiniAOD_mutau{tes_string}_cfg.py".format(tes_string=tes_string)
+        sequence.append(fileCleaner)
+        prepdir = '$CMSSW_BASE/python/CMGTools/H2TauTau/preprocessor'
+        prepdata = '/'.join([prepdir, 'h2TauTauMiniAOD_mutau_data_cfg.py'])
+        prepmc = '/'.join([prepdir, 'h2TauTauMiniAOD_mutau{tes_string}_cfg.py'.format(tes_string=tes_string)])
+        fname = prepdata if data else prepmc
         preprocessor = CmsswPreprocessor(fname, addOrigAsSecondary=False)
         #selectedComponents[0].files = ['2018-05-22-02/HiggsSUSYBB1000/cmsswPreProcessing.root']
 
@@ -359,3 +358,4 @@ config = cfg.Config(components=selectedComponents,
                     )
 
 printComps(config.components, True)
+

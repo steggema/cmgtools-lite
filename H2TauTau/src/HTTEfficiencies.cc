@@ -1,34 +1,17 @@
+#include "CMGTools/H2TauTau/interface/HTTEfficiencies.h"
+
 #include <vector>
 
 #include "TFile.h"
-#include "RooWorkspace.h"
 #include "RooRealVar.h"
 #include "RooFunctor.h"
 
-class EffProvider {
-public:
-    static EffProvider& instance() {
-        static EffProvider instance;
-        return instance;
-    }
-
-    const RooWorkspace& ws() const {
-        return *ws_;
-    }
-
-private:
-    EffProvider() {
-        TFile f_in("/afs/cern.ch/user/s/steggema/work/80/CMSSW_8_0_25/src/CMGTools/H2TauTau/data/htt_scalefactors_v16_5.root");
-        std::cout << "Creating EffProvider instance in HTTWeighter" << std::endl;
-        ws_ = (RooWorkspace*) f_in.Get("w");
-        f_in.Close();
-    }
-
-    ~EffProvider() {
-    }
-    RooWorkspace* ws_;
-};
-
+EffProvider::EffProvider() {
+  // TFile f_in("/afs/cern.ch/user/s/steggema/work/80/CMSSW_8_0_25/src/CMGTools/H2TauTau/data/htt_scalefactors_v16_5.root");
+  // std::cout << "Creating EffProvider instance in HTTWeighter" << std::endl;
+  // ws_ = (RooWorkspace*) f_in.Get("w");
+  // f_in.Close();
+}
 
 double getDYWeightWS(double genMass, double genpT) {
     auto ws = EffProvider::instance().ws();
