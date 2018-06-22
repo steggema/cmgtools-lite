@@ -39,6 +39,8 @@ git clone -o cmglite-colin git@github.com:cbernet/cmgtools-lite.git CMGTools
 cd CMGTools
 git co -t cmglite-colin/828patch1_HTT
 
+cd $CMSSW_BASE/src
+
 scram b -j 8
 ```
 
