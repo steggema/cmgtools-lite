@@ -126,7 +126,7 @@ void cmg::DiTauObjectFactory<T, U>::produce(edm::Event& iEvent, const edm::Event
     if (patMET) {
       patMet = true;
       if (! patMET->hasUserCand("lepton0") || ! patMET->hasUserCand("lepton1")) {
-        edm::LogWarning("produce") << "Cannot access MET user candidates (0: " << patMET->hasUserCand("lepton0") << ", 1: " << patMET->hasUserCand("lepton1") << std::endl;
+        /* edm::LogWarning("produce") << "Cannot access MET user candidates (0: " << patMET->hasUserCand("lepton0") << ", 1: " << patMET->hasUserCand("lepton1") << std::endl; */
         continue;
       }
       // JAN - not sure how to code this nicer w/o avoiding extra casts...
@@ -152,8 +152,8 @@ void cmg::DiTauObjectFactory<T, U>::produce(edm::Event& iEvent, const edm::Event
     }
   }
 
-  if (!found)
-    edm::LogWarning("produce") << "Did not find suitable user candidates in the pat::MET of types T and U" << std::endl;
+  /* if (!found) */
+  /*   edm::LogWarning("produce") << "Did not find suitable user candidates in the pat::MET of types T and U" << std::endl; */
 
   if (!patMet || !found) {
     for (size_t i1 = 0; i1 < leg1Cands->size(); ++i1) {
@@ -168,7 +168,11 @@ void cmg::DiTauObjectFactory<T, U>::produce(edm::Event& iEvent, const edm::Event
         
         if (metAvailable && !metCands->empty()) {
             if (metCands->size() < result->size()+1) {
-              edm::LogWarning("produce") << "Fewer MET candidates than leg1/leg2 combinations; are the inputs to the MET producer and the di-tau object producer the same?" << std::endl;
+              /* edm::LogWarning("produce") << "Fewer MET candidates than leg1/leg2 combinations; are the inputs to the MET producer and the di-tau object producer the same?" */
+	      /* 			       << " N leg1 = "<< leg1Cands->size()  */
+	      /* 			       << " N leg2 = "<< leg2Cands->size() */
+	      /* 			       << " N mets = "<< metCands->size() */
+	      /* 			       << std::endl; */
               cmg::DiTauObjectFactory<T, U>::set(metCands->at(0), cmgTmp);
             }
             else {
