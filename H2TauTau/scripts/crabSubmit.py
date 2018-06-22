@@ -10,6 +10,15 @@ import imp
 import datetime
 import copy
 
+def ask_confirmation():
+    answer = None
+    while answer not in ['y','n']:
+        answer=raw_input('Confirm submission? [y/n]')
+    if answer == 'n':
+        print 'submission cancelled.'
+        sys.exit(3)
+    
+
 def nfiles_per_job(nevents_per_job, nevents, nfiles):
     nevents_per_file=nevents/nfiles
     nfiles_per_job = nevents_per_job/nevents_per_file
@@ -62,16 +71,30 @@ if __name__ == '__main__':
     import imp
     import pprint
     from optparse import OptionParser
-    usage = "usage: %prog [options] pattern"
+    usage = '''usage: %prog [options] pattern
+
+pattern can be either:
+- a wildcard pattern, e.g. '/DYJets*'. Note the quotes around the pattern, necessary to avoid the pattern to be interpreted by the shell.
+- a set of wildcard patterns separated by commas, e.g. '/DYJets*,*BB*'
+- a file with a pattern on each line, e.g. file.txt:
+
+/DYJets*
+/WJets*
+*Higgs*
+
+Example of use: 
+
+./crabSubmit.py '*BB1000*' -r version2 -e 10000
+'''
     parser = OptionParser(usage=usage)
 
     default_module = os.path.expandvars('$CMSSW_BASE/src/CMGTools/H2TauTau/python/proto/samples/summer16/htt_common.py')
     parser.add_option("-c", "--config", dest="config",
                       default='crabConfig.py',
-                      help='base crab configuration file. defaults to crabConfig.py')
+                      help='base crab configuration file. defaults to crabConfig.py.')
     parser.add_option("-m", "--module", dest="module",
                       default=default_module,
-                      help='module where the components are defined')
+                      help='module where the components are defined. Defaults to '+default_module)
     parser.add_option("-n", "--dry-run", dest="dryrun",
                       action='store_true',
                       default=False,
@@ -83,10 +106,10 @@ if __name__ == '__main__':
     parser.add_option("-e", "--nevents_per_job", dest="nevents_per_job",
                       default=20e4,
                       type='int',
-                      help='desired approximate number of events per job')
+                      help='desired approximate number of events per job. Defaults to 20k. Be aware that the larger the number of jobs, the more probable it is that your job is killed on the GRID because it is using too much memory. We do not advise values larger than 500k events.')
     parser.add_option("-r", "--request_name", dest="request_name",
                       default=None,
-                      help='base name for this request. default: <date_time>')
+                      help='base name for this request. default: <date_time>. The task name is built as <component_name>_<basename>. For the example above, the task name is therefore: HiggsSUSYBB1000_version2')
     
     options, args = parser.parse_args()
 
@@ -97,6 +120,14 @@ if __name__ == '__main__':
   
     if options.dryrun:
         print 'Dry run, will do nothing'
+
+    if not options.dryrun:
+        maxeventsperjob = int(2e4)
+        if options.nevents_per_job > maxeventsperjob:
+            print 'More than {} events/job requested ({})'.format(maxeventsperjob,
+                                                                  options.nevents_per_job)
+            ask_confirmation()
+            
 
     index=ComponentIndex(options.module)
     
@@ -113,12 +144,7 @@ if __name__ == '__main__':
         
     if not options.dryrun:
         print 
-        answer=None
-        while answer not in ['y','n']:
-            answer=raw_input('Confirm submission? [y/n]')
-        if answer == 'n':
-            print 'submission cancelled.'
-            sys.exit(3)
+        ask_confirmation()
 
     if not options.dryrun:
         for component in selected_components:
