@@ -53,7 +53,7 @@ def load_base_config(fname):
 
 def create_config(component, options, base_config):
     '''create crab config for a given component'''
-    config = copy.copy(base_config)
+    config = copy.deepcopy(base_config)
     request_name = None
     if options.request_name:
         request_name = options.request_name
@@ -162,6 +162,7 @@ Example of use:
         for component in selected_components:
             print 'submitting:'
             print component.dataset
+            print component.config
             crabCommand('submit', config=component.config)
         
     
