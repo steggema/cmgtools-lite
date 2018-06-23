@@ -18,3 +18,4 @@ config.Data.publication = True
 config.Data.outputDatasetTag = 'MINIAOD_CL_2'
 
 config.Site.storageSite = 'T3_FR_IPNL'
+config.Site.blacklist = ['T1_US_FNAL']
