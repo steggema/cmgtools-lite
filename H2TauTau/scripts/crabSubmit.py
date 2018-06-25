@@ -11,6 +11,7 @@ import datetime
 import copy
 
 def ask_confirmation():
+    '''ask user confirmation for submission and exit if no'''
     answer = None
     while answer not in ['y','n']:
         answer=raw_input('Confirm submission? [y/n]')
@@ -20,6 +21,7 @@ def ask_confirmation():
     
 
 def nfiles_per_job(nevents_per_job, nevents, nfiles):
+    '''Compute the number of files / job'''
     nevents_per_file=nevents/nfiles
     nfiles_per_job = nevents_per_job/nevents_per_file
     if nfiles_per_job == 0: 
@@ -27,6 +29,12 @@ def nfiles_per_job(nevents_per_job, nevents, nfiles):
     return nfiles_per_job
     
 def get_selected_components(pattern_or_fname):
+    '''Returns the list of components matching pattern_or_fname.
+    pattern_or_fname can be: 
+    - a wildcard pattern
+    - a comma-separated list of patterns
+    - the path to a file containing on each line a pattern
+    '''
     if os.path.isfile(pattern_or_fname):
         sys.exit(4)
     patterns = pattern_or_fname.split(',')
@@ -36,6 +44,7 @@ def get_selected_components(pattern_or_fname):
     return selected
     
 def load_base_config(fname):
+    '''Load crab config from file fname and return it'''
     config = None
     with open(fname) as ifile:
         mod = imp.load_source('mod', fname, ifile)
@@ -43,7 +52,8 @@ def load_base_config(fname):
     return config
 
 def create_config(component, options, base_config):
-    config = copy.copy(base_config)
+    '''create crab config for a given component'''
+    config = copy.deepcopy(base_config)
     request_name = None
     if options.request_name:
         request_name = options.request_name
@@ -58,6 +68,8 @@ def create_config(component, options, base_config):
                                            nfiles)
     print 'Task:', 
     print '\t', component.dataset
+    print '\tn evts(M) = {:5.2f}'.format(component.dataset_entries/1e6)
+    print '\tn files   =', nfiles
     print '\tfiles/job =', config.Data.unitsPerJob
     print '\tn jobs    =', nfiles/config.Data.unitsPerJob
     if options.verbose: 
@@ -104,7 +116,7 @@ Example of use:
                       default=False,
                       help='verbose mode')
     parser.add_option("-e", "--nevents_per_job", dest="nevents_per_job",
-                      default=20e4,
+                      default=int(5e4),
                       type='int',
                       help='desired approximate number of events per job. Defaults to 20k. Be aware that the larger the number of jobs, the more probable it is that your job is killed on the GRID because it is using too much memory. We do not advise values larger than 500k events.')
     parser.add_option("-r", "--request_name", dest="request_name",
@@ -122,7 +134,7 @@ Example of use:
         print 'Dry run, will do nothing'
 
     if not options.dryrun:
-        maxeventsperjob = int(2e4)
+        maxeventsperjob = int(2e5)
         if options.nevents_per_job > maxeventsperjob:
             print 'More than {} events/job requested ({})'.format(maxeventsperjob,
                                                                   options.nevents_per_job)
@@ -150,6 +162,7 @@ Example of use:
         for component in selected_components:
             print 'submitting:'
             print component.dataset
+            print component.config
             crabCommand('submit', config=component.config)
         
     
