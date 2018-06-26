@@ -130,8 +130,6 @@ class Dataset(object):
 def get_options():
     import os
     import sys
-    import imp
-    import pprint
     from optparse import OptionParser
     usage = "usage: %prog [options] <src_dir>"
     parser = OptionParser(usage=usage)
