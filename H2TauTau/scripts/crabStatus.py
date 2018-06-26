@@ -36,9 +36,10 @@ def filter_by_error_code(result, error_code):
 def print_jobs(jobs): 
     pprint.pprint(jobs)
 
-def job_ids(jobs):
+def print_job_ids(jobs):
     ids = jobs.keys()
-    return ','.join(ids)
+    print len(ids), 'selected jobs'
+    print ','.join(ids)
 
 def print_one(jobs):
     print 'this is one of your jobs:'
@@ -52,5 +53,5 @@ if __name__ == '__main__':
     
     filtered = filter_by_error_code(result, options.error_code)
     print_one(filtered)
-    print 
-    print job_ids(filtered)
+    print_job_ids(filtered)
+     
