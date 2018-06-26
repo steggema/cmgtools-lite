@@ -64,6 +64,7 @@ compindex = ComponentIndex(higgs_susy)
 data_list = compindex.glob('data_single_muon')
 
 samples = compindex.glob('*BB1000*')
+
 nevts_per_file = 1e4
 
 if (not cmssw) or production:

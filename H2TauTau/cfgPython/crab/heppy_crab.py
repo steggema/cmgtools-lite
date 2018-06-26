@@ -23,6 +23,7 @@ parser.add_option_group(g1)
 
 g2 = OptionGroup(parser,"Stageout options")
 g2.add_option("-s", "--storage-site", dest="storageSite", 
+              default='T3_FR_IPNL',
               help="site where the output should be staged out (T2_XX_YYYY)")
 g2.add_option("-d", "--output-dir", dest="outputDir", 
               help="name of the directory where files will be staged out: /store/user/$USER/<output_dir>/<cmg_version>/<production_label>/dataset/$date_$time/0000/foo.bar", default="heppyTrees")
@@ -40,7 +41,7 @@ g2.add_option("--only-unpacked", dest="only_unpacked",
 
 parser.add_option("-n", "--dryrun", dest="dryrun", action="store_true",default=False, help="dryrun")
 parser.add_option("-w", "--siteWhitelist", dest="siteWhitelist", type="string", 
-                  action="append", default=[], 
+                  action="append", default=['T3_FR_IPNL'], 
                   help="Sites whitelist (default is using the one in heppy_crab_config.py)")
 parser.add_option("-N", dest="maxevents", default=-1, 
                   help="maximum number of events to process per heppy run (for debugging purposes)")
