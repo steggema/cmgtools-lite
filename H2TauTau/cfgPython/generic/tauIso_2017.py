@@ -5,11 +5,15 @@ from PhysicsTools.HeppyCore.framework.eventsfwlite import Events
 
 from CMGTools.H2TauTau.proto.analyzers.TauIsoAnalyzer import TauIsoAnalyzer
 from CMGTools.H2TauTau.proto.analyzers.TauIsoTreeProducer import TauIsoTreeProducer
-from CMGTools.H2TauTau.proto.samples.fall17.htt_common import DYJetsToLL_M50_LO
+from CMGTools.H2TauTau.proto.samples.fall17.htt_common import DYJetsToLL_M50_LO, QCD_Pt_15to7000_TuneCP5_Flat2017, QCD_Pt_15to7000_TuneCP5_Flat
+from CMGTools.RootTools.samples.autoAAAconfig import autoAAA
 
-production = getHeppyOption('production', True)
+production = getHeppyOption('production', False)
 
 selected_components = [DYJetsToLL_M50_LO]
+selected_components = [QCD_Pt_15to7000_TuneCP5_Flat2017]
+selected_components = [QCD_Pt_15to7000_TuneCP5_Flat]
+autoAAA(selected_components)
 
 tau_iso_ana = cfg.Analyzer(
     TauIsoAnalyzer,

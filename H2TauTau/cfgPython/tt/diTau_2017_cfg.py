@@ -14,7 +14,6 @@ from CMGTools.H2TauTau.proto.analyzers.TauP4Scaler import TauP4Scaler
 from CMGTools.H2TauTau.proto.analyzers.SVfitProducer import SVfitProducer
 from CMGTools.H2TauTau.proto.analyzers.L1TriggerAnalyzer import L1TriggerAnalyzer
 from CMGTools.H2TauTau.proto.analyzers.MT2Analyzer import MT2Analyzer
-from CMGTools.H2TauTau.proto.analyzers.METFilter import METFilter
 
 # common configuration and sequence
 from CMGTools.H2TauTau.htt_ntuple_base_cff import commonSequence, httGenAna, puFileData, puFileMC, eventSelector, susyCounter, susyScanAna, jetAna, recoilCorr, mcWeighter, triggerAna, lheWeightAna
@@ -223,19 +222,7 @@ svfitProducer = cfg.Analyzer(
     l2type='tau'
 )
 
-metFilter = cfg.Analyzer(
-    METFilter,
-    name='METFilter',
-    processName='AOD',
-    triggers=[
-        'Flag_HBHENoiseFilter', 
-        'Flag_HBHENoiseIsoFilter', 
-        'Flag_EcalDeadCellTriggerPrimitiveFilter',
-        'Flag_goodVertices',
-        'Flag_eeBadScFilter',
-        'Flag_globalTightHalo2016Filter'
-    ]
-)
+
 
 ###################################################
 ### CONNECT SAMPLES TO THEIR ALIASES AND FILES  ###
@@ -295,7 +282,6 @@ sequence.append(tauDecayModeWeighter)
 sequence.append(tau1Weighter)
 sequence.append(tau2Weighter)
 sequence.append(tauTauMT2Ana)
-sequence.append(metFilter)
 if doSUSY:
     sequence.insert(sequence.index(mcWeighter) + 1, susyScanAna)
     sequence.insert(sequence.index(susyScanAna) + 1, susyCounter)

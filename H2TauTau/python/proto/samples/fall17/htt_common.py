@@ -1,4 +1,4 @@
-from CMGTools.RootTools.samples.samples_13TeV_RunIIFall17MiniAOD import DYNJetsToLL, QCD_EMs, TBar_tch, Ws, T_tch, DYJetsToLL_M10to50_LO, DYJetsToLL_M50_LO, DYJetsToLL_M50_LO_ext, TBar_tWch_noFullyHad, T_tWch_noFullyHad, WJetsToLNu_LO, TTLep_pow, TTHad_pow, TTSemi_pow, ZZTo4L,  WWTo2L2Nu, WZTo3LNu_fxfx, ZZTo2L2Nu
+from CMGTools.RootTools.samples.samples_13TeV_RunIIFall17MiniAOD import DYNJetsToLL, QCD_EMs, TBar_tch, Ws, T_tch, DYJetsToLL_M10to50_LO, DYJetsToLL_M50_LO, DYJetsToLL_M50_LO_ext, TBar_tWch_noFullyHad, T_tWch_noFullyHad, WJetsToLNu_LO, TTLep_pow, TTHad_pow, TTSemi_pow, ZZTo4L,  WWTo2L2Nu, WZTo3LNu_fxfx, ZZTo2L2Nu, QCD_Pt_15to7000_TuneCP5_Flat2017, QCD_Pt_15to7000_TuneCP5_Flat
 
 # There in 2016, not yet in 2017: QCDPtbcToE, WZJToLLLNu, WZTo1L3Nu, WWTo1L1Nu2Q, WZTo1L1Nu2Q, ZZTo2L2Q, WZTo2L2Q
 
