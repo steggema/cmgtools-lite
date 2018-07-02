@@ -42,16 +42,6 @@ class TauTauAnalyzer(DiLeptonAnalyzer):
             'std::vector<pat::Jet>'
         )
 
-        self.handles['puppiMET'] = AutoHandle(
-            'slimmedMETsPuppi',
-            'std::vector<pat::MET>'
-        )
-
-        self.handles['pfMET'] = AutoHandle(
-            'slimmedMETs',
-            'std::vector<pat::MET>'
-        )
-
         self.handles['l1IsoTau'] = AutoHandle( 
             ('l1extraParticles', 'IsoTau'), 
             'std::vector<l1extra::L1JetParticle>'   
@@ -75,18 +65,8 @@ class TauTauAnalyzer(DiLeptonAnalyzer):
         # as implemented here
         event.goodVertices = event.vertices
 
-        result = super(TauTauAnalyzer, self).process(event)
+        super(TauTauAnalyzer, self).process(event)
 
-        event.isSignal = False
-        if result:
-            event.isSignal = True
-
-        if hasattr(self.cfg_ana, 'tauEnergyScale') and self.cfg_ana.tauEnergyScale and self.cfg_comp.isMC:
-            self.TauEnergyScale(event.diLeptons, event)
-
-        # trying to get a dilepton from the control region.
-        # it must have well id'ed and trig matched legs,
-        # di-lepton and tri-lepton veto must pass
         result = self.selectionSequence(event,
                                         fillCounter=True,
                                         leg1IsoCut=self.cfg_ana.looseiso1,
@@ -99,18 +79,6 @@ class TauTauAnalyzer(DiLeptonAnalyzer):
         
         if not (hasattr(event, 'leg1') and hasattr(event, 'leg2')):
             return False
-
-        if hasattr(event, 'calibratedPfMet'):
-            event.pfmet = event.calibratedPfMet
-        else:
-            event.pfmet = self.handles['pfMET'].product()[0]
-
-        if hasattr(self.cfg_ana, 'tauEnergyScale') and \
-                self.cfg_ana.tauEnergyScale and self.cfg_comp.isMC:
-            # correct pfmet for selected leptons scaling
-            for lep in [event.diLepton.leg1(),event.diLepton.leg2()]:
-                event.pfmet.setP4(event.pfmet.p4()-(lep.p4()-lep.unscaledP4))
-            event.diLepton.met().setP4(event.pfmet.p4())
 
         if hasattr(event, 'calibratedPuppiMet'):
             event.puppimet = event.calibratedPuppiMet
@@ -151,11 +119,8 @@ class TauTauAnalyzer(DiLeptonAnalyzer):
         else:
             taus = self.handles['taus'].product()
         
-        if hasattr(event, 'calibratedPfMet'):
-            met = event.calibratedPfMet
-        else:
-            met = self.handles['pfMET'].product()[0]
-        
+        met = event.pfmet
+                
         taus = [Tau(tau) for tau in taus]
 
         if getattr(self.cfg_ana, 'scaleTaus', False):

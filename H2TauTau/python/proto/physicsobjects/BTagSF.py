@@ -20,7 +20,7 @@ class BTagSF(object):
         self.btag_eff_oth = self.mc_eff_file.Get('btag_eff_oth')
 
         # b-tag SFs from POG
-        calib = ROOT.BTagCalibration("csvv2", os.path.expandvars("$CMSSW_BASE/src/CMGTools/RootTools/data/btag/CSVv2_Moriond17_B_H.csv"))
+        calib = ROOT.BTagCalibration("DeepCSV", os.path.expandvars("$CMSSW_BASE/src/CMGTools/H2TauTau/data/DeepCSV_94XSF_V1_B_F.csv"))
         
         op_dict = {
             'loose':0,

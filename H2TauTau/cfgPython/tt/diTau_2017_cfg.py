@@ -232,19 +232,7 @@ svfitProducer = cfg.Analyzer(
     l2type='tau'
 )
 
-metFilter = cfg.Analyzer(
-    METFilter,
-    name='METFilter',
-    processName='AOD',
-    triggers=[
-        'Flag_HBHENoiseFilter', 
-        'Flag_HBHENoiseIsoFilter', 
-        'Flag_EcalDeadCellTriggerPrimitiveFilter',
-        'Flag_goodVertices',
-        'Flag_eeBadScFilter',
-        'Flag_globalTightHalo2016Filter'
-    ]
-)
+
 
 tauIDWeighter = cfg.Analyzer(
     TauIDWeighter,
@@ -316,7 +304,6 @@ sequence.append(tau2Weighter)
 if syncntuple:
     sequence.append(tauIDWeighter)
 sequence.append(tauTauMT2Ana)
-sequence.append(metFilter)
 if doSUSY:
     sequence.insert(sequence.index(mcWeighter) + 1, susyScanAna)
     sequence.insert(sequence.index(susyScanAna) + 1, susyCounter)

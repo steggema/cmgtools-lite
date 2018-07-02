@@ -10,7 +10,7 @@ from CMGTools.H2TauTau.proto.plotter.HistCreator import createHistograms, create
 from CMGTools.H2TauTau.proto.plotter.HistDrawer import HistDrawer
 from CMGTools.H2TauTau.proto.plotter.Variables import taumu_vars, getVars
 from CMGTools.H2TauTau.proto.plotter.helper_methods import getVertexWeight
-from CMGTools.H2TauTau.proto.samples.spring16.htt_common import lumi, lumi_2016G
+from CMGTools.H2TauTau.proto.samples.fall17.htt_common import lumi
 
 from CMGTools.H2TauTau.proto.plotter.qcdEstimationMSSMltau import estimateQCDWMSSM, createQCDWHistograms
 from CMGTools.H2TauTau.proto.plotter.defaultGroups import createDefaultGroups
@@ -33,9 +33,9 @@ def prepareCuts(mode):
     # inc_cut += '&& l2_decayModeFinding'
 
     mt_cut = 'mt<30'
-    if mode in ['sm', 'iso', 'cp', 'mva']:
+    if mode in ['sm', 'iso', 'cp', 'mva', 'pog']:
         mt_cut = 'mt<40'
-        inc_cut += '&& n_bjets==0'
+        # inc_cut += '&& n_bjets==0'
 
     
     # cuts.append(Cut('inclusive_tauisosideband', inc_cut.replace('l2_byIsolationMVArun2v1DBoldDMwLT>3.5', 'l2_byIsolationMVArun2v1DBoldDMwLT<3.5&&l2_byIsolationMVArun2v1DBoldDMwLT>0.5') + '&& l1_charge != l2_charge'))
@@ -58,8 +58,13 @@ def prepareCuts(mode):
         cuts.append(Cut('btag_highmtss', inc_cut + '&& l1_charge == l2_charge && n_bjets>=1 && n_jets<=1 && mt>70'))
         cuts.append(Cut('btag_lowmtss', inc_cut + '&& l1_charge == l2_charge && n_bjets>=1 && n_jets<=1 && mt<30'))
 
-    if mode == 'sm':
+    if mode in ['sm', 'pog']:
         cuts.append(Cut('inclusive', inc_cut + '&&  l1_charge != l2_charge'))
+        cuts.append(Cut('lowmt', inc_cut + '&& l1_charge != l2_charge && mt<30'))
+        cuts.append(Cut('lowmt_dm0', inc_cut + '&& l1_charge != l2_charge && mt<30 && l2_decayMode==0'))
+        cuts.append(Cut('lowmt_dm1', inc_cut + '&& l1_charge != l2_charge && mt<30 && l2_decayMode==1'))
+        cuts.append(Cut('lowmt_dm10', inc_cut + '&& l1_charge != l2_charge && mt<30 && l2_decayMode==10'))
+        cuts.append(Cut('lowmt_lowmvis_pzetadisc_lowmuonpt', inc_cut + '&& l1_charge != l2_charge && mt<30 && mvis<100 && pzeta_disc>-40. && l1_pt<45.'))
         # cuts.append(Cut('inclusive_dm0', inc_cut + '&&  l1_charge != l2_charge && l2_decayMode==0'))
         # cuts.append(Cut('inclusive_dm1', inc_cut + '&&  l1_charge != l2_charge && l2_decayMode==1'))
         # cuts.append(Cut('inclusive_dm10', inc_cut + '&&  l1_charge != l2_charge && l2_decayMode==10'))
@@ -93,32 +98,6 @@ def prepareCuts(mode):
 
             cuts.append(Cut('vbf_loose', inc_cut + '&& l1_charge != l2_charge && l2_pt>30. && mt<40 && {vbf}'.format(vbf=cut_vbf_loose)))
             cuts.append(Cut('vbf_tight', inc_cut + '&& l1_charge != l2_charge && l2_pt>30. && mt<40 && {vbf}'.format(vbf=cut_vbf_tight)))
-    if mode == 'mva':
-        # cuts.append(Cut('mva_high', inc_cut + '&& l1_charge != l2_charge && mt<40 && mva>0.2'))
-        # cuts.append(Cut('mva_vhigh', inc_cut + '&& l1_charge != l2_charge && mt<40 && mva>0.5'))
-        # cuts.append(Cut('mva_low', inc_cut + '&& l1_charge != l2_charge && mt<40 && mva<0.2'))
-
-        # for mva_cut in ['0.5', '0.6', '0.7']:
-        #     cuts.append(Cut('mva_gr{cut}_vbf'.format(cut=mva_cut).replace('.', ''), inc_cut + '&& l1_charge != l2_charge && mt<40 && mva>{cut} && vbf_mjj>300 && abs(vbf_deta)>3.5'.format(cut=mva_cut)))
-        #     cuts.append(Cut('mva_l{cut}_vbf'.format(cut=mva_cut).replace('.', ''), inc_cut + '&& l1_charge != l2_charge && mt<40 && mva<{cut} && vbf_mjj>300 && abs(vbf_deta)>3.5'.format(cut=mva_cut)))
-        #     cuts.append(Cut('mva_gr{cut}_1jet'.format(cut=mva_cut).replace('.', ''), inc_cut + '&& l1_charge != l2_charge && mt<40 && mva>{cut} && !(vbf_mjj>300 && abs(vbf_deta)>3.5) && n_jets>0.5'.format(cut=mva_cut)))
-        #     cuts.append(Cut('mva_l{cut}_1jet'.format(cut=mva_cut).replace('.', ''), inc_cut + '&& l1_charge != l2_charge && mt<40 && mva<{cut} && !(vbf_mjj>300 && abs(vbf_deta)>3.5) && n_jets>0.5'.format(cut=mva_cut)))
-
-        #     cuts.append(Cut('mva_gr{cut}_0jet'.format(cut=mva_cut).replace('.', ''), inc_cut + '&& l1_charge != l2_charge && mt<40 && mva>{cut} && !(vbf_mjj>300 && abs(vbf_deta)>3.5) && n_jets<0.5'.format(cut=mva_cut)))
-        #     cuts.append(Cut('mva_l{cut}_0jet'.format(cut=mva_cut).replace('.', ''), inc_cut + '&& l1_charge != l2_charge && mt<40 && mva<{cut} && !(vbf_mjj>300 && abs(vbf_deta)>3.5) && n_jets<0.5'.format(cut=mva_cut)))
-        # cuts.append(Cut('1jet_novbf', inc_cut + '&& l1_charge != l2_charge && mt<40 && n_jets>0.5 && !{vbf}'.format(vbf=cut_vbf)))
-        
-        cut_vbf = '(vbf_mjj>500. && abs(vbf_deta)>3.5 && vbf_n_central==0. && jet1_pt>50 && jet2_pt>30)'
-
-        # cuts.append(Cut('0jet_lowmva0', inc_cut + '&& l1_charge != l2_charge && {mt_cut} && n_jets<0.5 && mva0<0.1'.format(mt_cut=mt_cut)))
-        # cuts.append(Cut('0jet_highmva0', inc_cut + '&& l1_charge != l2_charge && {mt_cut} && n_jets<0.5 && mva0>0.1'.format(mt_cut=mt_cut)))
-        cuts.append(Cut('vbf_lowmva0_jetpt5030', inc_cut + '&& l1_charge != l2_charge && {mt_cut} && {vbf} && mva0<0.1'.format(mt_cut=mt_cut, vbf=cut_vbf)))
-        cuts.append(Cut('vbf_highmva0_jetpt5030', inc_cut + '&& l1_charge != l2_charge && {mt_cut} && {vbf} && mva0>0.1'.format(mt_cut=mt_cut, vbf=cut_vbf)))
-        # cuts.append(Cut('1jet_novbf_verylowmva0', inc_cut + '&& l1_charge != l2_charge && {mt_cut} && n_jets>0.5 && !{vbf} && mva0<0.1'.format(mt_cut=mt_cut, vbf=cut_vbf)))
-        # cuts.append(Cut('1jet_novbf_lowmva0', inc_cut + '&& l1_charge != l2_charge && {mt_cut} && n_jets>0.5 && !{vbf} && mva0<0.2'.format(mt_cut=mt_cut, vbf=cut_vbf)))
-        # cuts.append(Cut('1jet_novbf_highmva0', inc_cut + '&& l1_charge != l2_charge && {mt_cut} && n_jets>0.5 && !{vbf} && mva0>0.1'.format(mt_cut=mt_cut, vbf=cut_vbf)))
-
-        # cuts.append(Cut('1jet_novbf_lowmva0lowmva1', inc_cut + '&& l1_charge != l2_charge && {mt_cut} && n_jets>0.5 && !{vbf} && mva0<0.2 && mva1<0.2'.format(mt_cut=mt_cut, vbf=cut_vbf)))
 
     if mode == 'cp':
         cuts.append(Cut('inclusivemt40', inc_cut + '&&  l1_charge != l2_charge && mt<40 && mvis>40 && mvis<90 && l2_nc_ratio>-99'))
@@ -140,7 +119,7 @@ def createSamples(mode, analysis_dir, total_weight, qcd_from_same_sign, w_qcd_ms
     hist_dict = {}
     sample_dict = {}
 
-    samples_mc, samples_data, samples, all_samples, sampleDict = createSampleLists(analysis_dir=analysis_dir)
+    samples_mc, samples_data, samples, all_samples, sampleDict = createSampleLists(analysis_dir=analysis_dir, mode=mode)
 
     if mode == 'mssm_control' or not 'mssm' in mode:
         all_samples = [s for s in all_samples if not 'ggH' in s.name and not 'bbH' in s.name]
@@ -174,33 +153,12 @@ def createVariables(mode):
     # variables = getVars(['_norm_', 'mt', 'mvis', 'l1_pt', 'l2_pt', 'l1_eta', 'l2_eta', 'n_vertices', 'n_jets', 'n_bjets'])
 
     variables = []
-    if mode == 'sm':
-        variables = [
-            # VariableCfg(name='mva', binning={'nbinsx':20, 'xmin':0., 'xmax':1.}, unit='', xtitle='s_{BDT}'),
-            # VariableCfg(name='svfit_mass', binning={'nbinsx':20, 'xmin':50., 'xmax':250}, unit='GeV', xtitle='m_{SVFit}'),
-            # VariableCfg(name='mva0', binning={'nbinsx':20, 'xmin':0., 'xmax':1.0001}, unit='', xtitle='s_{BDT} (BG)'),
-            # VariableCfg(name='mva1', binning={'nbinsx':20, 'xmin':0., 'xmax':1.0001}, unit='', xtitle='s_{BDT} (ZTT)'),
-            # VariableCfg(name='mva2', binning=binning_mva2, unit='', xtitle='s_{BDT} (Higgs)'),
-            # VariableCfg(name='mva2div1', drawname='mva2/(mva1+mva2)', binning={'nbinsx':20, 'xmin':0., 'xmax':1.0001}, unit='', xtitle='s_{BDT}^{Higgs}/s_{BDT}^{ZTT}'),
-            # VariableCfg(name='mva2div1', drawname='mva2/(mva1+mva2)', binning=binning_mva, unit='', xtitle='s_{BDT}^{Higgs}/s_{BDT}^{ZTT}'),
-        ]
-
+    if mode in ['sm', 'pog']:
         # MVA training variables, and others
-        variables += getVars(['mt', 'l2_mt', 'n_jets', 'met_pt', 'pthiggs', 'vbf_mjj', 'vbf_deta', 'vbf_n_central', 'l2_pt', 'l1_pt','mvis', 'l1_eta', 'l2_eta', 'delta_phi_l1_l2', 'delta_eta_l1_l2', 'pt_l1l2', 'delta_phi_j1_met', 'pzeta_disc', 'jet1_pt', 'jet1_eta'])#  'svfit_transverse_mass', 
+        variables += getVars(['mt', 'l2_mt', 'n_jets', 'met_pt', 'pthiggs', 'l2_pt', 'l1_pt','mvis', 'l1_eta', 'l2_eta', 'pzeta_disc', 'jet1_pt', 'jet1_eta', 'n_vertices', 'rho', 'dil_pt', 'l2_byIsolationMVArun2v1DBoldDMwLTraw', 'l2_byCombinedIsolationDeltaBetaCorrRaw3Hits', 'l2_byIsolationMVArun2v1DBoldDMwLTraw_zoom',
+            'l2_nc_ratio', 'l2_pt_weighted_dr_iso', 'l2_pt_weighted_dr_signal', 'l2_pt_weighted_dphi_strip', 'l2_pt_weighted_deta_strip', 'l2_flightLength', 'l2_flightLengthSig', 'l2_dxy_Sig', 'l2_ip3d', 'l2_ip3d_Sig', 'l2_e_over_h', 'l2_n_photons', ])#  'svfit_transverse_mass',  'delta_phi_l1_l2', 'delta_eta_l1_l2', 'pt_l1l2', 'delta_phi_j1_met',
 
-        variables = taumu_vars
-
-    if mode == 'mva':
-        variables = [
-            VariableCfg(name='mva0', binning={'nbinsx':20, 'xmin':0., 'xmax':1.0001}, unit='', xtitle='s_{BDT} (BG)'),
-            VariableCfg(name='mva1', binning={'nbinsx':20, 'xmin':0., 'xmax':1.0001}, unit='', xtitle='s_{BDT} (ZTT)'),
-            VariableCfg(name='mva2', binning=binning_mva2, unit='', xtitle='s_{BDT} (Higgs)'),
-            VariableCfg(name='mva2div1', drawname='mva2/(mva1+mva2)', binning={'nbinsx':20, 'xmin':0., 'xmax':1.0001}, unit='', xtitle='s_{BDT}^{Higgs}/s_{BDT}^{ZTT}'),
-            VariableCfg(name='mva2div1_fine', drawname='mva2/(mva1+mva2)', binning=binning_mva, unit='', xtitle='s_{BDT}^{Higgs}/s_{BDT}^{ZTT}'),
-        ]
-
-        # variables += getVars(['mt', 'n_jets', 'met_pt', 'pthiggs', 'vbf_mjj', 'vbf_deta', 'vbf_n_central', 'l2_pt', 'l1_pt', 'mvis', 'n_vertices', 'l1_eta', 'l2_eta', 'delta_phi_l1_l2', 'delta_eta_l1_l2', '_norm_'])
-        variables += taumu_vars
+        # variables = taumu_vars
 
     if mode == 'cp':
         variables = getVars(['l2_nc_ratio'])
@@ -292,26 +250,19 @@ if __name__ == '__main__':
         
     # mode = 'iso'
     # mode = 'sm'
-    mode = 'mva'
+    mode = 'pog'
     # mode = 'cp'
     # mode = 'mssm_signal' 
     # mode = 'mssm_control'
 
-    data2016G = False
 
     friend_func = None
     
     int_lumi = lumi
-
-    if data2016G:
-        int_lumi = lumi_2016G
         
     qcd_from_same_sign = True
     w_qcd_mssm_method = True
     r_qcd_os_ss = 1.17
-
-    if mode == 'mva':
-        friend_func = lambda f: f.replace('MC', 'MVA')
 
     if mode == 'iso':
         qcd_from_same_sign = False
@@ -323,13 +274,10 @@ if __name__ == '__main__':
     add_tes_sys = False
 
 
-    analysis_dir = '/data1/steggema/mt/051016/MuTauMC/'
+    analysis_dir = '/afs/cern.ch/user/s/steggema/work/analysis/CMSSW_9_4_4/src/CMGTools/H2TauTau/cfgPython/mt/MC_AAA/'
 
-    total_weight = 'weight'
-    total_weight = 'weight * (1. - 0.0772790*(l2_gen_match == 5 && l2_decayMode==0) - 0.138582*(l2_gen_match == 5 && l2_decayMode==1) - 0.220793*(l2_gen_match == 5 && l2_decayMode==10) )' # Tau ID eff scale factor
-
-    if data2016G:
-        total_weight = '(' + total_weight + '*' + getVertexWeight(True) + ')'
+    total_weight = 'weight*abs(weight_gen)'
+    # total_weight = 'weight * (1. - 0.0772790*(l2_gen_match == 5 && l2_decayMode==0) - 0.138582*(l2_gen_match == 5 && l2_decayMode==1) - 0.220793*(l2_gen_match == 5 && l2_decayMode==10) )' # Tau ID eff scale factor
 
     print total_weight
 

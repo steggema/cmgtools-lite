@@ -1,3 +1,5 @@
+from fnmatch import fnmatch
+
 from PhysicsTools.Heppy.analyzers.core.Analyzer import Analyzer
 from PhysicsTools.Heppy.analyzers.core.AutoHandle import AutoHandle
 
@@ -62,7 +64,7 @@ class TriggerAnalyzer(Analyzer):
                 )
         else:    
             self.handles['triggerObjects'] =  AutoHandle(
-                'selectedPatTrigger',
+                'slimmedPatTrigger',
                 'std::vector<pat::TriggerObjectStandAlone>'
                 )
  
@@ -130,21 +132,32 @@ class TriggerAnalyzer(Analyzer):
         triggers_fired = []
         
         for trigger_name in self.triggerList + self.extraTrig:
-            index = names.triggerIndex(trigger_name)
+
+            matched_names = [n for n in names.triggerNames() if fnmatch(n, trigger_name)]
+            
+            trigger_match_name = trigger_name
+
+            if len(matched_names) > 1:
+                print 'Multiple trigger names matched to', trigger_name
+                import pdb; pdb.set_trace()
+            elif matched_names:
+                trigger_match_name = matched_names[0]
+
+            index = names.triggerIndex(trigger_match_name)
             if index == len(triggerBits):
                 continue
             prescale = preScales.getPrescaleForIndex(index)
             fired = triggerBits.accept(index)
 
-            trigger_infos.append(TriggerInfo(trigger_name, index, fired, prescale))
+            trigger_infos.append(TriggerInfo(trigger_match_name, index, fired, prescale))
 
-            if fired and (prescale == 1 or self.cfg_ana.usePrescaled):
+            if fired and (prescale == 1 or self.cfg_ana.usePrescaled or prescale == 0): # FIXME: prescale should of course not be zero, but there was a bug in the PAT trigger producer for 2017 data
                 if trigger_name in self.triggerList:
                     trigger_passed = True
                     self.counters.counter('Trigger').inc(trigger_name)            
                 triggers_fired.append(trigger_name)
             elif fired:
-                print 'WARNING: Trigger not passing because of prescale', trigger_name
+                print 'WARNING: Trigger not passing because of prescale', trigger_name, trigger_match_name, prescale
                 self.counters.counter('Trigger').inc(trigger_name + 'prescaled')
 
         if self.cfg_ana.requireTrigger:
@@ -155,11 +168,13 @@ class TriggerAnalyzer(Analyzer):
             triggerObjects = self.handles['triggerObjects'].product()
             for to in triggerObjects:
                 to.unpackPathNames(names)
+                # import pdb; pdb.set_trace()
+                to.unpackFilterLabels(event.input.object(), triggerBits)
                 for info in trigger_infos:
                     if to.hasPathName(info.name):
                         for match_info in self.triggerObjects + self.extraTriggerObjects:
                             if match_info.triggers:
-                                if not info.name in match_info.triggers:
+                                if not any(fnmatch(info.name, n) for n in match_info.triggers):
                                     continue
                             if any(n in to.filterLabels() for n in match_info.leg1_names):
                                 info.leg1_objs.append(to)

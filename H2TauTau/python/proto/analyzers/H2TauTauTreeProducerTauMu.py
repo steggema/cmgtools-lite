@@ -1,6 +1,7 @@
 import ROOT
 
 from CMGTools.H2TauTau.proto.analyzers.H2TauTauTreeProducer import H2TauTauTreeProducer
+from CMGTools.H2TauTau.proto.analyzers.tau_utils import n_photons_tau, e_over_h, tau_pt_weighted_dr_iso, tau_pt_weighted_dphi_strip, tau_pt_weighted_deta_strip, tau_pt_weighted_dr_signal
 from PhysicsTools.Heppy.physicsutils.TauDecayModes import tauDecayModes
 
 class H2TauTauTreeProducerTauMu(H2TauTauTreeProducer):
@@ -25,21 +26,41 @@ class H2TauTauTreeProducerTauMu(H2TauTauTreeProducer):
         self.var(self.tree, 'l2_gen_nc_ratio')
         self.var(self.tree, 'l2_nc_ratio')
 
-        self.var(self.tree, 'l2_weight_fakerate')
-        self.var(self.tree, 'l2_weight_fakerate_up')
-        self.var(self.tree, 'l2_weight_fakerate_down')
+        # self.var(self.tree, 'l2_weight_fakerate')
+        # self.var(self.tree, 'l2_weight_fakerate_up')
+        # self.var(self.tree, 'l2_weight_fakerate_down')
 
-        self.var(self.tree, 'trigger_isomu22')
-        self.var(self.tree, 'trigger_isotkmu22')
-        self.var(self.tree, 'trigger_isomu19tau20')
+        self.var(self.tree, 'trigger_isomu24')
+        self.var(self.tree, 'trigger_isomu27')
+        # self.var(self.tree, 'trigger_isotkmu22')
+        # self.var(self.tree, 'trigger_isomu19tau20')
 
-        self.var(self.tree, 'trigger_matched_isomu22')
-        self.var(self.tree, 'trigger_matched_isotkmu22')
-        self.var(self.tree, 'trigger_matched_isomu19tau20')
+        self.var(self.tree, 'trigger_matched_isomu24')
+        self.var(self.tree, 'trigger_matched_isomu27')
+        # self.var(self.tree, 'trigger_matched_isotkmu22')
+        # self.var(self.tree, 'trigger_matched_isomu19tau20')
 
-        self.var(self.tree, 'trigger_matched_singlemuon')
+        self.var(self.tree, 'l2_weight_mutotau')
 
-        if hasattr(self.cfg_ana, 'addIsoInfo') and self.cfg_ana.addIsoInfo:
+        if getattr(self.cfg_ana, 'addTauMVAInputs', False):
+            self.var(self.tree, 'l2_n_photons')
+            self.var(self.tree, 'l2_e_over_h')
+            self.var(self.tree, 'l2_pt_weighted_dr_iso')
+            self.var(self.tree, 'l2_pt_weighted_dr_signal')
+            self.var(self.tree, 'l2_pt_weighted_dphi_strip')
+            self.var(self.tree, 'l2_pt_weighted_deta_strip')
+
+            self.var(self.tree, 'l2_flightLength')
+            self.var(self.tree, 'l2_flightLengthSig')
+            self.var(self.tree, 'l2_dxy_Sig')
+            self.var(self.tree, 'l2_ip3d')
+            self.var(self.tree, 'l2_ip3d_error')
+            self.var(self.tree, 'l2_ip3d_Sig')
+            self.var(self.tree, 'l2_leadingTrackNormChi2')
+            self.var(self.tree, 'l2_leadingTrackNormChi2')
+
+        if getattr(self.cfg_ana, 'addIsoInfo', False):
+
             self.var(self.tree, 'l1_puppi_iso_pt')
             self.var(self.tree, 'l1_puppi_iso04_pt')
             self.var(self.tree, 'l1_puppi_iso03_pt')
@@ -55,13 +76,13 @@ class H2TauTauTreeProducerTauMu(H2TauTauTreeProducer):
             self.var(self.tree, 'l1_mini_iso')
             self.var(self.tree, 'l1_mini_reliso')
 
-        if hasattr(self.cfg_ana, 'addTauTrackInfo') and self.cfg_ana.addTauTrackInfo:
+        if getattr(self.cfg_ana, 'addTauTrackInfo', False):
             self.var(self.tree, 'tau_iso_n_ch')
             self.var(self.tree, 'tau_iso_n_gamma')
             self.bookTrackInfo('tau_lead_ch')
             self.bookTrackInfo('tau_leadiso_ch')
 
-        if hasattr(self.cfg_ana, 'addTnPInfo') and self.cfg_ana.addTnPInfo:
+        if getattr(self.cfg_ana, 'addTnPInfo', False):
             self.var(self.tree, 'tag')
             self.var(self.tree, 'probe')
             self.bookParticle(self.tree, 'l1_trig_obj')
@@ -98,10 +119,10 @@ class H2TauTauTreeProducerTauMu(H2TauTauTreeProducer):
         norm_chi2 = track.pseudoTrack().normalizedChi2()
 
         n_layers_pixel = track.pseudoTrack().hitPattern().pixelLayersWithMeasurement()
-        n_hits_pixel = track.pseudoTrack().hitPattern().numberOfValidPixelHits()
+        n_hits_pixel = track.numberOfPixelHits()
         n_layers_tracker = track.pseudoTrack().hitPattern().trackerLayersWithMeasurement()
-        n_hits = track.pseudoTrack().hitPattern().numberOfValidHits()
-        n_missing_inner = track.pseudoTrack().hitPattern().numberOfHits(ROOT.reco.HitPattern.MISSING_INNER_HITS)
+        n_hits = track.numberOfHits()
+        n_missing_inner = track.lostInnerHits()
         high_purity = track.pseudoTrack().quality(ROOT.reco.TrackBase.highPurity)
 
         self.fill(self.tree, name + '_pt', pt)
@@ -168,20 +189,21 @@ class H2TauTauTreeProducerTauMu(H2TauTauTreeProducer):
             if pt_charged > 0.:
                 self.fill(self.tree, 'l2_nc_ratio', (pt_charged - pt_neutral)/(pt_charged + pt_neutral))
 
-        self.fill(self.tree, 'l2_weight_fakerate', event.tauFakeRateWeight)
-        self.fill(self.tree, 'l2_weight_fakerate_up', event.tauFakeRateWeightUp)
-        self.fill(self.tree, 'l2_weight_fakerate_down', event.tauFakeRateWeightDown)
 
         fired_triggers = [info.name for info in getattr(event, 'trigger_infos', []) if info.fired]
 
-        self.fill(self.tree, 'trigger_isomu22', any('IsoMu22_v' in name for name in fired_triggers))
-        self.fill(self.tree, 'trigger_isotkmu22', any('IsoTkMu22_v' in name for name in fired_triggers))
-        self.fill(self.tree, 'trigger_isomu19tau20', any('IsoMu19_eta2p1_LooseIsoPFTau20_v' in name for name in fired_triggers))
+        self.fill(self.tree, 'trigger_isomu24', any('IsoMu24_v' in name for name in fired_triggers))
+        self.fill(self.tree, 'trigger_isomu27', any('IsoMu27_v' in name for name in fired_triggers))
+        # self.fill(self.tree, 'trigger_isotkmu22', any('IsoTkMu22_v' in name for name in fired_triggers))
+        # self.fill(self.tree, 'trigger_isomu19tau20', any('IsoMu19_eta2p1_LooseIsoPFTau20_v' in name for name in fired_triggers))
 
         matched_paths = getattr(event.diLepton, 'matchedPaths', [])
-        self.fill(self.tree, 'trigger_matched_isomu22', any('IsoMu22_v' in name for name in matched_paths))
-        self.fill(self.tree, 'trigger_matched_isotkmu22', any('IsoTkMu22_v' in name for name in matched_paths))
-        self.fill(self.tree, 'trigger_matched_isomu19tau20', any('IsoMu19_eta2p1_LooseIsoPFTau20_v' in name for name in matched_paths))
+        self.fill(self.tree, 'trigger_matched_isomu24', any('IsoMu24_v' in name for name in matched_paths))
+        self.fill(self.tree, 'trigger_matched_isomu27', any('IsoMu27_v' in name for name in matched_paths))
+        # self.fill(self.tree, 'trigger_matched_isotkmu22', any('IsoTkMu22_v' in name for name in matched_paths))
+        # self.fill(self.tree, 'trigger_matched_isomu19tau20', any('IsoMu19_eta2p1_LooseIsoPFTau20_v' in name for name in matched_paths))
+
+        self.fill(self.tree, 'l2_weight_mutotau', event.zllWeight)
 
         self.fill(self.tree, 'trigger_matched_singlemuon', any('Mu22' in name for name in matched_paths))
 
@@ -243,6 +265,25 @@ class H2TauTauTreeProducerTauMu(H2TauTauTreeProducer):
             #    I cannot find a better solution for the moment 14/10/2015
             if hasattr(tau, 'hltL2Tau30eta2p2'):
                 self.fillParticle(self.tree, 'l2_hltL2Tau30eta2p2', tau.hltL2Tau30eta2p2)
+
+        if getattr(self.cfg_ana, 'addTauMVAInputs', False):
+            self.fill(self.tree, 'l2_n_photons', n_photons_tau(tau))
+            self.fill(self.tree, 'l2_e_over_h', e_over_h(tau))
+            self.fill(self.tree, 'l2_pt_weighted_dr_iso', tau_pt_weighted_dr_iso(tau))
+            self.fill(self.tree, 'l2_pt_weighted_dr_signal', tau_pt_weighted_dr_signal(tau))
+            self.fill(self.tree, 'l2_pt_weighted_dphi_strip', tau_pt_weighted_dphi_strip(tau))
+            self.fill(self.tree, 'l2_pt_weighted_deta_strip', tau_pt_weighted_deta_strip(tau))
+
+            self.fill(self.tree, 'l2_flightLength', tau.flightLength().r())
+            self.fill(self.tree, 'l2_flightLengthSig', tau.flightLengthSig())
+            self.fill(self.tree, 'l2_dxy_Sig', tau.dxy_Sig())
+            self.fill(self.tree, 'l2_ip3d', tau.ip3d())
+            self.fill(self.tree, 'l2_ip3d_error', tau.ip3d_error())
+            self.fill(self.tree, 'l2_ip3d_Sig', tau.ip3d_Sig())
+            self.fill(self.tree, 'l2_leadingTrackNormChi2', tau.leadingTrackNormChi2())
+            self.fill(self.tree, 'l2_leadingTrackNormChi2', tau.leadingTrackNormChi2())
+
+            
 
         self.fillTree(event)
         #import pdb; pdb.set_trace() # weight lt test

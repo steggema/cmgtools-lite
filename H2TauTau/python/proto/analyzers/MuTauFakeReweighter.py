@@ -2,22 +2,22 @@ from PhysicsTools.Heppy.analyzers.core.Analyzer import Analyzer
 
 class MuTauFakeReweighter(Analyzer):
     '''Reweight muon->tauh fakes as derived here:
-    https://twiki.cern.ch/twiki/bin/viewauth/CMS/TauIDRecommendation13TeV#Muon_to_tau_fake_rate
+    https://indico.cern.ch/event/715039/contributions/2939095/attachments/1619524/2575700/leptauFRRereco_20180319.pdf slide 8
     '''
 
     @staticmethod
     def sfTight(eta):
         eta = abs(eta)
         if eta < 0.4:
-            return 1.47 # 1.5
+            return 1.17
         if eta < 0.8:
-            return 1.55 # 1.4
+            return 1.29
         if eta < 1.2:
-            return 1.33 # 1.21
+            return 1.14
         if eta < 1.7:
-            return 1.72 # 2.6
+            return 0.93
         if eta < 2.3:
-            return 2.50 # 2.1
+            return 1.61
 
         print 'MuTauFakeReweighter: invalid eta', eta, 'returning SF of 1'
         return 1.
@@ -26,15 +26,15 @@ class MuTauFakeReweighter(Analyzer):
     def sfLoose(eta):
         eta = abs(eta)
         if eta < 0.4:
-            return 1.22 # 1.15
+            return 1.06
         if eta < 0.8:
-            return 1.12 # 1.15
+            return 1.02
         if eta < 1.2:
-            return 1.26 # 1.18
+            return 1.10
         if eta < 1.7:
-            return 1.22 # 1.2
+            return 1.03
         if eta < 2.3:
-            return 2.39 # 1.3
+            return 1.94
 
         print 'MuTauFakeReweighter: invalid eta', eta, 'returning SF of 1'
         return 1.

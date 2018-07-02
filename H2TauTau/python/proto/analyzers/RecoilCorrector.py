@@ -22,17 +22,17 @@ class RecoilCorrector(Analyzer):
     def __init__(self, cfg_ana, cfg_comp, looperName):
         super(RecoilCorrector, self).__init__(cfg_ana, cfg_comp, looperName)
 
-        # FIXME - no MVA MET yet, and no recoil corrections, so correcting 
-        # both with PF MET
-        self.rcMVAMET = RC('CMGTools/H2TauTau/data/TypeI-PFMet_Run2016BtoH.root')
-        self.rcPFMET = RC('CMGTools/H2TauTau/data/TypeI-PFMet_Run2016BtoH.root')
-
         wpat = re.compile('W\d?Jet.*')
         match = wpat.match(self.cfg_comp.name)
         self.isWJets = not (match is None)
 
         # Apply to signal, DY, and W+jets samples
         self.apply = getattr(self.cfg_ana, 'apply', False) and ('Higgs' in self.cfg_comp.name or 'DY' in self.cfg_comp.name or self.isWJets)
+
+        if self.apply:
+            # FIXME - no recoil corrections yet for 2017
+            self.rcMVAMET = RC('CMGTools/H2TauTau/data/TypeI-PFMet_Run2016BtoH.root')
+            self.rcPFMET = RC('CMGTools/H2TauTau/data/TypeI-PFMet_Run2016BtoH.root')
 
 
 
@@ -79,10 +79,11 @@ class RecoilCorrector(Analyzer):
         if not self.cfg_comp.isMC:
             return
 
+
         # Calculate generator four-momenta even if not applying corrections
         # to save them in final trees
         gen_z_px, gen_z_py, gen_vis_z_px, gen_vis_z_py = self.getGenP4(event)
-
+        
         if not self.apply:
             return
 

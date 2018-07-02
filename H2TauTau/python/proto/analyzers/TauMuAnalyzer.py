@@ -19,6 +19,14 @@ class TauMuAnalyzer(DiLeptonAnalyzer):
     LeptonClass = Muon
     OtherLeptonClass = Electron
 
+    def __init__(self, cfg_ana, cfg_comp, looperName):
+        super(TauMuAnalyzer,self).__init__(cfg_ana, cfg_comp, looperName)
+        import os.path
+        self._mvaId2017 = ROOT.heppy.PATTauDiscriminationByMVAIsolationRun2FWlite(
+                    os.path.expandvars('$CMSSW_BASE/src/PhysicsTools/Heppy/data/GBRForest_tauIdMVAIsoDBoldDMwLT2017v2.root'),
+                    'RecoTauTag_tauIdMVAIsoDBoldDMwLT2017v2',
+                    'oldDMwLT')
+
     def declareHandles(self):
         super(TauMuAnalyzer, self).declareHandles()
 
@@ -48,22 +56,6 @@ class TauMuAnalyzer(DiLeptonAnalyzer):
             'std::vector<reco::GenParticle>'
         )
 
-        self.handles['puppiMET'] = AutoHandle(
-            'slimmedMETsPuppi',
-            'std::vector<pat::MET>'
-        )
-
-        self.handles['pfMET'] = AutoHandle(
-            'slimmedMETs',
-            'std::vector<pat::MET>'
-        )
-        
-        # for tau energy scale !
-        if hasattr(self.cfg_ana, 'tauEnergyScale') and self.cfg_ana.tauEnergyScale:
-            self.handles['genParticles'] = AutoHandle( 
-            'prunedGenParticles', 
-            'std::vector<reco::GenParticle'
-            )
 
     def buildDiLeptons(self, patDiLeptons, event):
         '''Build di-leptons, associate best vertex to both legs,
@@ -91,11 +83,13 @@ class TauMuAnalyzer(DiLeptonAnalyzer):
 
     def buildDiLeptonsSingle(self, leptons, event):
         di_leptons = []
-        met = self.handles['pfMET'].product()[0]
+        met = event.pfmet
         for pat_mu in leptons:
             muon = self.__class__.LeptonClass(pat_mu)
             for pat_tau in self.handles['taus'].product():
                 tau = Tau(pat_tau)
+                tau.mvaId2017 = self._mvaId2017(tau.physObj)
+                # print 'Calculated tau ID', tau.mvaId2017, tau.tauID("byIsolationMVArun2v1DBoldDMwLTraw")
                 di_tau = DirectDiTau(muon, tau, met)
                 di_tau.leg2().associatedVertex = event.goodVertices[0]
                 di_tau.leg1().associatedVertex = event.goodVertices[0]
@@ -135,47 +129,13 @@ class TauMuAnalyzer(DiLeptonAnalyzer):
         # Take the pre-sorted vertices from miniAOD
         event.goodVertices = event.vertices
 
-        result = super(TauMuAnalyzer, self).process(event)
+        super(TauMuAnalyzer, self).process(event)
 
-        event.isSignal = False
-        if result:
-            event.isSignal = True
-
-        if hasattr(self.cfg_ana, 'tauEnergyScale') and self.cfg_ana.tauEnergyScale and self.cfg_comp.isMC:
-            self.TauEnergyScale(event.diLeptons, event)
-        
-        # trying to get a dilepton from the control region.
-        # it must have well id'ed and trig matched legs,
-        # di-lepton and tri-lepton veto must pass
         result = self.selectionSequence(event, fillCounter=True,
                                         leg1IsoCut=self.cfg_ana.looseiso1,
                                         leg2IsoCut=self.cfg_ana.looseiso2)
-        if result is False:
-            # really no way to find a suitable di-lepton,
-            # even in the control region
-            return False
-
-        if hasattr(event, 'calibratedPfMet'):
-            event.pfmet = event.calibratedPfMet
-        else:
-            event.pfmet = self.handles['pfMET'].product()[0]
-
-        if hasattr(self.cfg_ana, 'tauEnergyScale') and \
-                self.cfg_ana.tauEnergyScale and self.cfg_comp.isMC:
-            # correct pfmet for selected taus (only leg2) scaling
-            for lep in [event.diLepton.leg2()]:
-                event.pfmet.setP4(event.pfmet.p4()-(lep.p4()-lep.unscaledP4))
-            event.diLepton.met().setP4(event.pfmet.p4())
-
-        if hasattr(event, 'calibratedPuppiMet'):
-            event.puppimet = event.calibratedPuppiMet
-        else:
-            event.puppimet = self.handles['puppiMET'].product()[0]
-
-        if getattr(self.cfg_ana, 'scaleTaus', False):
-            self.scaleMet(event, event.diLepton)
-
-        return True
+        
+        return result
 
     def testLeg2ID(self, tau):
         return (tau.tauID('decayModeFinding') > 0.5 and
@@ -211,7 +171,7 @@ class TauMuAnalyzer(DiLeptonAnalyzer):
 
     def testLeg1ID(self, muon):
         '''Tight muon selection, no isolation requirement'''
-        return muon.muonID("POG_ID_Medium_Moriond") and self.testVertex(muon)
+        return muon.muonID("POG_ID_Medium") and self.testVertex(muon)
 
     def testLeg1Iso(self, muon, isocut):
         '''Tight muon selection, with isolation requirement'''
@@ -223,7 +183,7 @@ class TauMuAnalyzer(DiLeptonAnalyzer):
     def thirdLeptonVeto(self, leptons, otherLeptons, isoCut=0.3):
         # count tight muons
         vLeptons = [muon for muon in leptons if
-                    muon.muonID("POG_ID_Medium_Moriond") and
+                    muon.muonID("POG_ID_Medium") and
                     self.testVertex(muon) and
                     self.testLegKine(muon, ptcut=10, etacut=2.4) and
                     self.testLeg1Iso(muon, 0.3)
@@ -236,7 +196,7 @@ class TauMuAnalyzer(DiLeptonAnalyzer):
 
 
     def testElectronID(self, electron):
-        return electron.mvaIDRun2('Spring16', 'POG90')
+        return electron.mvaIDRun2("Fall17noIso","wp90")
 
     def otherLeptonVeto(self, leptons, otherLeptons, isoCut=0.3):
         # count electrons
@@ -245,7 +205,7 @@ class TauMuAnalyzer(DiLeptonAnalyzer):
                          self.testVertex(electron) and
                          self.testElectronID(electron) and
                          electron.passConversionVeto() and
-                         electron.physObj.gsfTrack().hitPattern().numberOfHits(ROOT.reco.HitPattern.MISSING_INNER_HITS) <= 1 and
+                         electron.physObj.gsfTrack().hitPattern().numberOfLostHits(ROOT.reco.HitPattern.MISSING_INNER_HITS) <= 1 and
                          electron.relIsoR(R=0.3, dBetaFactor=0.5, allCharged=0) < 0.3]
 
         if len(vOtherLeptons) > 0:

@@ -10,6 +10,9 @@ class HTTGenMatcher(Analyzer):
         super(HTTGenMatcher, self).declareHandles()
 
     def process(self, event):
+        
+        if self.cfg_comp.isData:
+            return True
 
         if self.cfg_comp.isData:
             return True

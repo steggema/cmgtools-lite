@@ -11,12 +11,7 @@ class METFilter(Analyzer):
 
     def declareHandles(self):
         super(METFilter, self).declareHandles()
-        self.handles['TriggerResults'] = AutoHandle(('TriggerResults', '', self.processName), 'edm::TriggerResults', fallbackLabel=('TriggerResults', '', 'PAT')) # fallback for FastSim
-
-        self.handles['badChargedHadronFilter'] = AutoHandle('BadChargedCandidateFilter', 'bool', mayFail=True)
-        self.handles['badPFMuonFilter'] = AutoHandle('BadPFMuonFilter', 'bool', mayFail=True)
-        self.handles['badGlobalMuonTagger'] = AutoHandle('badGlobalMuonTaggerMAOD', 'bool', mayFail=True)
-        self.handles['cloneGlobalMuonTagger'] = AutoHandle('cloneGlobalMuonTaggerMAOD', 'bool', mayFail=True)
+        self.handles['TriggerResults'] = AutoHandle(('TriggerResults', '', self.processName), 'edm::TriggerResults', fallbackLabel=('TriggerResults', '', 'RECO')) # fallback for data
 
     def beginLoop(self, setup):
         super(METFilter, self).beginLoop(setup)
@@ -26,10 +21,6 @@ class METFilter(Analyzer):
         for trigger in self.triggers:
             self.count.register('pass {t}'.format(t=trigger))
 
-        self.count.register('pass bad muon')
-        self.count.register('pass bad charged hadron')
-        self.count.register('bad global muon')
-        self.count.register('clone global muon')
 
     def process(self, event):
         if self.autoAccept:
@@ -56,23 +47,6 @@ class METFilter(Analyzer):
             else:
                 setattr(event, trigger_name, False)
     
-        self.handles['badPFMuonFilter'].ReallyLoad(self.handles['badPFMuonFilter'].event)
-        self.handles['badChargedHadronFilter'].ReallyLoad(self.handles['badChargedHadronFilter'].event)
-
-        if not self.handles['badPFMuonFilter'].isValid() or not self.handles['badChargedHadronFilter'].isValid():
-            print 'WARNING: Bad PF muon filter and bad charged hadron filters only work with CMSSW pre-sequence'
-            event.passBadMuonFilter = True
-            event.passBadChargedHadronFilter = True
-            return True
-        
-        event.passBadMuonFilter = self.handles['badPFMuonFilter'].product()[0]
-        event.passBadChargedHadronFilter = self.handles['badChargedHadronFilter'].product()[0]
-        if event.passBadMuonFilter:
-            self.count.inc('pass bad muon')
-        if event.passBadChargedHadronFilter:
-            self.count.inc('pass bad charged hadron')
-        
-
         self.handles['badGlobalMuonTagger'].ReallyLoad(self.handles['badGlobalMuonTagger'].event)
         self.handles['cloneGlobalMuonTagger'].ReallyLoad(self.handles['cloneGlobalMuonTagger'].event)
 

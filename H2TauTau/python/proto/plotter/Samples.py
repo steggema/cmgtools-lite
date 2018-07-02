@@ -7,17 +7,15 @@ from ROOT import gSystem, gROOT
 from CMGTools.H2TauTau.proto.plotter.PlotConfigs import SampleCfg, HistogramCfg
 from CMGTools.H2TauTau.proto.samples.spring16.sms_xsec import get_xsec
 
-from CMGTools.H2TauTau.proto.samples.summer16.htt_common import TT_pow, DYJetsToLL_M50_LO, DYJetsToLL_M50_LO_ext2, DYJetsToLL_M10to50_LO, DYNJets, WJetsToLNu_LO, WJetsToLNu_LO_ext, WNJets, WWTo2L2Nu, T_tWch, TBar_tWch, VVTo2L2Nu, VVTo2L2Nu_ext, WZJToLLLNu, ZZTo4L, WZTo1L3Nu, WWTo1L1Nu2Q, ZZTo2L2Q, WZTo2L2Q, WZTo1L1Nu2Q, TBar_tch_powheg, T_tch_powheg, HiggsGGH125, HiggsVBF125, mssm_signals, dy_weight_dict, w_weight_dict, data_tau
+from CMGTools.H2TauTau.proto.samples.fall17.htt_common import TTLep_pow, TTHad_pow, TTSemi_pow, DYJetsToLL_M50_LO, DYJetsToLL_M50_LO_ext, DYNJetsToLL, WJetsToLNu_LO,  Ws, WWTo2L2Nu, T_tWch_noFullyHad, TBar_tWch_noFullyHad, WWTo2L2Nu, ZZTo4L, TBar_tch, T_tch, HiggsGGH125, HiggsVBF125, mssm_signals, dy_weight_dict, w_weight_dict, data_tau
 
-
-# WJetsToLNu_LO, TToLeptons_tch_amcatnlo, WZTo3LNu_amcatnlo, , WJetsToLNu_HT100to200, WJetsToLNu_HT200to400, WJetsToLNu_HT400to600, WJetsToLNu_HT600toInf, QCD_Mu15, DYJetsToTauTau_M150_LO, DYJetsToLL_M10to50_ext1
+# WJetsToLNu_LO, TToLeptons_tch_amcatnlo, WZTo3LNu_amcatnlo, , WJetsToLNu_HT100to200, WJetsToLNu_HT200to400, WJetsToLNu_HT400to600, WJetsToLNu_HT600toInf, QCD_Mu15, DYJetsToTauTau_M150_LO, DYJetsToLL_M10to50_ext1, WZTo1L3Nu, WWTo1L1Nu2Q, ZZTo2L2Q, WZTo2L2Q, WZTo1L1Nu2Q
 
 gSystem.Load("libCMGToolsH2TauTau")
 from ROOT import getDYWeight
 
 splitDY = True
 useDYWeight = True
-# data2016G = True
 
 if useDYWeight or splitDY:
     dy_exps = []
@@ -50,7 +48,6 @@ def createSampleLists(analysis_dir='/afs/cern.ch/user/s/steggema/work/public/mt/
                       mode='sm',
                       ztt_cut='(l2_gen_match == 5)', zl_cut='(l2_gen_match < 5)',
                       zj_cut='(l2_gen_match == 6)',
-                      data2016G=False,
                       signal_scale=1.,
                       no_data=False):
     # -> Possibly from cfg like in the past, but may also make sense to enter directly
@@ -76,7 +73,7 @@ def createSampleLists(analysis_dir='/afs/cern.ch/user/s/steggema/work/public/mt/
                       # xsec=DYJetsToLL_M10to50_ext1.xSection, sumweights=DYJetsToLL_M10to50_ext1.nGenEvents, weight_expr=zj_cut),
     ]
     if splitDY:
-        for sample in [DYJetsToLL_M50_LO_ext2, DYJetsToLL_M50_LO]:
+        for sample in [DYJetsToLL_M50_LO_ext, DYJetsToLL_M50_LO]:
             samples_essential += [
                 SampleCfg(name='ZTT', dir_name=sample.name, ana_dir=analysis_dir, tree_prod_name=tree_prod_name, xsec=1., sumweights=1., weight_expr=ztt_cut+dy_exp),
                 SampleCfg(name='ZL', dir_name=sample.name, ana_dir=analysis_dir, tree_prod_name=tree_prod_name,
@@ -99,12 +96,12 @@ def createSampleLists(analysis_dir='/afs/cern.ch/user/s/steggema/work/public/mt/
         
     else:
         samples_essential += [
-            SampleCfg(name='ZTT', dir_name=DYJetsToLL_M50_LO_ext2.name, ana_dir=analysis_dir, tree_prod_name=tree_prod_name,
-                      xsec=DYJetsToLL_M50_LO_ext2.xSection, sumweights=DYJetsToLL_M50_LO_ext2.nGenEvents, weight_expr=ztt_cut),
-            SampleCfg(name='ZL', dir_name=DYJetsToLL_M50_LO_ext2.name, ana_dir=analysis_dir, tree_prod_name=tree_prod_name,
-                      xsec=DYJetsToLL_M50_LO_ext2.xSection, sumweights=DYJetsToLL_M50_LO_ext2.nGenEvents, weight_expr=zl_cut),
-            SampleCfg(name='ZJ', dir_name=DYJetsToLL_M50_LO_ext2.name, ana_dir=analysis_dir, tree_prod_name=tree_prod_name,
-                      xsec=DYJetsToLL_M50_LO_ext2.xSection, sumweights=DYJetsToLL_M50_LO_ext2.nGenEvents, weight_expr=zj_cut),
+            SampleCfg(name='ZTT', dir_name=DYJetsToLL_M50_LO_ext.name, ana_dir=analysis_dir, tree_prod_name=tree_prod_name,
+                      xsec=DYJetsToLL_M50_LO_ext.xSection, sumweights=DYJetsToLL_M50_LO_ext.nGenEvents, weight_expr=ztt_cut),
+            SampleCfg(name='ZL', dir_name=DYJetsToLL_M50_LO_ext.name, ana_dir=analysis_dir, tree_prod_name=tree_prod_name,
+                      xsec=DYJetsToLL_M50_LO_ext.xSection, sumweights=DYJetsToLL_M50_LO_ext.nGenEvents, weight_expr=zl_cut),
+            SampleCfg(name='ZJ', dir_name=DYJetsToLL_M50_LO_ext.name, ana_dir=analysis_dir, tree_prod_name=tree_prod_name,
+                      xsec=DYJetsToLL_M50_LO_ext.xSection, sumweights=DYJetsToLL_M50_LO_ext.nGenEvents, weight_expr=zj_cut),
             ]
 
     if channel == 'tt':
@@ -115,12 +112,14 @@ def createSampleLists(analysis_dir='/afs/cern.ch/user/s/steggema/work/public/mt/
         ]
     else:
         samples_essential += [
-            SampleCfg(name='TT', dir_name='TT_pow', ana_dir=analysis_dir, tree_prod_name=tree_prod_name, xsec=TT_pow.xSection, sumweights=TT_pow.nGenEvents),
+            SampleCfg(name='TTLep_pow', dir_name='TTLep_pow', ana_dir=analysis_dir, tree_prod_name=tree_prod_name, xsec=TTLep_pow.xSection, sumweights=TTLep_pow.nGenEvents),
+            SampleCfg(name='TTHad_pow', dir_name='TTHad_pow', ana_dir=analysis_dir, tree_prod_name=tree_prod_name, xsec=TTHad_pow.xSection, sumweights=TTHad_pow.nGenEvents),
+            SampleCfg(name='TTSemi_pow', dir_name='TTSemi_pow', ana_dir=analysis_dir, tree_prod_name=tree_prod_name, xsec=TTSemi_pow.xSection, sumweights=TTSemi_pow.nGenEvents),
         ]
 
     samples_essential += [
-            SampleCfg(name='T_tWch', dir_name='T_tWch_ext', ana_dir=analysis_dir, tree_prod_name=tree_prod_name, xsec=T_tWch.xSection, sumweights=T_tWch.nGenEvents),
-            SampleCfg(name='TBar_tWch', dir_name='TBar_tWch_ext', ana_dir=analysis_dir, tree_prod_name=tree_prod_name, xsec=TBar_tWch.xSection, sumweights=TBar_tWch.nGenEvents),
+            SampleCfg(name='T_tWch_noFullyHad', dir_name='T_tWch_noFullyHad', ana_dir=analysis_dir, tree_prod_name=tree_prod_name, xsec=T_tWch_noFullyHad.xSection, sumweights=T_tWch_noFullyHad.nGenEvents),
+            SampleCfg(name='TBar_tWch_noFullyHad', dir_name='TBar_tWch_noFullyHad', ana_dir=analysis_dir, tree_prod_name=tree_prod_name, xsec=TBar_tWch_noFullyHad.xSection, sumweights=TBar_tWch_noFullyHad.nGenEvents),
             # SampleCfg(name='HiggsGGH125', dir_name='HiggsGGH125', ana_dir=analysis_dir, tree_prod_name=tree_prod_name, xsec=HiggsGGH125.xSection, sumweights=HiggsGGH125.nGenEvents),
             # SampleCfg(name='HiggsVBF125', dir_name='HiggsVBF125', ana_dir=analysis_dir, tree_prod_name=tree_prod_name, xsec=HiggsVBF125.xSection, sumweights=HiggsVBF125.nGenEvents),
             # SampleCfg(name='QCD', dir_name='QCD_Mu15', ana_dir=analysis_dir, tree_prod_name=tree_prod_name, xsec=QCD_Mu15.xSection)
@@ -143,41 +142,29 @@ def createSampleLists(analysis_dir='/afs/cern.ch/user/s/steggema/work/public/mt/
     ###GAEL
 
     if splitDY and channel not in ['mm', 'tau_fr']:
-        for sample in DYNJets:
+        for sample in DYNJetsToLL:
             n_jet_name = str(sample.name[sample.name.find('Jets')-1])+'Jets'
             samples_essential += [
                 SampleCfg(name='ZTT'+n_jet_name, dir_name=sample.name, ana_dir=analysis_dir, tree_prod_name=tree_prod_name, xsec=1., sumweights=1., weight_expr=ztt_cut+dy_exp),
                 SampleCfg(name='ZL'+n_jet_name, dir_name=sample.name, ana_dir=analysis_dir, tree_prod_name=tree_prod_name, xsec=1., sumweights=1., weight_expr=zl_cut+dy_exp),
                 SampleCfg(name='ZJ'+n_jet_name, dir_name=sample.name, ana_dir=analysis_dir, tree_prod_name=tree_prod_name, xsec=1., sumweights=1., weight_expr=zj_cut+dy_exp),
             ]
-            ###GAEL
-            samples_essential += [
-                SampleCfg(name='ZLL'+n_jet_name, dir_name=sample.name, ana_dir=analysis_dir, tree_prod_name=tree_prod_name, xsec=1., sumweights=1., weight_expr='('+zl_cut+' || '+zj_cut+')'+dy_exp)]
-    samples_essential += [
-        SampleCfg(name='WJets', dir_name='WJetsToLNu_LO', ana_dir=analysis_dir, tree_prod_name=tree_prod_name, xsec=1., sumweights=1., weight_expr=w_exp), #, sumweights=WJetsToLNu_LO.nevents[0]) #, weight_expr=w_exp)
-        SampleCfg(name='WJets_ext', dir_name='WJetsToLNu_LO_ext', ana_dir=analysis_dir, tree_prod_name=tree_prod_name, xsec=1., sumweights=1., weight_expr=w_exp)] #, sumweights=WJetsToLNu_LO.nevents[0]) #, weight_expr=w_exp)
-            ###GAEL
-    for sample in WNJets:
+    for sample in Ws:
         n_jet_name = str(sample.name[sample.name.find('Jets')-1])+'Jets'
-        if sample.name.find('ext2')>=0:
-            n_jet_name += '_ext2'
-        elif sample.name.find('ext')>=0:
-            n_jet_name += '_ext'
+        if n_jet_name == 'WJets': continue
         # print 'WARNING - W - using n(gen events)', WJetsToLNu_LO.nevents[0], 'for W n(jets)', n_jet_name, 'xsec', sample.xSection
         samples_essential += [
             SampleCfg(name='W'+n_jet_name, dir_name=sample.name, ana_dir=analysis_dir, tree_prod_name=tree_prod_name, xsec=1., sumweights=1., weight_expr=w_exp) #, sumweights=WJetsToLNu_LO.nevents[0]) #, weight_expr=w_exp)
             ]
         
     samples_data = []
-    if data2016G and channel in ['mt', 'mm', 'tau_fr']:
-         samples_data = [
-            SampleCfg(name='data_obs', dir_name='SingleMuon_Run2016G_PromptReco_v1', ana_dir=analysis_dir, tree_prod_name=tree_prod_name, is_data=True)
-        ]
-    elif channel in ['mt', 'mm', 'tau_fr']:
+    if channel in ['mt', 'mm', 'tau_fr']:
         samples_data = [
-            SampleCfg(name='data_obs', dir_name='SingleMuon_Run2016B_PromptReco_v2', ana_dir=analysis_dir, tree_prod_name=tree_prod_name, is_data=True),
-            SampleCfg(name='data_obs', dir_name='SingleMuon_Run2016C_PromptReco_v2', ana_dir=analysis_dir, tree_prod_name=tree_prod_name, is_data=True),
-            SampleCfg(name='data_obs', dir_name='SingleMuon_Run2016D_PromptReco_v2', ana_dir=analysis_dir, tree_prod_name=tree_prod_name, is_data=True),
+            SampleCfg(name='data_obs', dir_name='SingleMuon_Run2017B_17Nov2017', ana_dir=analysis_dir, tree_prod_name=tree_prod_name, is_data=True),
+            SampleCfg(name='data_obs', dir_name='SingleMuon_Run2017C_17Nov2017', ana_dir=analysis_dir, tree_prod_name=tree_prod_name, is_data=True),
+            SampleCfg(name='data_obs', dir_name='SingleMuon_Run2017D_17Nov2017', ana_dir=analysis_dir, tree_prod_name=tree_prod_name, is_data=True),
+            SampleCfg(name='data_obs', dir_name='SingleMuon_Run2017E_17Nov2017', ana_dir=analysis_dir, tree_prod_name=tree_prod_name, is_data=True),
+            SampleCfg(name='data_obs', dir_name='SingleMuon_Run2017F_17Nov2017', ana_dir=analysis_dir, tree_prod_name=tree_prod_name, is_data=True),
         ]
     elif channel in ['et']:
         samples_data = [
@@ -198,34 +185,19 @@ def createSampleLists(analysis_dir='/afs/cern.ch/user/s/steggema/work/public/mt/
         samples_data = []
 
     samples_additional = [
-        SampleCfg(name='TToLeptons_tch_powheg', dir_name=T_tch_powheg.name, ana_dir=analysis_dir, tree_prod_name=tree_prod_name, xsec=T_tch_powheg.xSection, sumweights=T_tch_powheg.nGenEvents),
-        SampleCfg(name='TBarToLeptons_tch_powheg', dir_name=TBar_tch_powheg.name, ana_dir=analysis_dir, tree_prod_name=tree_prod_name, xsec=TBar_tch_powheg.xSection, sumweights=TBar_tch_powheg.nGenEvents),
+        SampleCfg(name='TToLeptons_tch_powheg', dir_name=T_tch.name, ana_dir=analysis_dir, tree_prod_name=tree_prod_name, xsec=T_tch.xSection, sumweights=T_tch.nGenEvents),
+        SampleCfg(name='TBarToLeptons_tch_powheg', dir_name=TBar_tch.name, ana_dir=analysis_dir, tree_prod_name=tree_prod_name, xsec=TBar_tch.xSection, sumweights=TBar_tch.nGenEvents),
     ]
 
     samples_additional += [
         SampleCfg(name='ZZTo4L', dir_name='ZZTo4L', ana_dir=analysis_dir, tree_prod_name=tree_prod_name, xsec=ZZTo4L.xSection, sumweights=ZZTo4L.nGenEvents),
-        SampleCfg(name='ZZTo2L2Q', dir_name='ZZTo2L2Q', ana_dir=analysis_dir, tree_prod_name=tree_prod_name, xsec=ZZTo2L2Q.xSection, sumweights=ZZTo2L2Q.nGenEvents),
+        # SampleCfg(name='ZZTo2L2Q', dir_name='ZZTo2L2Q', ana_dir=analysis_dir, tree_prod_name=tree_prod_name, xsec=ZZTo2L2Q.xSection, sumweights=ZZTo2L2Q.nGenEvents),
         # SampleCfg(name='WZTo3L', dir_name='WZTo3LNu_amcatnlo', ana_dir=analysis_dir, tree_prod_name=tree_prod_name, xsec=WZTo3LNu_amcatnlo.xSection, sumweights=WZTo3LNu_amcatnlo.nGenEvents),
-        SampleCfg(name='WZTo2L2Q', dir_name='WZTo2L2Q', ana_dir=analysis_dir, tree_prod_name=tree_prod_name, xsec=WZTo2L2Q.xSection, sumweights=WZTo2L2Q.nGenEvents),
-        SampleCfg(name='WZTo1L3Nu', dir_name='WZTo1L3Nu', ana_dir=analysis_dir, tree_prod_name=tree_prod_name, xsec=WZTo1L3Nu.xSection, sumweights=WZTo1L3Nu.nGenEvents),
-        SampleCfg(name='WZTo1L1Nu2Q', dir_name='WZTo1L1Nu2Q', ana_dir=analysis_dir, tree_prod_name=tree_prod_name, xsec=WZTo1L1Nu2Q.xSection, sumweights=WZTo1L1Nu2Q.nGenEvents),
-        SampleCfg(name='VVTo2L2Nu', dir_name='VVTo2L2Nu', ana_dir=analysis_dir, tree_prod_name=tree_prod_name, xsec=VVTo2L2Nu.xSection, sumweights=VVTo2L2Nu.nGenEvents, weight_expr='((11.95*2852958.0)/((2852958.0+6888511.0)*(2852958.0+6888511.0)))'),
-        SampleCfg(name='VVTo2L2Nu_ext', dir_name='VVTo2L2Nu_ext', ana_dir=analysis_dir, tree_prod_name=tree_prod_name, xsec=VVTo2L2Nu_ext.xSection, sumweights=VVTo2L2Nu_ext.nGenEvents, weight_expr='((11.95*6888511.0)/((2852958.0+6888511.0)*(2852958.0+6888511.0)))'),
-        SampleCfg(name='WWTo1L1Nu2Q', dir_name='WWTo1L1Nu2Q', ana_dir=analysis_dir, tree_prod_name=tree_prod_name, xsec=WWTo1L1Nu2Q.xSection, sumweights=WWTo1L1Nu2Q.nGenEvents),
-        SampleCfg(name='WZJToLLLNu', dir_name='WZJToLLLNu', ana_dir=analysis_dir, tree_prod_name=tree_prod_name, xsec=WZJToLLLNu.xSection, sumweights=WZJToLLLNu.nGenEvents),
-    ]
-    ###GAEL
-    samples_additional += [
-        SampleCfg(name='ZZTo4L_T', dir_name='ZZTo4L', ana_dir=analysis_dir, tree_prod_name=tree_prod_name, xsec=ZZTo4L.xSection, sumweights=ZZTo4L.nGenEvents, weight_expr='(l1_gen_match<6 && l2_gen_match<6)'),
-        SampleCfg(name='ZZTo2L2Q_T', dir_name='ZZTo2L2Q', ana_dir=analysis_dir, tree_prod_name=tree_prod_name, xsec=ZZTo2L2Q.xSection, sumweights=ZZTo2L2Q.nGenEvents, weight_expr='(l1_gen_match<6 && l2_gen_match<6)'),
-        # SampleCfg(name='WZTo3L', dir_name='WZTo3LNu_amcatnlo', ana_dir=analysis_dir, tree_prod_name=tree_prod_name, xsec=WZTo3LNu_amcatnlo.xSection, sumweights=WZTo3LNu_amcatnlo.nGenEvents),
-        SampleCfg(name='WZTo2L2Q_T', dir_name='WZTo2L2Q', ana_dir=analysis_dir, tree_prod_name=tree_prod_name, xsec=WZTo2L2Q.xSection, sumweights=WZTo2L2Q.nGenEvents, weight_expr='(l1_gen_match<6 && l2_gen_match<6)'),
-        SampleCfg(name='WZTo1L3Nu_T', dir_name='WZTo1L3Nu', ana_dir=analysis_dir, tree_prod_name=tree_prod_name, xsec=WZTo1L3Nu.xSection, sumweights=WZTo1L3Nu.nGenEvents, weight_expr='(l1_gen_match<6 && l2_gen_match<6)'),
-        SampleCfg(name='WZTo1L1Nu2Q_T', dir_name='WZTo1L1Nu2Q', ana_dir=analysis_dir, tree_prod_name=tree_prod_name, xsec=WZTo1L1Nu2Q.xSection, sumweights=WZTo1L1Nu2Q.nGenEvents, weight_expr='(l1_gen_match<6 && l2_gen_match<6)'),
-        SampleCfg(name='VVTo2L2Nu_T', dir_name='VVTo2L2Nu', ana_dir=analysis_dir, tree_prod_name=tree_prod_name, xsec=VVTo2L2Nu.xSection, sumweights=VVTo2L2Nu.nGenEvents, weight_expr='(l1_gen_match<6 && l2_gen_match<6)'),
-        SampleCfg(name='WWTo1L1Nu2Q_T', dir_name='WWTo1L1Nu2Q', ana_dir=analysis_dir, tree_prod_name=tree_prod_name, xsec=WWTo1L1Nu2Q.xSection, sumweights=WWTo1L1Nu2Q.nGenEvents, weight_expr='(l1_gen_match<6 && l2_gen_match<6)'),
-        SampleCfg(name='WZJToLLLNu_T', dir_name='WZJToLLLNu', ana_dir=analysis_dir, tree_prod_name=tree_prod_name, xsec=WZJToLLLNu.xSection, sumweights=WZJToLLLNu.nGenEvents, weight_expr='(l1_gen_match<6 && l2_gen_match<6)'),
-        SampleCfg(name='VVTo2L2Nu_ext_T', dir_name='VVTo2L2Nu_ext', ana_dir=analysis_dir, tree_prod_name=tree_prod_name, xsec=VVTo2L2Nu_ext.xSection, sumweights=VVTo2L2Nu_ext.nGenEvents, weight_expr='(l1_gen_match<6 && l2_gen_match<6)'),
+        # SampleCfg(name='WZTo2L2Q', dir_name='WZTo2L2Q', ana_dir=analysis_dir, tree_prod_name=tree_prod_name, xsec=WZTo2L2Q.xSection, sumweights=WZTo2L2Q.nGenEvents),
+        # SampleCfg(name='WZTo1L3Nu', dir_name='WZTo1L3Nu', ana_dir=analysis_dir, tree_prod_name=tree_prod_name, xsec=WZTo1L3Nu.xSection, sumweights=WZTo1L3Nu.nGenEvents),
+        # SampleCfg(name='WZTo1L1Nu2Q', dir_name='WZTo1L1Nu2Q', ana_dir=analysis_dir, tree_prod_name=tree_prod_name, xsec=WZTo1L1Nu2Q.xSection, sumweights=WZTo1L1Nu2Q.nGenEvents),
+        SampleCfg(name='WWTo2L2Nu', dir_name='WWTo2L2Nu', ana_dir=analysis_dir, tree_prod_name=tree_prod_name, xsec=WWTo2L2Nu.xSection, sumweights=WWTo2L2Nu.nGenEvents),
+        # SampleCfg(name='WWTo1L1Nu2Q', dir_name='WWTo1L1Nu2Q', ana_dir=analysis_dir, tree_prod_name=tree_prod_name, xsec=WWTo1L1Nu2Q.xSection, sumweights=WWTo1L1Nu2Q.nGenEvents),
     ]
     samples_additional += [
         SampleCfg(name='ZZTo4L_J', dir_name='ZZTo4L', ana_dir=analysis_dir, tree_prod_name=tree_prod_name, xsec=ZZTo4L.xSection, sumweights=ZZTo4L.nGenEvents, weight_expr='(!(l1_gen_match<6 && l2_gen_match<6))'),
@@ -349,7 +321,7 @@ def createSampleLists(analysis_dir='/afs/cern.ch/user/s/steggema/work/public/mt/
     
     for sample in samples_mc:
         if sample.name not in weighted_list:
-            setSumWeights(sample, 'MCWeighter' if channel not in ['tau_fr'] else 'SkimAnalyzerCount')
+            setSumWeights(sample, 'MCWeighter' if channel not in ['tau_fr', 'mt'] else 'SkimAnalyzerCount')
             print 'Set sum weights for sample', sample.name, 'to', sample.sumweights
 
     # sampleDict = {s.name: s for s in all_samples}
