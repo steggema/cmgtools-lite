@@ -11,6 +11,9 @@ class HTTGenMatcher(Analyzer):
 
     def process(self, event):
 
+        if self.cfg_comp.isData:
+            return True
+
         self.l1 = event.diLepton.leg1()
         self.l2 = event.diLepton.leg2()
 

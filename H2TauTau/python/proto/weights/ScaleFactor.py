@@ -79,6 +79,8 @@ class ScaleFactor(object):
                 continue
             if isinstance(self.eff_mc[etaLabel], ROOT.TF1) and isinstance(self.eff_data[etaLabel], ROOT.TF1):
                 continue
+            if isinstance(self.eff_mc[etaLabel], ROOT.TGraphAsymmErrors) and isinstance(self.eff_data[etaLabel], ROOT.TGraphAsymmErrors):
+                continue
             elif not self.checkSameBinning(self.eff_mc[etaLabel], self.eff_data[etaLabel]):
                 raise RuntimeError(
                     'ERROR in ScaleFactor::init_ScaleFactor(TString inputRootFile) from LepEffInterface/src/ScaleFactor.cc . Can not proceed because ScaleFactor::check_SameBinning returned different pT binning for data and MC for eta label', etaLabel)
@@ -134,8 +136,10 @@ class ScaleFactor(object):
             self.ws.var('_'.join([self.obj_tag, 'dm'])).setVal(dm)
 
         sf_name = self.sf_name.replace('genuine', 'fake') if isFake else self.sf_name
-
-        return self.ws.function('_'.join([sf_name, tag])).getVal()
+        try:
+            return self.ws.function('_'.join([sf_name, tag])).getVal()
+        except TypeError:
+            import pdb; pdb.set_trace()
 
     def findEtaLabel(self, eta, eff_dict):
         eta = abs(eta)
@@ -167,7 +171,6 @@ class ScaleFactor(object):
             args = (a for a in [pt, eta, iso, dm] if a is not None)
             eff = func(*args)
             return eff
-
         label = self.findEtaLabel(eta, eff_dict)
 
         g_eff = eff_dict[label]

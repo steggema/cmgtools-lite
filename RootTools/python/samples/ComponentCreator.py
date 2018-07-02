@@ -4,21 +4,25 @@ from CMGTools.Production.dataset import createDataset, createMyDataset
 import re
 
 class ComponentCreator(object):
-    def makeMCComponent(self,name,dataset,user,pattern,xSec=1,useAAA=False,unsafe=False,fracNegWeights=None):
-        
-         component = cfg.MCComponent(
+
+    useAAA = None
+
+    def makeMCComponent(self,name,dataset,user,pattern,xSec=1,useAAA=False,unsafe=False,fracNegWeights=None,dbsInstance=None):
+        if self.__class__.useAAA is not None:
+            useAAA = self.__class__.useAAA
+        component = cfg.MCComponent(
              dataset=dataset,
              name = name,
-             files = self.getFiles(dataset,user,pattern,useAAA=useAAA,unsafe=unsafe),
+             files = self.getFiles(dataset,user,pattern,useAAA=useAAA,unsafe=unsafe, dbsInstance=dbsInstance),
              xSection = xSec,
              nGenEvents = 1,
              triggers = [],
              effCorrFactor = 1,
          )
-         component.splitFactor = 100
-         component.fracNegWeights = fracNegWeights
-         component.dataset_entries = self.getPrimaryDatasetEntries(dataset,user,pattern,useAAA=useAAA)
-         return component
+        component.splitFactor = 100
+        component.fracNegWeights = fracNegWeights
+        component.dataset_entries = self.getPrimaryDatasetEntries(dataset,user,pattern,useAAA=useAAA)
+        return component
 
     def makePrivateMCComponent(self,name,dataset,files,xSec=1, prefix="auto"):
          if len(files) == 0:
@@ -57,7 +61,8 @@ class ComponentCreator(object):
          return component
 
     def makeMyPrivateMCComponent(self,name,dataset,user,pattern,dbsInstance, xSec=1,useAAA=False):
-
+        if self.__class__.useAAA is not None:
+            useAAA = self.__class__.useAAA
         component = cfg.MCComponent(
             dataset=dataset,
             name = name,
@@ -165,11 +170,13 @@ class ComponentCreator(object):
         component.splitFactor = 100
         return component
 
-    def makeDataComponent(self,name,dataset,user,pattern,json=None,run_range=None,triggers=[],vetoTriggers=[],useAAA=False,jsonFilter=False):
+    def makeDataComponent(self,name,dataset,user,pattern,json=None,run_range=None,triggers=[],vetoTriggers=[],useAAA=True,jsonFilter=False, dbsInstance=None):
+        if self.__class__.useAAA is not None:
+            useAAA = self.__class__.useAAA
         component = cfg.DataComponent(
             #dataset = dataset,
             name = name,
-            files = self.getFiles(dataset,user,pattern,run_range=run_range,useAAA=useAAA,json=(json if jsonFilter else None)),
+            files = self.getFiles(dataset,user,pattern,run_range=run_range,useAAA=useAAA,json=(json if jsonFilter else None), dbsInstance=dbsInstance),
             intLumi = 1,
             triggers = triggers,
             json = (json if jsonFilter else None)
@@ -182,9 +189,12 @@ class ComponentCreator(object):
         component.splitFactor = 100
         return component
 
-    def getFiles(self, dataset, user, pattern, useAAA=False, run_range=None, json=None, unsafe = False):
+    def getFiles(self, dataset, user, pattern, dbsInstance, useAAA=False, run_range=None, json=None, unsafe = False):
         # print 'getting files for', dataset,user,pattern
-        ds = createDataset( user, dataset, pattern, readcache=True, run_range=run_range, json=json, unsafe = unsafe )
+        ds = createDataset( user, dataset, pattern, readcache=True, 
+                            run_range=run_range, 
+                            json=json, unsafe = unsafe, 
+                            dbsInstance=dbsInstance )
         files = ds.listOfGoodFiles()
         mapping = 'root://eoscms.cern.ch//eos/cms%s'
         if useAAA: mapping = 'root://cms-xrd-global.cern.ch/%s'

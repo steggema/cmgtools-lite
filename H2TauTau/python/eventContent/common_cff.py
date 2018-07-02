@@ -32,13 +32,15 @@ common = [
     'keep *_generator_*_*',
     'keep *_genEvtWeightsCounter_*_H2TAUTAU',
     'keep *_offlineBeamSpot_*_*',
-    'keep *_reducedEgamma_reducedConversions_*',
+    'keep *_reducedEgamma_*_*',
     'keep LHEEventProduct_*_*_*',
     'keep *_l1extraParticles_*_*',
     'keep patPATTauDiscriminator_*_*_H2TAUTAU',
     # 'keep *_mvaMETTauMu_*_H2TAUTAU'
     'keep *_BadPFMuonFilter_*_H2TAUTAU',
-    'keep *_BadChargedCandidateFilter_*_H2TAUTAU'
+    'keep *_BadChargedCandidateFilter_*_H2TAUTAU',
+    'keep *_badGlobalMuonTaggerMAOD_*_*',
+    'keep *_cloneGlobalMuonTaggerMAOD_*_*',
     ]
 
 commonDebug = copy.deepcopy(common) 

@@ -65,7 +65,6 @@ class BaseDataset( object ):
         return self.primaryDatasetEntries
 
     def printFiles(self, abspath=True, info=True):
-        # import pdb; pdb.set_trace()
         if self.files == None:
             self.buildListOfFiles(self.pattern)
         for file in self.files:
@@ -179,7 +178,7 @@ class CMSDataset( BaseDataset ):
             runs = self.run_range
         if not hasattr(self,'summaries'):
             self.summaries = self.findPrimaryDatasetSummaries(self.name.rstrip('/'),
-                                                  runs[0],runs[1])
+                                                              runs[0],runs[1],self.dbsInstance)
         num_files = self.summaries['files']
         if num_files == -1:
             raise RuntimeError, "Error querying DAS for dataset %r" % self.name.rstrip('/')

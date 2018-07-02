@@ -13,25 +13,28 @@ class DYLLReweighterTauEle(Analyzer):
             return True
 
         # Only apply corrections for leptons giving rise to fake hadronic taus
-        if event.leg1.gen_match not in [1, 3] or self.cfg_comp.name.find('DY') == -1 :
-            return True
+        for dilep in event.diLeptons :
+            if hasattr(dilep.leg1(), 'gen_match'):
+                if dilep.leg1().gen_match not in [1, 3] or self.cfg_comp.name.find('DY') == -1 :
+                    return True
 
-        tau = event.diLepton.leg2()
-        if tau.decayMode() == 0 :   # 1prong 0pi
-            if abs (tau.eta()) < 1.5 :
-                event.zllWeight = self.cfg_ana.W1p0PB 
-            else:
-                event.zllWeight = self.cfg_ana.W1p0PE 
-        elif tau.decayMode() == 1 : # 1prong 1pi
-            if abs (tau.eta()) < 1.5 :
-                event.zllWeight = self.cfg_ana.W1p1PB 
-            else:
-                event.zllWeight = self.cfg_ana.W1p1PE 
+            tau = dilep.leg2()
+            if tau.decayMode() == 0 :   # 1prong 0pi
+                if abs (tau.eta()) < 1.5 :
+                    event.zllWeight = self.cfg_ana.W1p0PB 
+                else:
+                    event.zllWeight = self.cfg_ana.W1p0PE 
+            elif tau.decayMode() == 1 : # 1prong 1pi
+                if abs (tau.eta()) < 1.5 :
+                    event.zllWeight = self.cfg_ana.W1p1PB 
+                else:
+                    event.zllWeight = self.cfg_ana.W1p1PE 
 
-        if self.cfg_ana.verbose:
-            print 'DYLLReweighterTauEle',tau.decayMode(),tau.eta(),event.zllWeight
-        
-        event.eventWeight = event.eventWeight * event.zllWeight
+            if self.cfg_ana.verbose:
+             print 'DYLLReweighterTauEle',tau.decayMode(),tau.eta(),event.zllWeight
+            
+            #TODO fix this in the case several taus are present, or several dileptons !!
+            #event.eventWeight = event.eventWeight * event.zllWeight
         return True
 
 # FIXME read from cfg file the scaling factors

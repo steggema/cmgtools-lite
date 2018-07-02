@@ -10,7 +10,9 @@ class BTagSF(object):
     def __init__ (self, seed, wp='medium', measurement='central') :
         self.randm = TRandom3(seed)
 
-        self.mc_eff_file = TFile('/afs/cern.ch/work/d/dwinterb/public/MSSM2016/tagging_efficiencies_Moriond2017.root')
+        rootfname = '/'.join([os.environ["CMSSW_BASE"],
+                              'src/CMGTools/H2TauTau/data/tagging_efficiencies_Moriond2017.root'])
+        self.mc_eff_file = TFile(rootfname)
 
         # MC b-tag efficiencies as measured in HTT by Adinda
         self.btag_eff_b = self.mc_eff_file.Get('btag_eff_b')
@@ -91,10 +93,10 @@ class BTagSF(object):
         if SFb < 1.:
             demoteProb_btag = abs(1. - SFb)
         else:
-            if eff_b == 0.:
+            if eff_b in [0.,1.]:
                 promoteProb_btag = 0.
             else:
-                promoteProb_btag = abs(SFb - 1.)/((SFb/eff_b) - 1.)
+                promoteProb_btag = abs(SFb - 1.)/((1./eff_b) - 1.)
 
         if csv > csv_cut:
             btagged = True
