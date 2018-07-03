@@ -34,7 +34,7 @@ scram b -j 20
 Small interactive test: 
 
 ```
-cd cfgPython/mt
+cd CMGTools/H2TauTau/cfgPython/mt
 heppy Trash tauMu_2018_cfg.py -N 1000 -f -o production=False
 ```
 
