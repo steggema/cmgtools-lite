@@ -14,6 +14,7 @@ export SCRAM_ARCH=slc6_amd64_gcc630
 cmsrel CMSSW_9_4_8
 cd CMSSW_9_4_8/src 
 cmsenv
+git init 
 
 # add custom CMSSW repo
 git remote add colin https://github.com/cbernet/cmg-cmssw.git  -f  -t 94X_HTT
@@ -35,7 +36,7 @@ Small interactive test:
 
 ```
 cd CMGTools/H2TauTau/cfgPython/mt
-heppy Trash tauMu_2018_cfg.py -N 1000 -f -o production=False
+heppy Trash tauMu_2018_cfg.py -N 1000 -f 
 ```
 
 ## Creation of MINIAOD_CL 
