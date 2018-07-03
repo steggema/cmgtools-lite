@@ -1,4 +1,4 @@
-# H->tau tau analysis (CERN/Lyon)
+# H->tau tau analysis, 2017 (CERN/Lyon)
 
 ## Installation recipe
 
@@ -10,38 +10,34 @@ source /cvmfs/cms.cern.ch/cmsset_default.sh
 Then follow this recipe to install the analysis software: 
 
 ```
-cmsrel CMSSW_8_0_28_patch1
-cd CMSSW_8_0_28_patch1/src 
+export SCRAM_ARCH=slc6_amd64_gcc630
+cmsrel CMSSW_9_4_8
+cd CMSSW_9_4_8/src 
 cmsenv
 git cms-init
 
-git remote add colin   git@github.com:cbernet/cmg-cmssw.git
-git fetch colin
+# add the central cmg-cmssw repository to get the Heppy 94X_dev branch
+git remote add cmg-central https://github.com/CERN-PH-CMG/cmg-cmssw.git  -f  -t heppy_94X_dev
 
 # configure the sparse checkout, and get the base heppy packages
-cp /afs/cern.ch/user/s/steggema/public/sparse-checkout-8025 .git/info/sparse-checkout
+cp /afs/cern.ch/user/c/cmgtools/public/sparse-checkout_94X_heppy .git/info/sparse-checkout
+git checkout -b heppy_94X_dev cmg-central/heppy_94X_dev
 
-# this includes: 
-#  - solve conflicts when merging Jan’s branch
-#  - MET recipe
-#  - MET filter BadGlobalMuonFilter produces a bool  
-git co -t colin/heppy_htt8025
-
-# Get MVA MET data file
-mkdir RecoMET/METPUSubtraction/data
-cd RecoMET/METPUSubtraction/data
-wget https://github.com/rfriese/cmssw/raw/MVAMET2_beta_0.6/RecoMET/METPUSubtraction/data/weightfile.root
-
-cd $CMSSW_BASE/src
+# add your mirror, and push the 94X_dev branch to it
+YOUR_GITHUB_REPOSITORY=$(git config user.github) # or set it manually if this doesn't work for you
+git remote add origin git@github.com:$YOUR_GITHUB_REPOSITORY/cmg-cmssw.git
+git push -u origin heppy_94X_dev
 
 # now get the CMGTools subsystem from the cmgtools-lite repository
-git clone -o cmglite-colin git@github.com:cbernet/cmgtools-lite.git CMGTools
-cd CMGTools
-git co -t cmglite-colin/828patch1_HTT
+git clone -o colin https://github.com/cbernet/cmgtools-lite.git -b migration_94x CMGTools
+cd CMGTools 
 
-cd $CMSSW_BASE/src
+# add your fork, and push the 94X_dev branch to it
+git remote add origin  git@github.com:$YOUR_GITHUB_REPOSITORY/cmgtools-lite.git 
+git push -u origin migration_94x
 
-scram b -j 8
+#compile
+cd $CMSSW_BASE/src && scram b -j 8
 ```
 
 ## Running our analysis in heppy
@@ -49,6 +45,13 @@ scram b -j 8
 to be written
 
 ## Creation of MINIAOD_CL 
+
+**For now, this step is not necessary for the 2017 analysis**
+
+**Not finalized yet, TODO:**
+
+* provide a vanilla CMSSW release, without CMG tools, for the production of these datasets. the tools and and the instructions will be moved to the sync repository on gitlab
+* study the event content in details, and make sure that the necessary products are indeed kept, and that the old ones are dropped.  
 
 In the new computing model, we do not run the preprocessor anymore in heppy. 
 Instead, we perform some of the tasks that were done by the preprocessor with cmsRun directly, and produce MINIAOD_CL events. These events are later on read with heppy. They are common to all analysis channels. 
