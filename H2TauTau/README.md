@@ -14,35 +14,29 @@ export SCRAM_ARCH=slc6_amd64_gcc630
 cmsrel CMSSW_9_4_8
 cd CMSSW_9_4_8/src 
 cmsenv
-git cms-init
 
-# add the central cmg-cmssw repository to get the Heppy 94X_dev branch
-git remote add cmg-central https://github.com/CERN-PH-CMG/cmg-cmssw.git  -f  -t heppy_94X_dev
+# add custom CMSSW repo
+git remote add colin https://github.com/cbernet/cmg-cmssw.git  -f  -t 94X_HTT
 
 # configure the sparse checkout, and get the base heppy packages
 cp /afs/cern.ch/user/c/cmgtools/public/sparse-checkout_94X_heppy .git/info/sparse-checkout
-git checkout -b heppy_94X_dev cmg-central/heppy_94X_dev
+git checkout -t colin/94X_HTT
 
-# add your mirror, and push the 94X_dev branch to it
-YOUR_GITHUB_REPOSITORY=$(git config user.github) # or set it manually if this doesn't work for you
-git remote add origin git@github.com:$YOUR_GITHUB_REPOSITORY/cmg-cmssw.git
-git push -u origin heppy_94X_dev
-
-# now get the CMGTools subsystem from the cmgtools-lite repository
-git clone -o colin https://github.com/cbernet/cmgtools-lite.git -b migration_94x CMGTools
-cd CMGTools 
-
-# add your fork, and push the 94X_dev branch to it
-git remote add origin  git@github.com:$YOUR_GITHUB_REPOSITORY/cmgtools-lite.git 
-git push -u origin migration_94x
+# get the CMGTools subsystem from the cmgtools-lite repository
+git clone -o colin https://github.com/cbernet/cmgtools-lite.git -b 94X_HTT CMGTools
 
 #compile
-cd $CMSSW_BASE/src && scram b -j 8
+scram b -j 20
 ```
 
 ## Running our analysis in heppy
 
-to be written
+Small interactive test: 
+
+```
+cd cfgPython/mt
+heppy Trash tauMu_2018_cfg.py -N 1000 -f -o production=False
+```
 
 ## Creation of MINIAOD_CL 
 
