@@ -4,6 +4,7 @@ import ROOT
 from ROOT import TRandom3, TFile
 ROOT.gSystem.Load('libCondToolsBTau')
 
+#todo: move this to separate BTagSF analyzer that could be configured? 
 class BTagSF(object):
     '''Translate heppy run 1 BTagSF class to python, and update to 2012.
     '''
@@ -20,7 +21,8 @@ class BTagSF(object):
         self.btag_eff_oth = self.mc_eff_file.Get('btag_eff_oth')
 
         # b-tag SFs from POG
-        calib = ROOT.BTagCalibration("DeepCSV", os.path.expandvars("$CMSSW_BASE/src/CMGTools/H2TauTau/data/DeepCSV_94XSF_V1_B_F.csv"))
+        # Todo : COLIN 3jul18: new recommendation is DeepCSV V2. what about CSV v2? 
+        calib = ROOT.BTagCalibration("DeepCSV", os.path.expandvars("$CMSSW_BASE/src/CMGTools/H2TauTau/data/DeepCSV_94XSF_V2_B_F.csv"))
         
         op_dict = {
             'loose':0,
