@@ -40,6 +40,8 @@ class H2TauTauTreeProducerTauMu(H2TauTauTreeProducer):
         # self.var(self.tree, 'trigger_matched_isotkmu22')
         # self.var(self.tree, 'trigger_matched_isomu19tau20')
 
+        self.var(self.tree, 'trigger_matched_singlemuon')
+
         self.var(self.tree, 'l2_weight_mutotau')
 
         if getattr(self.cfg_ana, 'addTauMVAInputs', False):
