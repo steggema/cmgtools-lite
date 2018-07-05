@@ -185,11 +185,11 @@ class ScaleFactor(object):
                     pt_low, pt_high = re.findall("\d+\.\d+", pt_key)
                     if pt >= float(pt_low) and pt < float(pt_high):
                         return sub_eff[pt_key][u'value']
-                    else:
-                        print 'pT out of range, using last pT bin'
-                        return sub_eff[pt_key][u'value']
-            else:
-                print 'JSON-based scale factor: eta out of range, last eta_high = ', eta_high, 'eta = ', eta
+                else:
+                    print 'pT out of range, using last pT bin'
+                    return sub_eff[pt_key][u'value']
+        else:
+            print 'JSON-based scale factor: eta out of range, last eta_high = ', eta_high, 'eta = ', eta
 
         print 'Unsuccessfully tried to extract json-based scale factor for pt, eta', pt, eta
         return -99.
