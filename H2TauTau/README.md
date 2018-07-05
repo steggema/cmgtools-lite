@@ -1,4 +1,4 @@
-# H->tau tau analysis, 2017 (CERN/Lyon)
+# H->tau tau analysis of the 2017 data (CERN/Lyon)
 
 ## Installation recipe
 
