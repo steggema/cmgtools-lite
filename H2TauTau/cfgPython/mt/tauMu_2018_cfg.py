@@ -172,9 +172,9 @@ muonWeighter = cfg.Analyzer(
     LeptonWeighter,
     name='LeptonWeighter_mu',
     scaleFactorFiles={
-        # 'id':('$CMSSW_BASE/src/CMGTools/H2TauTau/data/RunBCDEF_SF_ID.json', 'NUM_MediumID_DEN_genTracks'),
-        # 'iso':('$CMSSW_BASE/src/CMGTools/H2TauTau/data/RunBCDEF_SF_ISO.json', 'NUM_TightRelIso_DEN_MediumID'),
-        # 'trigger':('$CMSSW_BASE/src/CMGTools/H2TauTau/data/theJSONfile_RunBtoF_Nov17Nov2017.json', 'IsoMu27_PtEtaBins')
+        'id':('$CMSSW_BASE/src/CMGTools/H2TauTau/data/RunBCDEF_SF_ID.json', 'NUM_MediumID_DEN_genTracks'),
+        'iso':('$CMSSW_BASE/src/CMGTools/H2TauTau/data/RunBCDEF_SF_ISO.json', 'NUM_TightRelIso_DEN_MediumID'),
+        'trigger':('$CMSSW_BASE/src/CMGTools/H2TauTau/data/theJSONfile_RunBtoF_Nov17Nov2017.json', 'IsoMu27_PtEtaBins')
     },
     dataEffFiles={
         # 'trigger':('$CMSSW_BASE/src/CMGTools/H2TauTau/data/htt_scalefactors_v16_2.root', 'm_trgIsoMu22orTkIsoMu22_desy'),
