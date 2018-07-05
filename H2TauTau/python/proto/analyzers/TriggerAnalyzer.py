@@ -6,11 +6,13 @@ from PhysicsTools.Heppy.analyzers.core.AutoHandle import AutoHandle
 import PhysicsTools.HeppyCore.framework.config as cfg
 
 class TriggerFilterMatch(object):
-    def __init__(self, leg1_names, leg2_names, match_both_legs=True, triggers=None):
+    def __init__(self, leg1_names, leg2_names, match_both_legs=True, triggers=None, match_all_names_leg1=False, match_all_names_leg2=False):
         self.leg1_names = leg1_names
         self.leg2_names = leg2_names
         # If true, requires both legs to be matched (if there are names)
         self.match_both_legs = match_both_legs
+        self.match_all_names_leg1 = match_all_names_leg1
+        self.match_all_names_leg2 = match_all_names_leg2
         # If set, will only attach this to passed trigger names; other,
         # TriggerAnalyzer will figure it out
         self.triggers = [] if triggers is None else triggers
@@ -176,13 +178,21 @@ class TriggerAnalyzer(Analyzer):
                             if match_info.triggers:
                                 if not any(fnmatch(info.name, n) for n in match_info.triggers):
                                     continue
-                            if any(n in to.filterLabels() for n in match_info.leg1_names):
+                            if match_info.match_all_names_leg1:
+                                leg1_match = all(n in to.filterLabels() for n in match_info.leg1_names)
+                            else:
+                                leg1_match = any(n in to.filterLabels() for n in match_info.leg1_names)
+                            if leg1_match:
                                 info.leg1_objs.append(to)
                                 info.leg1_names.append([n for n in to.filterLabels() if n in match_info.leg1_names])
                                 info.match_both = match_info.match_both_legs
                                 info.match_infos.add(match_info)
 
-                            if any(n in to.filterLabels() for n in match_info.leg2_names):
+                            if match_info.match_all_names_leg2:
+                                leg2_match = all(n in to.filterLabels() for n in match_info.leg2_names)
+                            else:
+                                leg2_match = any(n in to.filterLabels() for n in match_info.leg2_names)
+                            if leg2_match:
                                 info.leg2_objs.append(to)
                                 info.leg2_names.append([n for n in to.filterLabels() if n in match_info.leg2_names])
                                 info.match_both = match_info.match_both_legs
