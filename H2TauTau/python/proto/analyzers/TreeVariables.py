@@ -122,8 +122,8 @@ particle_vars = [
 
 # generic lepton
 lepton_vars = [
-    # Variable('dxy', lambda lep : lep.dxy()),
-    Variable('dxy', lambda lep : lep.physObj.dxy()),
+    Variable('dxy', lambda lep : lep.dxy()),
+    # Variable('dxy', lambda lep : lep.physObj.dxy()),
     Variable('dxy_error', lambda lep : lep.edxy() if hasattr(lep, 'edxy') else lep.dxy_error()),
     Variable('dz', lambda lep : lep.leadChargedHadrCand().dz() if hasattr(lep, 'leadChargedHadrCand') else lep.dz()),
     Variable('dz_error', lambda lep : lep.edz() if hasattr(lep, 'edz') else -1.),
