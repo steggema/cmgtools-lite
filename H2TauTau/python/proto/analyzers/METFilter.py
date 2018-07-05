@@ -46,21 +46,5 @@ class METFilter(Analyzer):
                 self.count.inc('pass {t}'.format(t=trigger_name))
             else:
                 setattr(event, trigger_name, False)
-    
-        self.handles['badGlobalMuonTagger'].ReallyLoad(self.handles['badGlobalMuonTagger'].event)
-        self.handles['cloneGlobalMuonTagger'].ReallyLoad(self.handles['cloneGlobalMuonTagger'].event)
-
-        if not self.handles['badGlobalMuonTagger'].isValid() or not self.handles['cloneGlobalMuonTagger'].isValid():
-            print 'WARNING: Bad global muon filter and clone global muon filters only work with CMSSW pre-sequence'
-            event.passBadGlobalMuonFilter = True
-            event.passcloneGlobalMuonFilter = True
-            return True
-
-        event.passBadGlobalMuonFilter = not self.handles['badGlobalMuonTagger'].product()[0]
-        event.passcloneGlobalMuonFilter = not self.handles['cloneGlobalMuonTagger'].product()[0]
-        if event.passBadGlobalMuonFilter:
-            self.count.inc('bad global muon')
-        if event.passcloneGlobalMuonFilter:
-            self.count.inc('clone global muon')
         
         return True
