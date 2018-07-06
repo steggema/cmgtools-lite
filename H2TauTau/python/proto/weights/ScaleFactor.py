@@ -186,7 +186,7 @@ class ScaleFactor(object):
                     if pt >= float(pt_low) and pt < float(pt_high):
                         return sub_eff[pt_key][u'value']
                 else:
-                    print 'pT out of range, using last pT bin'
+                    # print 'pT out of range, using last pT bin'
                     return sub_eff[pt_key][u'value']
         else:
             print 'JSON-based scale factor: eta out of range, last eta_high = ', eta_high, 'eta = ', eta
