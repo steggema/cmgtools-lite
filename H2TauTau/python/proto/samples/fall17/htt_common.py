@@ -1,3 +1,5 @@
+import os
+
 from CMGTools.RootTools.samples.samples_13TeV_RunIIFall17MiniAOD import DYNJetsToLL, QCD_EMs, TBar_tch, Ws, T_tch, DYJetsToLL_M10to50_LO, DYJetsToLL_M50_LO, DYJetsToLL_M50_LO_ext, TBar_tWch_noFullyHad, T_tWch_noFullyHad, WJetsToLNu_LO, TTLep_pow, TTHad_pow, TTSemi_pow, ZZTo4L,  WWTo2L2Nu, WZTo3LNu_fxfx, ZZTo2L2Nu, QCD_Pt_15to7000_TuneCP5_Flat2017, QCD_Pt_15to7000_TuneCP5_Flat
 
 # There in 2016, not yet in 2017: QCDPtbcToE, WZJToLLLNu, WZTo1L3Nu, WWTo1L1Nu2Q, WZTo1L1Nu2Q, ZZTo2L2Q, WZTo2L2Q
@@ -13,9 +15,9 @@ from CMGTools.H2TauTau.proto.samples.fall17.higgs_susy import mc_higgs_susy_gg, 
 
 from CMGTools.H2TauTau.proto.samples.fall17.higgs_susy import HiggsSUSYBB900 as bbh900
 
-# Full 2016
-json = '/afs/cern.ch/cms/CAF/CMSCOMM/COMM_DQM/certification/Collisions17/13TeV/ReReco/Cert_294927-306462_13TeV_EOY2017ReReco_Collisions17_JSON.txt'
-lumi = 41298.
+# Full 2017
+json = os.path.expandvars('$CMSSW_BASE/src/CMGTools/H2TauTau/data/Cert_294927-306462_13TeV_EOY2017ReReco_Collisions17_JSON_v1.txt')
+lumi = 41529.
 
 # Set cross sections to HTT values
 
