@@ -10,6 +10,10 @@ from PhysicsTools.Heppy.utils.cmsswPreprocessor import CmsswPreprocessor
 from CMGTools.RootTools.samples.ComponentCreator import ComponentCreator
 ComponentCreator.useAAA = True
 
+import logging
+logging.shutdown()
+reload(logging)
+logging.basicConfig(level=logging.WARNING)
 
 ###############
 # Options
@@ -18,7 +22,7 @@ ComponentCreator.useAAA = True
 # Get all heppy options; set via "-o production" or "-o production=True"
 
 # production = True run on batch, production = False run locally
-production = getHeppyOption('production', False)
+test = getHeppyOption('test', True)
 syncntuple = getHeppyOption('syncntuple', False)
 data = getHeppyOption('data', False)
 tes_string = getHeppyOption('tes_string', '') # '_tesup' '_tesdown'
@@ -67,15 +71,14 @@ for sample in data_list:
     sample.splitFactor = splitFactor(sample, n_events_per_job)
     sample.dataGT = gt_data.format(sample.name[sample.name.find('2017')+4])
 
-selectedComponents=[]
-if production: 
-    selectedComponents = data_list if data else backgrounds_mu + sm_signals #+ mssm_signals
-else: 
+selectedComponents = data_list if data else backgrounds_mu + sm_signals #+ mssm_signals
+
+if test:
     cache = True
-    selectedComponents = index.glob('*BB900*') 
-    for comp in selectedComponents:
-        comp.splitFactor = 1
-        comp.fineSplitFactor = 1
+    comp = index.glob('HiggsVBF125')[0]
+    comp.files = comp.files[:1]
+    selectedComponents = [comp]
+    # comp.files = ['test.root']
 
 
 events_to_pick = []
@@ -102,7 +105,7 @@ from CMGTools.H2TauTau.proto.analyzers.MuonIsolationCalculator import MuonIsolat
 mcWeighter.activate = False
 
 # Just to be sure
-if production:
+if not test:
     syncntuple = False
     pick_events = False
 
@@ -266,3 +269,4 @@ config = cfg.Config(components=selectedComponents,
                     )
 
 printComps(config.components, True)
+

@@ -7,15 +7,7 @@ from CMGTools.RootTools.samples.ComponentCreator import ComponentCreator
 creator = ComponentCreator()
 
 HiggsGGH125 = creator.makeMCComponent('HiggsGGH125', '/GluGluHToTauTau_M125_13TeV_powheg_pythia8/RunIIFall17MiniAODv2-PU2017_12Apr2018_94X_mc2017_realistic_v14-v1/MINIAODSIM', 'CMS', '.*root', 1.0)
-# HiggsGGH130 = creator.makeMCComponent('HiggsGGH130', '/GluGluHToTauTau_M130_13TeV_powheg_pythia8/RunIIFall15MiniAODv2-PU25nsData2015v1_76X_mcRun2_asymptotic_v12-v1/MINIAODSIM', 'CMS', '.*root', 1.0)
-
-# HiggsVBF120 = creator.makeMCComponent('HiggsVBF125', '/VBFHToTauTau_M120_13TeV_powheg_pythia8/RunIIFall15MiniAODv2-PU25nsData2015v1_76X_mcRun2_asymptotic_v12-v1/MINIAODSIM', 'CMS', '.*root', 1.0)
 HiggsVBF125 = creator.makeMCComponent('HiggsVBF125', '/VBFHToTauTau_M125_13TeV_powheg_pythia8/RunIIFall17MiniAODv2-PU2017_12Apr2018_94X_mc2017_realistic_v14-v1/MINIAODSIM', 'CMS', '.*root', 1.0)
-# HiggsVBF130 = creator.makeMCComponent('HiggsVBF125', '/VBFHToTauTau_M130_13TeV_powheg_pythia8/RunIIFall15MiniAODv2-PU25nsData2015v1_76X_mcRun2_asymptotic_v12-v1/MINIAODSIM', 'CMS', '.*root', 1.0)
-
-
-
-
 HiggsTTH125 = creator.makeMCComponent('HiggsTTH125', '/ttHToNonbb_M125_TuneCP5_13TeV-powheg-pythia8/RunIIFall17MiniAODv2-PU2017_12Apr2018_94X_mc2017_realistic_v14-v1/MINIAODSIM', 'CMS', '.*root', 1.0)
 
 
@@ -27,7 +19,7 @@ mc_higgs_vbf = [
 ]
 
 mc_higgs_ggh = [
-    HiggsGGH125,
+    # HiggsGGH125,
     # HiggsGGHtoWW125,
 ]
 
@@ -37,7 +29,7 @@ mc_higgs_vh = [
 ]
 
 mc_higgs_tth = [
-    HiggsTTH125
+    # HiggsTTH125
 ]
 
 mc_higgs = copy.copy(mc_higgs_vbf)
@@ -46,6 +38,12 @@ mc_higgs.extend(mc_higgs_ggh)
 mc_higgs.extend(mc_higgs_vh)
 mc_higgs.extend(mc_higgs_tth)
 
+# Signals
+sm_signals = [
+    # HiggsGGH125, 
+    HiggsVBF125, 
+    # HiggsTTH125
+]
 
 pattern = re.compile('Higgs(\D+)(\d+)')
 for h in mc_higgs:
