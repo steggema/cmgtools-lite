@@ -2,11 +2,11 @@ from CMGTools.RootTools.samples.samples_13TeV_RunIIFall17MiniAOD import DYNJetsT
 
 # There in 2016, not yet in 2017: QCDPtbcToE, WZJToLLLNu, WZTo1L3Nu, WWTo1L1Nu2Q, WZTo1L1Nu2Q, ZZTo2L2Q, WZTo2L2Q
 
-from CMGTools.RootTools.samples.samples_13TeV_DATA2017 import SingleMuon_Run2017B_17Nov2017, SingleElectron_Run2017B_17Nov2017, MuonEG_Run2017B_17Nov2017, Tau_Run2017B_17Nov2017
-from CMGTools.RootTools.samples.samples_13TeV_DATA2017 import SingleMuon_Run2017C_17Nov2017, SingleElectron_Run2017C_17Nov2017, MuonEG_Run2017C_17Nov2017, Tau_Run2017C_17Nov2017
-from CMGTools.RootTools.samples.samples_13TeV_DATA2017 import SingleMuon_Run2017D_17Nov2017, SingleElectron_Run2017D_17Nov2017, MuonEG_Run2017D_17Nov2017, Tau_Run2017D_17Nov2017
-from CMGTools.RootTools.samples.samples_13TeV_DATA2017 import SingleMuon_Run2017E_17Nov2017, SingleElectron_Run2017E_17Nov2017, MuonEG_Run2017E_17Nov2017, Tau_Run2017E_17Nov2017
-from CMGTools.RootTools.samples.samples_13TeV_DATA2017 import SingleMuon_Run2017F_17Nov2017, SingleElectron_Run2017F_17Nov2017, MuonEG_Run2017F_17Nov2017, Tau_Run2017F_17Nov2017
+from CMGTools.RootTools.samples.samples_13TeV_DATA2017 import SingleMuon_Run2017B_31Mar2018, SingleElectron_Run2017B_31Mar2018, MuonEG_Run2017B_31Mar2018, Tau_Run2017B_31Mar2018
+from CMGTools.RootTools.samples.samples_13TeV_DATA2017 import SingleMuon_Run2017C_31Mar2018, SingleElectron_Run2017C_31Mar2018, MuonEG_Run2017C_31Mar2018, Tau_Run2017C_31Mar2018
+from CMGTools.RootTools.samples.samples_13TeV_DATA2017 import SingleMuon_Run2017D_31Mar2018, SingleElectron_Run2017D_31Mar2018, MuonEG_Run2017D_31Mar2018, Tau_Run2017D_31Mar2018
+from CMGTools.RootTools.samples.samples_13TeV_DATA2017 import SingleMuon_Run2017E_31Mar2018, SingleElectron_Run2017E_31Mar2018, MuonEG_Run2017E_31Mar2018, Tau_Run2017E_31Mar2018
+from CMGTools.RootTools.samples.samples_13TeV_DATA2017 import SingleMuon_Run2017F_31Mar2018, SingleElectron_Run2017F_31Mar2018, MuonEG_Run2017F_31Mar2018, Tau_Run2017F_31Mar2018
 
 from CMGTools.H2TauTau.proto.samples.fall17.higgs import HiggsGGH125, HiggsVBF125, HiggsTTH125
 from CMGTools.H2TauTau.proto.samples.fall17.higgs_susy import mc_higgs_susy_gg, mc_higgs_susy_bb
@@ -123,10 +123,10 @@ backgrounds_ele += QCD_EMs
 # backgrounds_ele += QCDPtbcToE
 
 # Data
-data_single_muon = [SingleMuon_Run2017B_17Nov2017, SingleMuon_Run2017C_17Nov2017, SingleMuon_Run2017D_17Nov2017, SingleMuon_Run2017E_17Nov2017, SingleMuon_Run2017F_17Nov2017]
-data_single_electron = [SingleElectron_Run2017B_17Nov2017, SingleElectron_Run2017C_17Nov2017, SingleElectron_Run2017D_17Nov2017, SingleElectron_Run2017E_17Nov2017, SingleElectron_Run2017F_17Nov2017]
-data_muon_electron = [MuonEG_Run2017B_17Nov2017, MuonEG_Run2017C_17Nov2017, MuonEG_Run2017D_17Nov2017, MuonEG_Run2017E_17Nov2017, MuonEG_Run2017F_17Nov2017]
-data_tau = [Tau_Run2017B_17Nov2017, Tau_Run2017C_17Nov2017, Tau_Run2017D_17Nov2017, Tau_Run2017E_17Nov2017, Tau_Run2017F_17Nov2017]
+data_single_muon = [SingleMuon_Run2017B_31Mar2018, SingleMuon_Run2017C_31Mar2018, SingleMuon_Run2017D_31Mar2018, SingleMuon_Run2017E_31Mar2018, SingleMuon_Run2017F_31Mar2018]
+data_single_electron = [SingleElectron_Run2017B_31Mar2018, SingleElectron_Run2017C_31Mar2018, SingleElectron_Run2017D_31Mar2018, SingleElectron_Run2017E_31Mar2018, SingleElectron_Run2017F_31Mar2018]
+data_muon_electron = [MuonEG_Run2017B_31Mar2018, MuonEG_Run2017C_31Mar2018, MuonEG_Run2017D_31Mar2018, MuonEG_Run2017E_31Mar2018, MuonEG_Run2017F_31Mar2018]
+data_tau = [Tau_Run2017B_31Mar2018, Tau_Run2017C_31Mar2018, Tau_Run2017D_31Mar2018, Tau_Run2017E_31Mar2018, Tau_Run2017F_31Mar2018]
 
 for sample in data_single_muon + data_single_electron + data_muon_electron + data_tau:
     sample.json = json
