@@ -134,7 +134,6 @@ class TauMuAnalyzer(DiLeptonAnalyzer):
         result = self.selectionSequence(event, fillCounter=True,
                                         leg1IsoCut=self.cfg_ana.looseiso1,
                                         leg2IsoCut=self.cfg_ana.looseiso2)
-        
         return result
 
     def testLeg2ID(self, tau):
@@ -149,13 +148,14 @@ class TauMuAnalyzer(DiLeptonAnalyzer):
     def testLeg2Iso(self, tau, isocut):
         '''if isocut is None, returns true if three-hit iso cut is passed.
         Otherwise, returns true if iso MVA > isocut.'''
-        if isocut is None:
-            return tau.tauID('byLooseCombinedIsolationDeltaBetaCorr3Hits') > 0.5
-        else:
-            # JAN FIXME - placeholder, as of now only used to define passing cuts
-            # return tau.tauID("byIsolationMVA3newDMwLTraw") > isocut
-            # RIC: 9 March 2015
-            return tau.tauID("byCombinedIsolationDeltaBetaCorrRaw3Hits") < isocut
+        return tau.mvaId2017 > 0.
+        # if isocut is None:
+        #     return tau.tauID('byVVLooseIsolationMVArun2017v2DBoldDMwLT2017') > 0.5
+        # else:
+        #     # JAN FIXME - placeholder, as of now only used to define passing cuts
+        #     # return tau.tauID("byIsolationMVA3newDMwLTraw") > isocut
+        #     # RIC: 9 March 2015
+        #     return tau.tauID("byVVLooseIsolationMVArun2017v2DBoldDMwLT2017") > isocut
 
     def testTauVertex(self, tau):
         '''Tests vertex constraints, for tau'''
@@ -175,17 +175,18 @@ class TauMuAnalyzer(DiLeptonAnalyzer):
 
     def testLeg1Iso(self, muon, isocut):
         '''Tight muon selection, with isolation requirement'''
-        if isocut is None:
-            isocut = self.cfg_ana.iso1 # why was iso2 here ??
+        return True # no isolation cut at sync stage
+        # if isocut is None:
+        #     isocut = self.cfg_ana.iso1 # why was iso2 here ??
 
-        return muon.relIsoR(R=0.4, dBetaFactor=0.5, allCharged=False) < isocut
+        # return muon.relIsoR(R=0.4, dBetaFactor=0.5, allCharged=False) < isocut
 
     def thirdLeptonVeto(self, leptons, otherLeptons, isoCut=0.3):
         # count tight muons
         vLeptons = [muon for muon in leptons if
                     muon.muonID("POG_ID_Medium") and
                     self.testVertex(muon) and
-                    self.testLegKine(muon, ptcut=10, etacut=2.4) and
+                    self.testLegKine(muon, ptcut=15, etacut=2.4) and
                     self.testLeg1Iso(muon, 0.3)
                     ]
 

@@ -73,13 +73,15 @@ for sample in data_list:
 
 selectedComponents = data_list if data else backgrounds_mu + sm_signals #+ mssm_signals
 
+
 if test:
     cache = True
     comp = index.glob('HiggsVBF125')[0]
     comp.files = comp.files[:1]
+    comp.splitFactor = 1
+    comp.fineSplitFactor = 1
     selectedComponents = [comp]
     # comp.files = ['test.root']
-
 
 events_to_pick = []
 
@@ -88,7 +90,7 @@ events_to_pick = []
 ###############
 
 # common configuration and sequence
-from CMGTools.H2TauTau.htt_ntuple_base_cff import commonSequence, eventSelector, httGenAna, jetAna, triggerAna, recoilCorr, mcWeighter
+from CMGTools.H2TauTau.htt_ntuple_base_cff import commonSequence, eventSelector, httGenAna, jetAna, triggerAna, recoilCorr
 
 # Tau-tau analyzers
 from CMGTools.H2TauTau.proto.analyzers.TauMuAnalyzer import TauMuAnalyzer
@@ -102,7 +104,6 @@ from CMGTools.H2TauTau.proto.analyzers.FileCleaner import FileCleaner
 from CMGTools.H2TauTau.proto.analyzers.TauIsolationCalculator import TauIsolationCalculator
 from CMGTools.H2TauTau.proto.analyzers.MuonIsolationCalculator import MuonIsolationCalculator
 
-mcWeighter.activate = False
 
 # Just to be sure
 if not test:
@@ -133,11 +134,11 @@ tauMuAna = cfg.Analyzer(
     pt1=29, # 2 GeV above IsoMu27 trigger (scale factors start at 29)
     eta1=2.4,
     iso1=0.15,
-    looseiso1=9999.,
+    looseiso1=None,
     pt2=20,
     eta2=2.3,
     iso2=1.5,
-    looseiso2=9999.,
+    looseiso2=None,
     m_min=10,
     m_max=99999,
     dR_min=0.5,

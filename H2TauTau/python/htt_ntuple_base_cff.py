@@ -11,7 +11,7 @@ from PhysicsTools.Heppy.analyzers.core.PileUpAnalyzer import PileUpAnalyzer
 from PhysicsTools.Heppy.analyzers.gen.LHEWeightAnalyzer import LHEWeightAnalyzer
 
 # Tau-tau analyzers
-from CMGTools.H2TauTau.proto.analyzers.MCWeighter import MCWeighter
+# from CMGTools.H2TauTau.proto.analyzers.MCWeighter import MCWeighter
 from CMGTools.H2TauTau.proto.analyzers.TriggerAnalyzer import TriggerAnalyzer
 from CMGTools.H2TauTau.proto.analyzers.JetAnalyzer import JetAnalyzer
 from CMGTools.H2TauTau.proto.analyzers.METAnalyzer import METAnalyzer
@@ -74,10 +74,10 @@ skimAna = cfg.Analyzer(
     name='SkimAnalyzerCount'
 )
 
-mcWeighter = cfg.Analyzer(
-    MCWeighter,
-    name='MCWeighter'
-)
+# mcWeighter = cfg.Analyzer(
+#     MCWeighter,
+#     name='MCWeighter'
+# )
 
 triggerAna = cfg.Analyzer(
     TriggerAnalyzer,
@@ -201,7 +201,7 @@ commonSequence = cfg.Sequence([
     lheWeightAna,
     jsonAna,
     skimAna,
-    mcWeighter,
+    # mcWeighter,
     # genAna,
     # susyScanAna,
     triggerAna,  # First analyser that applies selections

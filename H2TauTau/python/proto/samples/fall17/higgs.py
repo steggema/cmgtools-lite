@@ -6,8 +6,9 @@ from CMGTools.RootTools.samples.ComponentCreator import ComponentCreator
 
 creator = ComponentCreator()
 
-
+HiggsGGH125 = creator.makeMCComponent('HiggsGGH125', '/GluGluHToTauTau_M125_13TeV_powheg_pythia8/RunIIFall17MiniAODv2-PU2017_12Apr2018_94X_mc2017_realistic_v14-v1/MINIAODSIM', 'CMS', '.*root', 1.0)
 HiggsVBF125 = creator.makeMCComponent('HiggsVBF125', '/VBFHToTauTau_M125_13TeV_powheg_pythia8/RunIIFall17MiniAODv2-PU2017_12Apr2018_94X_mc2017_realistic_v14-v1/MINIAODSIM', 'CMS', '.*root', 1.0)
+HiggsTTH125 = creator.makeMCComponent('HiggsTTH125', '/ttHToNonbb_M125_TuneCP5_13TeV-powheg-pythia8/RunIIFall17MiniAODv2-PU2017_12Apr2018_94X_mc2017_realistic_v14-v1/MINIAODSIM', 'CMS', '.*root', 1.0)
 
 
 #############
