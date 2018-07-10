@@ -44,16 +44,18 @@ gt_data = 'Fall17_17Nov2017{}_V6_DATA'
 ###############
 
 from CMGTools.RootTools.utils.splitFactor import splitFactor
-import CMGTools.H2TauTau.proto.samples.fall17.htt_common as htt_common
 from CMGTools.H2TauTau.proto.samples.component_index import ComponentIndex
-index=ComponentIndex(htt_common)
+# index=ComponentIndex(htt_common) TODO adapt this, need to undo the removal of htt_common?
 
-from CMGTools.H2TauTau.proto.samples.fall17.htt_common import backgrounds_mu, sm_signals, mssm_signals, data_single_muon, sync_list
+from CMGTools.H2TauTau.proto.samples.fall17.data import data_single_muon
+from CMGTools.H2TauTau.proto.samples.fall17.higgs_susy import mssm_signals
+from CMGTools.H2TauTau.proto.samples.fall17.higgs import sync_list
+from CMGTools.H2TauTau.proto.samples.fall17.backgrounds import backgrounds
 from CMGTools.H2TauTau.proto.samples.fall17.triggers_tauMu import mc_triggers, mc_triggerfilters
 from CMGTools.H2TauTau.proto.samples.fall17.triggers_tauMu import data_triggers, data_triggerfilters
 from CMGTools.H2TauTau.htt_ntuple_base_cff import puFileData, puFileMC
 
-mc_list = backgrounds_mu + sm_signals + sync_list + mssm_signals
+mc_list = backgrounds + sync_list + mssm_signals
 data_list = data_single_muon
 
 n_events_per_job = 1e5
@@ -71,16 +73,17 @@ for sample in data_list:
     sample.splitFactor = splitFactor(sample, n_events_per_job)
     sample.dataGT = gt_data.format(sample.name[sample.name.find('2017')+4])
 
-selectedComponents = data_list if data else backgrounds_mu + sm_signals #+ mssm_signals
+selectedComponents = data_list if data else backgrounds + mssm_signals
 
 
 if test:
     cache = True
-    comp = index.glob('HiggsVBF125')[0]
-    comp.files = comp.files[:1]
-    comp.splitFactor = 1
-    comp.fineSplitFactor = 1
-    selectedComponents = [comp]
+    # comp = index.glob('HiggsVBF125')[0] # TODO adapt to this scheme when implemented
+    selectedComponents = sync_list
+    for comp in selectedComponents: 
+        comp.files = comp.files[:1]
+        comp.splitFactor = 1
+        comp.fineSplitFactor = 1
     # comp.files = ['test.root']
 
 events_to_pick = []

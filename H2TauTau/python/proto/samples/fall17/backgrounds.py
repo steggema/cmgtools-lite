@@ -23,6 +23,41 @@ DYJets_to_stitch = [DY1JetsToLL_M50_LO,
                     DYJetsToLL_M50,
                     DYJetsToLL_M50_ext]
 
+dy_xsec = 5765.4
+
+
+n_ev_dy_incl = 48099551.0 + 48744812.0
+n_ev_dy_1jet = 32528702.0 + 34135231.0
+n_ev_dy_2jet = 11611398.0 + 9691457.0
+n_ev_dy_3jet = 4772102.0
+n_ev_dy_4jet = 4327065.0
+
+
+k_factor = dy_xsec/4954.0
+dy_xsec_incl = 4954.0 * k_factor
+dy_xsec_1jet = 878 * k_factor
+dy_xsec_2jet = 307 * k_factor
+dy_xsec_3jet = 112 * k_factor
+dy_xsec_4jet = 44.2 * k_factor
+
+
+dy_weight_dict = {
+    0:dy_xsec_incl/n_ev_dy_incl,
+    1:dy_xsec_1jet/(n_ev_dy_incl*dy_xsec_1jet/dy_xsec_incl + n_ev_dy_1jet),
+    2:dy_xsec_2jet/(n_ev_dy_incl*dy_xsec_2jet/dy_xsec_incl  + n_ev_dy_2jet),
+    3:dy_xsec_3jet/(n_ev_dy_incl*dy_xsec_3jet/dy_xsec_incl  + n_ev_dy_3jet),
+    4:dy_xsec_4jet/(n_ev_dy_incl*dy_xsec_4jet/dy_xsec_incl  + n_ev_dy_4jet),
+}
+
+def getDYWeight(n_jets):
+    return dy_weight_dict[n_jets]
+
+for sample in DYJets_to_stitch:
+    sample.weight_func = getDYWeight
+    sample.xSection = dy_xsec
+
+
+
 ### single top
 
 T_tch = kreator.makeMCComponent("T_tch", "/ST_t-channel_top_4f_inclusiveDecays_TuneCP5_13TeV-powhegV2-madspin-pythia8/RunIIFall17MiniAODv2-PU2017_12Apr2018_94X_mc2017_realistic_v14-v1/MINIAODSIM",           "CMS", ".*root", 136.02) # inclusive sample
@@ -48,6 +83,25 @@ Wjets_to_stitch = [WJetsToLNu_LO,
                    W2JetsToLNu_LO,
                    W3JetsToLNu_LO,
                    W4JetsToLNu_LO]
+
+w_xsec = 61526.7
+# From https://twiki.cern.ch/twiki/pub/CMS/HiggsToTauTauWorking2015/DYNjetWeights.xls r3
+w_weight_dict = {
+    0:1.304600668/w_xsec,
+    1:0.216233816/w_xsec,
+    2:0.115900663/w_xsec,
+    3:0.058200264/w_xsec,
+    4:0.06275589/w_xsec
+}
+
+def getWWeight(n_jets):
+    return w_weight_dict[n_jets]
+
+for sample in Wjets_to_stitch: 
+
+    sample.weight_func = getWWeight
+    # sample.xSection = w_xsec
+
 
 ### Di-Bosons
 
