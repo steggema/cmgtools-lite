@@ -1,6 +1,6 @@
 from CMGTools.RootTools.samples.ComponentCreator import ComponentCreator
 
-creator = ComponentCreator()
+kreator = ComponentCreator()
 
 ### DY
 
@@ -45,11 +45,10 @@ ZZ = kreator.makeMCComponent("ZZ", "/ZZ_TuneCP5_13TeV-pythia8/RunIIFall17MiniAOD
 
 ### Electroweak
 
-# what cross-sec to use?
-# WToLNu_M50_Plus2J = kreator.makeMCComponent("WToLNu_M50_Plus2J", "/EWKWMinus2Jets_WToLNu_M-50_TuneCP5_13TeV-madgraph-pythia8/RunIIFall17MiniAODv2-PU2017_12Apr2018_94X_mc2017_realistic_v14-v1/MINIAODSIM", ".*root", )
-# WToLNu_M50_Minus2J = kreator.makeMCComponent("WToLNu_M50_Minus2J", "/EWKWPlus2Jets_WToLNu_M-50_TuneCP5_13TeV-madgraph-pythia8/RunIIFall17MiniAODv2-PU2017_12Apr2018_94X_mc2017_realistic_v14-v1/MINIAODSIM", ".*root", )
-# ZToLL_M50 = kreator.makeMCComponent("ZToLL_M50", "/EWKZ2Jets_ZToLL_M-50_TuneCP5_13TeV-madgraph-pythia8/RunIIFall17MiniAODv2-PU2017_12Apr2018_94X_mc2017_realistic_v14-v1/MINIAODSIM", ".*root", )
-# ZToNuNu = kreator.makeMCComponent("ZToNuNu", "/EWKZ2Jets_ZToNuNu_TuneCP5_13TeV-madgraph-pythia8/RunIIFall17MiniAODv2-PU2017_12Apr2018_94X_mc2017_realistic_v14-v1/MINIAODSIM", ".*root", )
+WToLNu_M50_Plus2J = kreator.makeMCComponent("WToLNu_M50_Plus2J", "/EWKWMinus2Jets_WToLNu_M-50_TuneCP5_13TeV-madgraph-pythia8/RunIIFall17MiniAODv2-PU2017_12Apr2018_94X_mc2017_realistic_v14-v1/MINIAODSIM", "CMS", ".*root", 25.81)
+WToLNu_M50_Minus2J = kreator.makeMCComponent("WToLNu_M50_Minus2J", "/EWKWPlus2Jets_WToLNu_M-50_TuneCP5_13TeV-madgraph-pythia8/RunIIFall17MiniAODv2-PU2017_12Apr2018_94X_mc2017_realistic_v14-v1/MINIAODSIM", "CMS", ".*root", 20.35)
+ZToLL_M50 = kreator.makeMCComponent("ZToLL_M50", "/EWKZ2Jets_ZToLL_M-50_TuneCP5_13TeV-madgraph-pythia8/RunIIFall17MiniAODv2-PU2017_12Apr2018_94X_mc2017_realistic_v14-v1/MINIAODSIM", "CMS", ".*root", 3.997)
+ZToNuNu = kreator.makeMCComponent("ZToNuNu", "/EWKZ2Jets_ZToNuNu_TuneCP5_13TeV-madgraph-pythia8/RunIIFall17MiniAODv2-PU2017_12Apr2018_94X_mc2017_realistic_v14-v1/MINIAODSIM", "CMS", ".*root", 10.04)
 
 
 

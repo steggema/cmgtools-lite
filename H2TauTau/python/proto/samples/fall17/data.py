@@ -1,6 +1,8 @@
 from CMGTools.RootTools.samples.ComponentCreator import ComponentCreator
 
-creator = ComponentCreator()
+kreator = ComponentCreator()
+
+json = '$CMSSW_BASE/src/CMGTools/H2TauTau/data/Cert_294927-306462_13TeV_EOY2017ReReco_Collisions17_JSON_v1.txt'
 
 # ----------------------------- Run2017B 31Mar2018 ----------------------------------------
 
@@ -80,5 +82,3 @@ Tau_Run2017F_31Mar2018 = kreator.makeDataComponent("Tau_Run2017F_31Mar2018", "/T
 dataSamples_Run2017F_31Mar2018 = [JetHT_Run2017F_31Mar2018, HTMHT_Run2017F_31Mar2018, MET_Run2017F_31Mar2018, SingleElectron_Run2017F_31Mar2018, SingleMuon_Run2017F_31Mar2018, SinglePhoton_Run2017F_31Mar2018, DoubleEG_Run2017F_31Mar2018, MuonEG_Run2017F_31Mar2018, DoubleMuon_Run2017F_31Mar2018, Tau_Run2017F_31Mar2018]
 
 
-dataSamples = dataSamples_31Mar2018
-samples = dataSamples
