@@ -200,5 +200,6 @@ mc_higgs_susy_bb = [
     HiggsSUSYBB3200
 ]
 
-mc_higgs_susy = copy.copy(mc_higgs_susy_gg)
-mc_higgs_susy.extend(mc_higgs_susy_bb)
+mssm_signals = copy.copy(mc_higgs_susy_gg)
+mssm_signals.extend(mc_higgs_susy_bb)
+

@@ -59,7 +59,8 @@ class JetAnalyzer(Analyzer):
         mcGT = getattr(cfg_ana, 'mcGT', '94X_mc2017_realistic_v14')
         dataGT = getattr(cfg_ana, 'dataGT', '94X_dataRun2_v6')
         dataGT = getattr(cfg_comp, 'dataGT', dataGT)
-        print 'Jet Analyzer - using dataGT', dataGT
+        print 'Jet Analyzer - dataGT', dataGT        
+        print 'Jet Analyzer -   mcGT', mcGT
 
         if self.recalibrateJets:
             doResidual = getattr(cfg_ana, 'applyL2L3Residual', 'Data')
@@ -117,7 +118,6 @@ class JetAnalyzer(Analyzer):
         if self.recalibrateJets:
             self.jetReCalibrator.correctAll(event.allJets, event.rho, delta=0.,
                                             addCorr=True, addShifts=True, metShift=event.metShift)
-
         for jet in event.allJets:
             if genJets:
                 # Use DeltaR = 0.25 matching like JetMET
@@ -139,6 +139,7 @@ class JetAnalyzer(Analyzer):
             if self.testBJet(jet, csv_cut=0.5426, wp='loose'):
                 event.bJetsLoose.append(jet)
 
+                
         self.counters.counter('jets').inc('all events')
 
         event.jets30 = [jet for jet in event.jets if jet.pt() > 30]
