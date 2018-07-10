@@ -10,8 +10,8 @@ from CMGTools.RootTools.samples.samples_13TeV_DATA2017 import SingleMuon_Run2017
 from CMGTools.RootTools.samples.samples_13TeV_DATA2017 import SingleMuon_Run2017E_17Nov2017, SingleElectron_Run2017E_17Nov2017, MuonEG_Run2017E_17Nov2017, Tau_Run2017E_17Nov2017
 from CMGTools.RootTools.samples.samples_13TeV_DATA2017 import SingleMuon_Run2017F_17Nov2017, SingleElectron_Run2017F_17Nov2017, MuonEG_Run2017F_17Nov2017, Tau_Run2017F_17Nov2017
 
-from CMGTools.H2TauTau.proto.samples.fall17.higgs import HiggsGGH125, HiggsVBF125, HiggsTTH125
-from CMGTools.H2TauTau.proto.samples.fall17.higgs_susy import mc_higgs_susy_gg, mc_higgs_susy_bb
+from CMGTools.H2TauTau.proto.samples.fall17.higgs import sm_signals, HiggsVBF125
+from CMGTools.H2TauTau.proto.samples.fall17.higgs_susy import mssm_signals
 
 from CMGTools.H2TauTau.proto.samples.fall17.higgs_susy import HiggsSUSYBB900 as bbh900
 
@@ -134,9 +134,6 @@ for sample in data_single_muon + data_single_electron + data_muon_electron + dat
     sample.json = json
     sample.lumi = lumi
 
-# Signals
-sm_signals = [HiggsGGH125, HiggsVBF125, HiggsTTH125]
-mssm_signals = mc_higgs_susy_bb + mc_higgs_susy_gg
-
-sync_list = [bbh900, HiggsVBF125]
-sync_list = [DYJetsToLL_M50_LO]
+sync_list = [
+    HiggsVBF125
+]

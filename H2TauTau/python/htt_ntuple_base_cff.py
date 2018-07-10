@@ -28,8 +28,8 @@ from CMGTools.H2TauTau.proto.analyzers.METFilter import METFilter
 from CMGTools.TTHAnalysis.analyzers.ttHhistoCounterAnalyzer import ttHhistoCounterAnalyzer
 from CMGTools.TTHAnalysis.analyzers.susyParameterScanAnalyzer import susyParameterScanAnalyzer
 
-puFileMC = '$CMSSW_BASE/src/CMGTools/H2TauTau/data/Data_Pileup_2017ReReco_294927-306462_100bins_69p2.root'
-puFileData = '$CMSSW_BASE/src/CMGTools/H2TauTau/data/Data_Pileup_2017ReReco_294927-306462_100bins_69p2.root'
+puFileMC = '$CMSSW_BASE/src/CMGTools/H2TauTau/data/pudistributions_mc_2017_artur_Jul9.root'
+puFileData = '$CMSSW_BASE/src/CMGTools/H2TauTau/data/pudistributions_data_2017.root'
 
 # badMuonAnaMoriond2017 = cfg.Analyzer(
 #     badMuonAnalyzerMoriond2017, name='badMuonMoriond2017',
@@ -99,7 +99,7 @@ pileUpAna = cfg.Analyzer(
     PileUpAnalyzer,
     name='PileUpAnalyzer',
     true=True,
-    autoPU=True
+    autoPU=False
 )
 
 # genAna = GeneratorAnalyzer.defaultConfig
