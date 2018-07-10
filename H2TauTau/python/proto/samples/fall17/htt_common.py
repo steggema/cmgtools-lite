@@ -1,13 +1,8 @@
 import os
 
-from CMGTools.H2TauTau.proto.samples.fall17.backgrounds import DY1JetsToLL_M50_LO, DY2JetsToLL_M50_LO, DY2JetsToLL_M50_LO_ext,DY3JetsToLL_M50_LO, DY4JetsToLL_M50_LO, DYJetsToLL_M50, DYJetsToLL_M50_ext, DYJetsToLL_M10to50_LO, T_tch, TBar_tch, TBar_tWch, T_tWch, TTLep_pow, TTHad_pow, TTSemi_pow, WJetsToLNu_LO, W2JetsToLNu_LO, W3JetsToLNu_LO, W4JetsToLNu_LO, WW, WZ, ZZ, WToLNu_M50_Plus2J, WToLNu_M50_Minus2J, ZToLL_M50, ZToNuNu
-# There in 2016, not yet in 2017: QCDPtbcToE, WZJToLLLNu, WZTo1L3Nu, WWTo1L1Nu2Q, WZTo1L1Nu2Q, ZZTo2L2Q, WZTo2L2Q
+from CMGTools.H2TauTau.proto.samples.fall17.backgrounds import backgrounds, Wjets_to_stitch, DYJets_to_stitch
 
-from CMGTools.H2TauTau.proto.samples.fall17.data import SingleMuon_Run2017B_31Mar2018, SingleElectron_Run2017B_31Mar2018, MuonEG_Run2017B_31Mar2018, Tau_Run2017B_31Mar2018
-from CMGTools.H2TauTau.proto.samples.fall17.data import SingleMuon_Run2017C_31Mar2018, SingleElectron_Run2017C_31Mar2018, MuonEG_Run2017C_31Mar2018, Tau_Run2017C_31Mar2018
-from CMGTools.H2TauTau.proto.samples.fall17.data import SingleMuon_Run2017D_31Mar2018, SingleElectron_Run2017D_31Mar2018, MuonEG_Run2017D_31Mar2018, Tau_Run2017D_31Mar2018
-from CMGTools.H2TauTau.proto.samples.fall17.data import SingleMuon_Run2017E_31Mar2018, SingleElectron_Run2017E_31Mar2018, MuonEG_Run2017E_31Mar2018, Tau_Run2017E_31Mar2018
-from CMGTools.H2TauTau.proto.samples.fall17.data import SingleMuon_Run2017F_31Mar2018, SingleElectron_Run2017F_31Mar2018, MuonEG_Run2017F_31Mar2018, Tau_Run2017F_31Mar2018
+from CMGTools.H2TauTau.proto.samples.fall17.data import data_single_muon, data_single_electron, data_muon_electron, data_tau
 
 from CMGTools.H2TauTau.proto.samples.fall17.higgs import sm_signals, HiggsVBF125
 from CMGTools.H2TauTau.proto.samples.fall17.higgs_susy import mssm_signals
@@ -76,9 +71,7 @@ def getDYWeight(n_jets): # , m_gen): # mass > 150 GeV sample buggy...
     #     return dy_weight_dict[(n_jets, 150)]
     return dy_weight_dict[n_jets]
 
-for sample in [DY1JetsToLL_M50_LO,DY2JetsToLL_M50_LO,DY2JetsToLL_M50_LO_ext,
-               DY3JetsToLL_M50_LO,DY4JetsToLL_M50_LO,DYJetsToLL_M50,
-               DYJetsToLL_M50_ext]: # + [DYJetsToTauTau_M150_LO]:
+for sample in DYJets_to_stitch:
     # sample.fractions = [0.7, 0.204374, 0.0671836, 0.0205415, 0.0110539]
 
     sample.weight_func = getDYWeight
@@ -96,41 +89,13 @@ w_weight_dict = {
 def getWWeight(n_jets):
     return w_weight_dict[n_jets]
 
-for sample in [WJetsToLNu_LO,
-               W2JetsToLNu_LO,
-               W3JetsToLNu_LO,
-               W4JetsToLNu_LO]: # 
+for sample in Wjets_to_stitch: 
 
     sample.weight_func = getWWeight
     # sample.xSection = w_xsec
 
 # Backgrounds
-backgrounds = [DY1JetsToLL_M50_LO,
-               DY2JetsToLL_M50_LO,
-               DY2JetsToLL_M50_LO_ext,
-               DY3JetsToLL_M50_LO,
-               DY4JetsToLL_M50_LO,
-               DYJetsToLL_M50,
-               DYJetsToLL_M50_ext,
-               DYJetsToLL_M10to50_LO,
-               T_tch,
-               TBar_tch,
-               TBar_tWch,
-               T_tWch,
-               TTLep_pow,
-               TTHad_pow,
-               TTSemi_pow,
-               WJetsToLNu_LO,
-               W2JetsToLNu_LO,
-               W3JetsToLNu_LO,
-               W4JetsToLNu_LO,
-               WW,
-               WZ,
-               ZZ,
-               WToLNu_M50_Plus2J,
-               WToLNu_M50_Minus2J,
-               ZToLL_M50,
-               ZToNuNu]
+
                
 
 backgrounds_mu = backgrounds[:]
@@ -138,10 +103,7 @@ backgrounds_mu = backgrounds[:]
 backgrounds_ele = backgrounds[:]
 
 # Data
-data_single_muon = [SingleMuon_Run2017B_31Mar2018, SingleMuon_Run2017C_31Mar2018, SingleMuon_Run2017D_31Mar2018, SingleMuon_Run2017E_31Mar2018, SingleMuon_Run2017F_31Mar2018]
-data_single_electron = [SingleElectron_Run2017B_31Mar2018, SingleElectron_Run2017C_31Mar2018, SingleElectron_Run2017D_31Mar2018, SingleElectron_Run2017E_31Mar2018, SingleElectron_Run2017F_31Mar2018]
-data_muon_electron = [MuonEG_Run2017B_31Mar2018, MuonEG_Run2017C_31Mar2018, MuonEG_Run2017D_31Mar2018, MuonEG_Run2017E_31Mar2018, MuonEG_Run2017F_31Mar2018]
-data_tau = [Tau_Run2017B_31Mar2018, Tau_Run2017C_31Mar2018, Tau_Run2017D_31Mar2018, Tau_Run2017E_31Mar2018, Tau_Run2017F_31Mar2018]
+
 
 for sample in data_single_muon + data_single_electron + data_muon_electron + data_tau:
     sample.json = json

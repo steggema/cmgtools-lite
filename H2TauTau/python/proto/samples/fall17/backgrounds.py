@@ -15,6 +15,13 @@ DYJetsToLL_M50 = kreator.makeMCComponent("DYJetsToLL_M50", "/DYJetsToLL_M-50_Tun
 DYJetsToLL_M50_ext = kreator.makeMCComponent("DYJetsToLL_M50_ext", "/DYJetsToLL_M-50_TuneCP5_13TeV-madgraphMLM-pythia8/RunIIFall17MiniAODv2-PU2017RECOSIMstep_12Apr2018_94X_mc2017_realistic_v14_ext1-v1/MINIAODSIM", "CMS", ".*root", 1921.8*3, fracNegWeights=0.16)
 DYJetsToLL_M10to50_LO =  kreator.makeMCComponent("DYJetsToLL_M10to50_LO", "/DYJetsToLL_M-10to50_TuneCP5_13TeV-madgraphMLM-pythia8/RunIIFall17MiniAOD-94X_mc2017_realistic_v10-v2/MINIAODSIM", "CMS", ".*root", 15810)
 
+DYJets_to_stitch = [DY1JetsToLL_M50_LO,
+                    DY2JetsToLL_M50_LO,
+                    DY2JetsToLL_M50_LO_ext,
+                    DY3JetsToLL_M50_LO,
+                    DY4JetsToLL_M50_LO,
+                    DYJetsToLL_M50,
+                    DYJetsToLL_M50_ext]
 
 ### single top
 
@@ -37,6 +44,11 @@ W2JetsToLNu_LO = kreator.makeMCComponent("W2JetsToLNu_LO","/W2JetsToLNu_TuneCP5_
 W3JetsToLNu_LO = kreator.makeMCComponent("W3JetsToLNu_LO","/W3JetsToLNu_TuneCP5_13TeV-madgraphMLM-pythia8/RunIIFall17MiniAODv2-PU2017_12Apr2018_94X_mc2017_realistic_v14-v1/MINIAODSIM", "CMS", ".*root", 993.4*1.17)
 W4JetsToLNu_LO = kreator.makeMCComponent("W4JetsToLNu_LO","/W4JetsToLNu_TuneCP5_13TeV-madgraphMLM-pythia8/RunIIFall17MiniAODv2-PU2017_12Apr2018_94X_mc2017_realistic_v14-v1/MINIAODSIM", "CMS", ".*root", 542.4*1.17)
 
+Wjets_to_stitch = [WJetsToLNu_LO,
+                   W2JetsToLNu_LO,
+                   W3JetsToLNu_LO,
+                   W4JetsToLNu_LO]
+
 ### Di-Bosons
 
 WW = kreator.makeMCComponent("WW", "/WW_TuneCP5_13TeV-pythia8/RunIIFall17MiniAODv2-PU2017_12Apr2018_94X_mc2017_realistic_v14-v1/MINIAODSIM", "CMS", ".*root", 63.21 * 1.82)
@@ -50,5 +62,29 @@ WToLNu_M50_Minus2J = kreator.makeMCComponent("WToLNu_M50_Minus2J", "/EWKWPlus2Je
 ZToLL_M50 = kreator.makeMCComponent("ZToLL_M50", "/EWKZ2Jets_ZToLL_M-50_TuneCP5_13TeV-madgraph-pythia8/RunIIFall17MiniAODv2-PU2017_12Apr2018_94X_mc2017_realistic_v14-v1/MINIAODSIM", "CMS", ".*root", 3.997)
 ZToNuNu = kreator.makeMCComponent("ZToNuNu", "/EWKZ2Jets_ZToNuNu_TuneCP5_13TeV-madgraph-pythia8/RunIIFall17MiniAODv2-PU2017_12Apr2018_94X_mc2017_realistic_v14-v1/MINIAODSIM", "CMS", ".*root", 10.04)
 
-
-
+backgrounds = [DY1JetsToLL_M50_LO,
+               DY2JetsToLL_M50_LO,
+               DY2JetsToLL_M50_LO_ext,
+               DY3JetsToLL_M50_LO,
+               DY4JetsToLL_M50_LO,
+               DYJetsToLL_M50,
+               DYJetsToLL_M50_ext,
+               DYJetsToLL_M10to50_LO,
+               T_tch,
+               TBar_tch,
+               TBar_tWch,
+               T_tWch,
+               TTLep_pow,
+               TTHad_pow,
+               TTSemi_pow,
+               WJetsToLNu_LO,
+               W2JetsToLNu_LO,
+               W3JetsToLNu_LO,
+               W4JetsToLNu_LO,
+               WW,
+               WZ,
+               ZZ,
+               WToLNu_M50_Plus2J,
+               WToLNu_M50_Minus2J,
+               ZToLL_M50,
+               ZToNuNu]
