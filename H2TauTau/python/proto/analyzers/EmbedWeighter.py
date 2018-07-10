@@ -16,7 +16,6 @@ class EmbedWeighter( Analyzer ):
 
             
     def beginLoop(self, setup):
-        print self, self.__class__
         super(EmbedWeighter,self).beginLoop(setup)
         self.averages.add('weight', Average('weight') )
         self.counters.addCounter('EmbedWeighter')
