@@ -45,7 +45,8 @@ gt_data = 'Fall17_17Nov2017{}_V6_DATA'
 
 from CMGTools.RootTools.utils.splitFactor import splitFactor
 from CMGTools.H2TauTau.proto.samples.component_index import ComponentIndex
-# index=ComponentIndex(htt_common) TODO adapt this, need to undo the removal of htt_common?
+import CMGTools.H2TauTau.proto.samples.fall17.higgs as higgs
+index=ComponentIndex(higgs)
 
 from CMGTools.H2TauTau.proto.samples.fall17.data import data_single_muon
 from CMGTools.H2TauTau.proto.samples.fall17.higgs_susy import mssm_signals
@@ -78,12 +79,11 @@ selectedComponents = data_list if data else backgrounds + mssm_signals
 
 if test:
     cache = True
-    # comp = index.glob('HiggsVBF125')[0] # TODO adapt to this scheme when implemented
-    selectedComponents = sync_list
-    for comp in selectedComponents: 
-        comp.files = comp.files[:1]
-        comp.splitFactor = 1
-        comp.fineSplitFactor = 1
+    comp = index.glob('HiggsVBF125')[0]
+    comp.files = comp.files[:1]
+    comp.splitFactor = 1
+    comp.fineSplitFactor = 1
+    selectedComponents = [comp]
     # comp.files = ['test.root']
 
 events_to_pick = []
