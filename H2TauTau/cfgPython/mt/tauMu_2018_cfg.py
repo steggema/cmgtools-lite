@@ -13,7 +13,7 @@ ComponentCreator.useAAA = True
 import logging
 logging.shutdown()
 reload(logging)
-logging.basicConfig(level=logging.INFO)
+logging.basicConfig(level=logging.WARNING)
 
 ###############
 # Options
@@ -78,7 +78,7 @@ if test:
     comp = index.glob('HiggsVBF125')[0]
     comp.files = comp.files[:1]
     selectedComponents = [comp]
-    comp.files = ['test.root']
+    # comp.files = ['test.root']
 
 
 events_to_pick = []
