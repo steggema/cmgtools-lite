@@ -194,8 +194,8 @@ treeProducer = cfg.Analyzer(
     addIsoInfo=add_iso_info,
     addTauTrackInfo=add_tau_fr_info,
     addMoreJetInfo=add_tau_fr_info,
-    addTauMVAInputs=True,
-    addVBF=False,
+    addTauMVAInputs=False,
+    addVBF=True,
     skimFunction='event.leg1.relIsoR(R=0.4, dBetaFactor=0.5, allCharged=False)<0.15 and event.leg2.tauID("againstMuonLoose3")>0.5 and (event.leg2.tauID("byLooseCombinedIsolationDeltaBetaCorr3Hits") > 0.5 or event.leg2.tauID("byVLooseIsolationMVArun2v1DBoldDMwLT") > 0.5)'
 )
 

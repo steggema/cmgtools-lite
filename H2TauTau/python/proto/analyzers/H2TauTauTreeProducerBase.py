@@ -1,7 +1,7 @@
 from PhysicsTools.Heppy.analyzers.core.TreeAnalyzerNumpy import TreeAnalyzerNumpy
 
 from CMGTools.H2TauTau.proto.analyzers.varsDictionary import vars as var_dict
-from CMGTools.H2TauTau.proto.analyzers.TreeVariables import event_vars, ditau_vars, particle_vars, lepton_vars, electron_vars, muon_vars, tau_vars, tau_vars_extra, jet_vars, jet_vars_extra, geninfo_vars, vbf_vars, svfit_vars
+from CMGTools.H2TauTau.proto.analyzers.TreeVariables import event_vars, ditau_vars, particle_vars, lepton_vars, electron_vars, muon_vars, tau_vars, tau_vars_extra, jet_vars, jet_vars_extra, geninfo_vars, vbf_vars, svfit_vars, top_pt_reweighting_vars
 
 from CMGTools.H2TauTau.proto.physicsobjects.DiObject import DiTau
 
@@ -235,16 +235,14 @@ class H2TauTauTreeProducerBase(TreeAnalyzerNumpy):
         self.fillVars(tree, ['TauSpinnerWTisValid', 'TauSpinnerWT', 'TauSpinnerWThminus', 'TauSpinnerWThplus', 'TauSpinnerTauPolFromZ', 'TauSpinnerWRight', 'TauSpinnerWLeft', 'TauSpinnerIsRightLeft'], event)
         
     def bookTopPtReweighting(self, tree):
-        self.vars(tree, ['gen_top_1_pt', 'gen_top_2_pt', 'gen_top_weight'])
+        self.bookGeneric(tree, top_pt_reweighting_vars)
 
     def fillTopPtReweighting(self, tree, event):
         if not self.cfg_comp.isMC:
             self.fill(tree, 'gen_top_weight', 1.)
             return
 
-        self.fill(tree, 'gen_top_1_pt', getattr(event, 'top_1_pt', -999.))
-        self.fill(tree, 'gen_top_2_pt', getattr(event, 'top_2_pt', -999.))
-        self.fill(tree, 'gen_top_weight', getattr(event, 'topweight', 1.))
+        self.fillGeneric(tree, top_pt_reweighting_vars, event)
 
     def bookLHEWeights(self, tree, n_max=10):
     	for n_lhe in xrange(1, n_max+1):
