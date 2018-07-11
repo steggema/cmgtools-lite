@@ -44,16 +44,19 @@ gt_data = 'Fall17_17Nov2017{}_V6_DATA'
 ###############
 
 from CMGTools.RootTools.utils.splitFactor import splitFactor
-import CMGTools.H2TauTau.proto.samples.fall17.htt_common as htt_common
 from CMGTools.H2TauTau.proto.samples.component_index import ComponentIndex
-index=ComponentIndex(htt_common)
+import CMGTools.H2TauTau.proto.samples.fall17.higgs as higgs
+index=ComponentIndex(higgs)
 
-from CMGTools.H2TauTau.proto.samples.fall17.htt_common import backgrounds_mu, sm_signals, mssm_signals, data_single_muon, sync_list
+from CMGTools.H2TauTau.proto.samples.fall17.data import data_single_muon
+from CMGTools.H2TauTau.proto.samples.fall17.higgs_susy import mssm_signals
+from CMGTools.H2TauTau.proto.samples.fall17.higgs import sync_list
+from CMGTools.H2TauTau.proto.samples.fall17.backgrounds import backgrounds
 from CMGTools.H2TauTau.proto.samples.fall17.triggers_tauMu import mc_triggers, mc_triggerfilters
 from CMGTools.H2TauTau.proto.samples.fall17.triggers_tauMu import data_triggers, data_triggerfilters
 from CMGTools.H2TauTau.htt_ntuple_base_cff import puFileData, puFileMC
 
-mc_list = backgrounds_mu + sm_signals + sync_list + mssm_signals
+mc_list = backgrounds + sync_list + mssm_signals
 data_list = data_single_muon
 
 n_events_per_job = 1e5
@@ -71,15 +74,17 @@ for sample in data_list:
     sample.splitFactor = splitFactor(sample, n_events_per_job)
     sample.dataGT = gt_data.format(sample.name[sample.name.find('2017')+4])
 
-selectedComponents = data_list if data else backgrounds_mu + sm_signals #+ mssm_signals
+selectedComponents = data_list if data else backgrounds + mssm_signals
+
 
 if test:
     cache = True
     comp = index.glob('HiggsVBF125')[0]
     comp.files = comp.files[:1]
+    comp.splitFactor = 1
+    comp.fineSplitFactor = 1
     selectedComponents = [comp]
     # comp.files = ['test.root']
-
 
 events_to_pick = []
 
@@ -88,7 +93,7 @@ events_to_pick = []
 ###############
 
 # common configuration and sequence
-from CMGTools.H2TauTau.htt_ntuple_base_cff import commonSequence, eventSelector, httGenAna, jetAna, triggerAna, recoilCorr, mcWeighter
+from CMGTools.H2TauTau.htt_ntuple_base_cff import commonSequence, eventSelector, httGenAna, jetAna, triggerAna, recoilCorr
 
 # Tau-tau analyzers
 from CMGTools.H2TauTau.proto.analyzers.TauMuAnalyzer import TauMuAnalyzer
@@ -102,7 +107,6 @@ from CMGTools.H2TauTau.proto.analyzers.FileCleaner import FileCleaner
 from CMGTools.H2TauTau.proto.analyzers.TauIsolationCalculator import TauIsolationCalculator
 from CMGTools.H2TauTau.proto.analyzers.MuonIsolationCalculator import MuonIsolationCalculator
 
-mcWeighter.activate = False
 
 # Just to be sure
 if not test:
@@ -130,14 +134,12 @@ if not data:
 tauMuAna = cfg.Analyzer(
     TauMuAnalyzer,
     name='TauMuAnalyzer',
-    pt1=29, # 2 GeV above IsoMu27 trigger (scale factors start at 29)
-    eta1=2.4,
-    iso1=0.15,
-    looseiso1=9999.,
+    pt1=21,
+    eta1=2.1,
+    iso1=None, # no iso cut for sync
     pt2=20,
     eta2=2.3,
     iso2=1.5,
-    looseiso2=9999.,
     m_min=10,
     m_max=99999,
     dR_min=0.5,
