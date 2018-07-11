@@ -134,8 +134,8 @@ if not data:
 tauMuAna = cfg.Analyzer(
     TauMuAnalyzer,
     name='TauMuAnalyzer',
-    pt1=29, # 2 GeV above IsoMu27 trigger (scale factors start at 29)
-    eta1=2.4,
+    pt1=21,
+    eta1=2.1,
     iso1=None, # no iso cut for sync
     pt2=20,
     eta2=2.3,
