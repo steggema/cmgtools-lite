@@ -266,12 +266,13 @@ class JetAnalyzer(Analyzer):
         # jet.btagFlag = jet.btagMVA > csv_cut
 
         # Use the following once we start applying data-MC scale factors:
+        # TODO add run-dependant scale factor from https://twiki.cern.ch/twiki/bin/viewauth/CMS/BtagRecommendation94X
         setattr(jet, 'btagFlag'+wp,
                 self.btagSF[wp].isBTagged(
                     pt=jet.pt(),
                     eta=jet.eta(),
                     csv=jet.btag(
-                        "pfCombinedInclusiveSecondaryVertexV2BJetTags"),
+                        "pfDeepCSVDiscriminatorsJetTags:BvsAll"),
                     jetflavor=abs(jet.hadronFlavour()),
                     is_data=not self.cfg_comp.isMC,
                     csv_cut=csv_cut
@@ -280,6 +281,6 @@ class JetAnalyzer(Analyzer):
 
 
         return self.testJet(jet) and \
-            abs(jet.eta()) < 2.4 and \
+            abs(jet.eta()) < 2.5 and \
             getattr(jet, 'btagFlag'+wp) and \
             self.testJetID(jet)
