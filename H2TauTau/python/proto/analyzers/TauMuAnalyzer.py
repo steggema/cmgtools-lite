@@ -126,15 +126,12 @@ class TauMuAnalyzer(DiLeptonAnalyzer):
         super(TauMuAnalyzer, self).process(event)
 
         result = self.selectionSequence(event, fillCounter=True,
-                                        leg1IsoCut=self.cfg_ana.looseiso1,
-                                        leg2IsoCut=self.cfg_ana.looseiso2)
+                                        leg1IsoCut=self.cfg_ana.iso1,
+                                        leg2IsoCut=self.cfg_ana.iso2)
         return result
 
     def testLeg2ID(self, tau):
         return (tau.tauID('decayModeFinding') > 0.5 and
-                 # tau.tauID('decayModeFindingNewDMs') > 0.5) and
-                # tau.tauID('againstElectronVLooseMVA5') > 0.5  and
-                # tau.tauID('againstMuonTight3')         > 0.5  and
                 abs(tau.charge()) == 1. and
                 self.testTauVertex(tau))
         # https://twiki.cern.ch/twiki/bin/view/CMS/TauIDRecommendation13TeV
@@ -143,7 +140,7 @@ class TauMuAnalyzer(DiLeptonAnalyzer):
         '''if isocut is None, returns true if three-hit iso cut is passed.
         Otherwise, returns true if iso MVA > isocut.'''
         return tau.mva_passes('Eff95') 
- 
+
     def testTauVertex(self, tau):
         '''Tests vertex constraints, for tau'''
         # Just checks if the primary vertex the tau was reconstructed with
@@ -162,8 +159,11 @@ class TauMuAnalyzer(DiLeptonAnalyzer):
 
     def testLeg1Iso(self, muon, isocut):
         '''Tight muon selection, with isolation requirement'''
-        return True # no isolation cut at sync stage
- 
+        if isocut is None:
+            return True # No isolation cut
+        else:
+            return muon.relIsoR(R=0.4, dBetaFactor=0.5, allCharged=False) < isocut
+
     def thirdLeptonVeto(self, leptons, otherLeptons, isoCut=0.3):
         # count tight muons
         vLeptons = [muon for muon in leptons if
@@ -202,9 +202,7 @@ class TauMuAnalyzer(DiLeptonAnalyzer):
         e.g. >= 1 OS mu pair in the mu tau channel'''
         looseLeptons = [muon for muon in leptons if
                         self.testLegKine(muon, ptcut=15, etacut=2.4) and
-                        muon.isGlobalMuon() and
-                        muon.isTrackerMuon() and
-                        muon.isPFMuon() and
+                        muon.isLooseMuon() and
                         self.testVertex(muon) and
                         self.testLeg1Iso(muon, 0.3)
                         ]

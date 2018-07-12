@@ -1,8 +1,10 @@
+import os
 from CMGTools.RootTools.samples.ComponentCreator import ComponentCreator
 
 kreator = ComponentCreator()
 
-json = '$CMSSW_BASE/src/CMGTools/H2TauTau/data/Cert_294927-306462_13TeV_EOY2017ReReco_Collisions17_JSON_v1.txt'
+json = os.path.expandvars('$CMSSW_BASE/src/CMGTools/H2TauTau/data/Cert_294927-306462_13TeV_EOY2017ReReco_Collisions17_JSON_v1.txt')
+lumi = 41529.
 
 # ----------------------------- Run2017B 31Mar2018 ----------------------------------------
 
@@ -82,3 +84,11 @@ Tau_Run2017F_31Mar2018 = kreator.makeDataComponent("Tau_Run2017F_31Mar2018", "/T
 dataSamples_Run2017F_31Mar2018 = [JetHT_Run2017F_31Mar2018, HTMHT_Run2017F_31Mar2018, MET_Run2017F_31Mar2018, SingleElectron_Run2017F_31Mar2018, SingleMuon_Run2017F_31Mar2018, SinglePhoton_Run2017F_31Mar2018, DoubleEG_Run2017F_31Mar2018, MuonEG_Run2017F_31Mar2018, DoubleMuon_Run2017F_31Mar2018, Tau_Run2017F_31Mar2018]
 
 
+data_single_muon = [SingleMuon_Run2017B_31Mar2018, SingleMuon_Run2017C_31Mar2018, SingleMuon_Run2017D_31Mar2018, SingleMuon_Run2017E_31Mar2018, SingleMuon_Run2017F_31Mar2018]
+data_single_electron = [SingleElectron_Run2017B_31Mar2018, SingleElectron_Run2017C_31Mar2018, SingleElectron_Run2017D_31Mar2018, SingleElectron_Run2017E_31Mar2018, SingleElectron_Run2017F_31Mar2018]
+data_muon_electron = [MuonEG_Run2017B_31Mar2018, MuonEG_Run2017C_31Mar2018, MuonEG_Run2017D_31Mar2018, MuonEG_Run2017E_31Mar2018, MuonEG_Run2017F_31Mar2018]
+data_tau = [Tau_Run2017B_31Mar2018, Tau_Run2017C_31Mar2018, Tau_Run2017D_31Mar2018, Tau_Run2017E_31Mar2018, Tau_Run2017F_31Mar2018]
+
+for sample in data_single_muon + data_single_electron + data_muon_electron + data_tau:
+    sample.json = json
+    sample.lumi = lumi
