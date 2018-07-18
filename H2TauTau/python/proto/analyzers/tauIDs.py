@@ -1,22 +1,23 @@
 tauIDs = [
     ('againstElectron{wp}MVA6', ['VLoose', 'Loose', 'Medium', 'Tight', 'VTight']),
     ('againstMuon{wp}3', ['Loose', 'Tight']),
-    'byCombinedIsolationDeltaBetaCorrRaw3Hits',
-    'byIsolationMVArun2v1DBoldDMwLTraw',
-    'byIsolationMVArun2v1DBnewDMwLTraw',
-    'byIsolationMVArun2v1DBdR03oldDMwLTraw',
-    ('by{wp}CombinedIsolationDeltaBetaCorr3Hits', ['Loose', 'Medium', 'Tight']),
+    # TODO add other isolation methods if needed
+    # 'byCombinedIsolationDeltaBetaCorrRaw3Hits',
+    # 'byIsolationMVArun2v1DBoldDMwLTraw',
+    # 'byIsolationMVArun2v1DBnewDMwLTraw',
+    # 'byIsolationMVArun2v1DBdR03oldDMwLTraw',
+    # ('by{wp}CombinedIsolationDeltaBetaCorr3Hits', ['Loose', 'Medium', 'Tight']),
     ('by{wp}IsolationMVArun2v1DBoldDMwLT', ['VLoose', 'Loose', 'Medium', 'Tight', 'VTight', 'VVTight']),
     # ('by{wp}IsolationMVArun2v1DBoldDMwLTNew', ['VLoose', 'Loose', 'Medium', 'Tight', 'VTight', 'VVTight']),
-    ('by{wp}IsolationMVArun2v1DBnewDMwLT', ['VLoose', 'Loose', 'Medium', 'Tight', 'VTight', 'VVTight']),
-    ('by{wp}IsolationMVArun2v1DBdR03oldDMwLT', ['VLoose', 'Loose', 'Medium', 'Tight', 'VTight', 'VVTight']),
+    # ('by{wp}IsolationMVArun2v1DBnewDMwLT', ['VLoose', 'Loose', 'Medium', 'Tight', 'VTight', 'VVTight']),
+    # ('by{wp}IsolationMVArun2v1DBdR03oldDMwLT', ['VLoose', 'Loose', 'Medium', 'Tight', 'VTight', 'VVTight']),
     'chargedIsoPtSum',
     'decayModeFinding',
-    'footprintCorrection',
+    # 'footprintCorrection',
     'neutralIsoPtSum',
     'puCorrPtSum',
-    'photonPtSumOutsideSignalCone',
-    'byTightIsolationMVArun2v1DBoldDMwLT' # For sync check
+    # 'photonPtSumOutsideSignalCone',
+    # 'byTightIsolationMVArun2v1DBoldDMwLT' # For sync check
     
 ]
 tauIDs_extra = [
