@@ -15,34 +15,15 @@ class H2TauTauTreeProducerTauMu(H2TauTauTreeProducer):
         self.bookTau(self.tree, 'l2')
         self.bookMuon(self.tree, 'l1')
 
-        self.bookGenParticle(self.tree, 'l2_gen')
-        self.var(self.tree, 'l2_gen_lepfromtau', int)
-        self.bookGenParticle(self.tree, 'l1_gen')
-        self.var(self.tree, 'l1_gen_lepfromtau', int)
+        # TODO add triggers in H2tautauproducer
+        # self.var(self.tree, 'trigger_isomu24')
+        # self.var(self.tree, 'trigger_isomu27')
 
-        self.bookParticle(self.tree, 'l2_gen_vis')
-        self.var(self.tree, 'l2_gen_decaymode', int)
+        # self.var(self.tree, 'trigger_matched_isomu24')
+        # self.var(self.tree, 'trigger_matched_isomu27')
 
-        self.var(self.tree, 'l2_gen_nc_ratio')
-        self.var(self.tree, 'l2_nc_ratio')
+        # self.var(self.tree, 'trigger_matched_singlemuon')
 
-        # self.var(self.tree, 'l2_weight_fakerate')
-        # self.var(self.tree, 'l2_weight_fakerate_up')
-        # self.var(self.tree, 'l2_weight_fakerate_down')
-
-        self.var(self.tree, 'trigger_isomu24')
-        self.var(self.tree, 'trigger_isomu27')
-        # self.var(self.tree, 'trigger_isotkmu22')
-        # self.var(self.tree, 'trigger_isomu19tau20')
-
-        self.var(self.tree, 'trigger_matched_isomu24')
-        self.var(self.tree, 'trigger_matched_isomu27')
-        # self.var(self.tree, 'trigger_matched_isotkmu22')
-        # self.var(self.tree, 'trigger_matched_isomu19tau20')
-
-        self.var(self.tree, 'trigger_matched_singlemuon')
-
-        self.var(self.tree, 'l2_weight_mutotau')
 
         if getattr(self.cfg_ana, 'addTauMVAInputs', False):
             self.var(self.tree, 'l2_n_photons')
@@ -150,64 +131,24 @@ class H2TauTauTreeProducerTauMu(H2TauTauTreeProducer):
         self.fillTau(self.tree, 'l2', tau)
         self.fillMuon(self.tree, 'l1', muon)
 
-        if hasattr(tau, 'genp') and tau.genp:
-            self.fillGenParticle(self.tree, 'l2_gen', tau.genp)
-            self.fill(self.tree, 'l2_gen_lepfromtau', tau.isTauLep)
 
-        if hasattr(muon, 'genp') and muon.genp:
-            self.fillGenParticle(self.tree, 'l1_gen', muon.genp)
-            self.fill(self.tree, 'l1_gen_lepfromtau', muon.isTauLep)
+        # TODO add triggers in H2tautauproducer
+        # fired_triggers = [info.name for info in getattr(event, 'trigger_infos', []) if info.fired]
 
-        # save the p4 of the visible tau products at the generator level
-        if tau.genJet() and hasattr(tau, 'genp') and tau.genp and abs(tau.genp.pdgId()) == 15:
-            self.fillParticle(self.tree, 'l2_gen_vis', tau.physObj.genJet())
-            tau_gen_dm = tauDecayModes.translateGenModeToInt(tauDecayModes.genDecayModeFromGenJet(tau.physObj.genJet()))
-            self.fill(self.tree, 'l2_gen_decaymode', tau_gen_dm)
-            if tau_gen_dm in [1, 2, 3, 4]:
-                pt_neutral = 0.
-                pt_charged = 0.
-                for daughter in tau.genJet().daughterPtrVector():
-                    id = abs(daughter.pdgId())
-                    if id in [22, 11]:
-                        pt_neutral += daughter.pt()
-                    elif id not in [11, 13, 22] and daughter.charge():
-                        if daughter.pt() > pt_charged:
-                            pt_charged = daughter.pt()
-                if pt_charged > 0.:
-                    self.fill(self.tree, 'l2_gen_nc_ratio', (pt_charged - pt_neutral)/(pt_charged + pt_neutral))
+        # self.fill(self.tree, 'trigger_isomu24', any('IsoMu24_v' in name for name in fired_triggers))
+        # self.fill(self.tree, 'trigger_isomu27', any('IsoMu27_v' in name for name in fired_triggers))
 
-        if tau.decayMode() in [1, 2, 3, 4]:
-            pt_neutral = 0.
-            pt_charged = 0.
-            # for cand_ptr in tau.signalCands(): # THIS CRASHES
-            for i_cand in xrange(len(tau.signalCands())):
-                cand = tau.signalCands()[i_cand]
-                id = abs(cand.pdgId())
-                if id in [11, 22, 130]:
-                    pt_neutral += cand.pt()
-                elif id in [211]:
-                    if cand.pt() > pt_charged:
-                        pt_charged = cand.pt()
-            if pt_charged > 0.:
-                self.fill(self.tree, 'l2_nc_ratio', (pt_charged - pt_neutral)/(pt_charged + pt_neutral))
+        # matched_paths = getattr(event.diLepton, 'matchedPaths', [])
+        # self.fill(self.tree, 'trigger_matched_isomu24', any('IsoMu24_v' in name for name in matched_paths))
+        # self.fill(self.tree, 'trigger_matched_isomu27', any('IsoMu27_v' in name for name in matched_paths))
+
+        # self.fill(self.tree, 'trigger_matched_singlemuon', any('Mu22' in name for name in matched_paths))
 
 
-        fired_triggers = [info.name for info in getattr(event, 'trigger_infos', []) if info.fired]
 
-        self.fill(self.tree, 'trigger_isomu24', any('IsoMu24_v' in name for name in fired_triggers))
-        self.fill(self.tree, 'trigger_isomu27', any('IsoMu27_v' in name for name in fired_triggers))
-        # self.fill(self.tree, 'trigger_isotkmu22', any('IsoTkMu22_v' in name for name in fired_triggers))
-        # self.fill(self.tree, 'trigger_isomu19tau20', any('IsoMu19_eta2p1_LooseIsoPFTau20_v' in name for name in fired_triggers))
 
-        matched_paths = getattr(event.diLepton, 'matchedPaths', [])
-        self.fill(self.tree, 'trigger_matched_isomu24', any('IsoMu24_v' in name for name in matched_paths))
-        self.fill(self.tree, 'trigger_matched_isomu27', any('IsoMu27_v' in name for name in matched_paths))
-        # self.fill(self.tree, 'trigger_matched_isotkmu22', any('IsoTkMu22_v' in name for name in matched_paths))
-        # self.fill(self.tree, 'trigger_matched_isomu19tau20', any('IsoMu19_eta2p1_LooseIsoPFTau20_v' in name for name in matched_paths))
 
-        self.fill(self.tree, 'l2_weight_mutotau', event.zllWeight)
-
-        self.fill(self.tree, 'trigger_matched_singlemuon', any('Mu22' in name for name in matched_paths))
+        ### Start of conditionnal vars
 
         if hasattr(self.cfg_ana, 'addTauTrackInfo') and self.cfg_ana.addTauTrackInfo:
             # Leading CH part
