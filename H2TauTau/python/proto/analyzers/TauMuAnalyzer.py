@@ -12,7 +12,6 @@ from CMGTools.H2TauTau.proto.analyzers.HTTGenAnalyzer import HTTGenAnalyzer
 
 from PhysicsTools.HeppyCore.utils.deltar import deltaR
 
-
 class TauMuAnalyzer(DiLeptonAnalyzer):
 
     DiObjectClass = TauMuon
@@ -22,10 +21,7 @@ class TauMuAnalyzer(DiLeptonAnalyzer):
     def __init__(self, cfg_ana, cfg_comp, looperName):
         super(TauMuAnalyzer,self).__init__(cfg_ana, cfg_comp, looperName)
         import os.path
-        self._mvaId2017 = ROOT.heppy.PATTauDiscriminationByMVAIsolationRun2FWlite(
-                    os.path.expandvars('$CMSSW_BASE/src/PhysicsTools/Heppy/data/GBRForest_tauIdMVAIsoDBoldDMwLT2017v2.root'),
-                    'RecoTauTag_tauIdMVAIsoDBoldDMwLT2017v2',
-                    'oldDMwLT')
+        
 
     def declareHandles(self):
         super(TauMuAnalyzer, self).declareHandles()
@@ -88,8 +84,6 @@ class TauMuAnalyzer(DiLeptonAnalyzer):
             muon = self.__class__.LeptonClass(pat_mu)
             for pat_tau in self.handles['taus'].product():
                 tau = Tau(pat_tau)
-                tau.mvaId2017 = self._mvaId2017(tau.physObj)
-                # print 'Calculated tau ID', tau.mvaId2017, tau.tauID("byIsolationMVArun2v1DBoldDMwLTraw")
                 di_tau = DirectDiTau(muon, tau, met)
                 di_tau.leg2().associatedVertex = event.goodVertices[0]
                 di_tau.leg1().associatedVertex = event.goodVertices[0]
@@ -145,7 +139,7 @@ class TauMuAnalyzer(DiLeptonAnalyzer):
     def testLeg2Iso(self, tau, isocut):
         '''if isocut is None, returns true if three-hit iso cut is passed.
         Otherwise, returns true if iso MVA > isocut.'''
-        return tau.mvaId2017 > 0. # placeholder for now, TODO implement VVLoose WP
+        return tau.mva_passes('Eff95') 
 
     def testTauVertex(self, tau):
         '''Tests vertex constraints, for tau'''
@@ -167,8 +161,8 @@ class TauMuAnalyzer(DiLeptonAnalyzer):
         '''Tight muon selection, with isolation requirement'''
         if isocut is None:
             return True # No isolation cut
-
-        return muon.relIsoR(R=0.4, dBetaFactor=0.5, allCharged=False) < isocut
+        else:
+            return muon.relIsoR(R=0.4, dBetaFactor=0.5, allCharged=False) < isocut
 
     def thirdLeptonVeto(self, leptons, otherLeptons, isoCut=0.3):
         # count tight muons
