@@ -200,6 +200,14 @@ muon_vars = [
 tau_vars = [
     # Variable('weight_fakerate', lambda tau : tau.fakeweight()), # TODO add fakefactor method at analyzer stage
     Variable('decayMode', lambda tau : tau.decayMode(), type=int),
+    Variable('byVVLooseIsolationMVArun2017v2DBoldDMwLT2017', lambda tau : tau.mva_passes('Eff95'), type=int),
+    Variable('byVLooseIsolationMVArun2017v2DBoldDMwLT2017', lambda tau : tau.mva_passes('Eff90'), type=int),
+    Variable('byLooseIsolationMVArun2017v2DBoldDMwLT2017', lambda tau : tau.mva_passes('Eff80'), type=int),
+    Variable('byMediumIsolationMVArun2017v2DBoldDMwLT2017', lambda tau : tau.mva_passes('Eff70'), type=int),
+    Variable('byTightIsolationMVArun2017v2DBoldDMwLT2017', lambda tau : tau.mva_passes('Eff60'), type=int),
+    Variable('byVTightIsolationMVArun2017v2DBoldDMwLT2017', lambda tau : tau.mva_passes('Eff50'), type=int),
+    Variable('byVVTightIsolationMVArun2017v2DBoldDMwLT2017', lambda tau : tau.mva_passes('Eff40'), type=int),
+    Variable('byIsolationMVArun2017v2DBoldDMwLTraw2017', lambda tau : tau.mva_score() ),
 
 
     # Variable('zImpact', lambda tau : tau.zImpact()),

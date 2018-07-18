@@ -84,6 +84,14 @@ vars['l1_neutralIsoPtSum'] = {'std': 'l1_neutralIsoPtSum', 'sync': 'neutralIsoPt
 vars['l1_puCorrPtSum'] = {'std': 'l1_puCorrPtSum', 'sync': 'puCorrPtSum_1'}
 vars['l1_gen_match'] = {'std': 'l1_gen_match', 'sync': 'gen_match_1'}
 vars['l1_byTightIsolationMVArun2v1DBoldDMwLT'] = {'std': 'l1_byTightIsolationMVArun2v1DBoldDMwLT', 'sync': 'byTightIsolationMVArun2v1DBoldDMwLT_1'}# For sync check
+vars['l1_byVVLooseIsolationMVArun2017v2DBoldDMwLT2017'] = {'std': 'l1_byVVLooseIsolationMVArun2017v2DBoldDMwLT2017', 'sync': 'byVVLooseIsolationMVArun2017v2DBoldDMwLT2017_1'}
+vars['l1_byVLooseIsolationMVArun2017v2DBoldDMwLT2017'] = {'std': 'l1_byVLooseIsolationMVArun2017v2DBoldDMwLT2017', 'sync': 'byVLooseIsolationMVArun2017v2DBoldDMwLT2017_1'}
+vars['l1_byLooseIsolationMVArun2017v2DBoldDMwLT2017'] = {'std': 'l1_byLooseIsolationMVArun2017v2DBoldDMwLT2017', 'sync': 'byLooseIsolationMVArun2017v2DBoldDMwLT2017_1'}
+vars['l1_byMediumIsolationMVArun2017v2DBoldDMwLT2017'] = {'std': 'l1_byMediumIsolationMVArun2017v2DBoldDMwLT2017', 'sync': 'byMediumIsolationMVArun2017v2DBoldDMwLT2017_1'}
+vars['l1_byTightIsolationMVArun2017v2DBoldDMwLT2017'] = {'std': 'l1_byTightIsolationMVArun2017v2DBoldDMwLT2017', 'sync': 'byTightIsolationMVArun2017v2DBoldDMwLT2017_1'}
+vars['l1_byVTightIsolationMVArun2017v2DBoldDMwLT2017'] = {'std': 'l1_byVTightIsolationMVArun2017v2DBoldDMwLT2017', 'sync': 'byVTightIsolationMVArun2017v2DBoldDMwLT2017_1'}
+vars['l1_byVVTightIsolationMVArun2017v2DBoldDMwLT2017'] = {'std': 'l1_byVVTightIsolationMVArun2017v2DBoldDMwLT2017', 'sync': 'byVVTightIsolationMVArun2017v2DBoldDMwLT2017_1'}
+vars['l1_byIsolationMVArun2017v2DBoldDMwLTraw2017'] = {'std': 'l1_byIsolationMVArun2017v2DBoldDMwLTraw2017', 'sync': 'byIsolationMVArun2017v2DBoldDMwLTraw2017_1'}
 
 # Leg 2 (tau, mu, ele)
 vars['l2_pt'] = {'std': 'l2_pt', 'sync': 'pt_2'}
