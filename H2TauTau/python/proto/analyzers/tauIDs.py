@@ -13,10 +13,10 @@ tauIDs = [
     # ('by{wp}IsolationMVArun2v1DBdR03oldDMwLT', ['VLoose', 'Loose', 'Medium', 'Tight', 'VTight', 'VVTight']),
     'chargedIsoPtSum',
     'decayModeFinding',
-    # 'footprintCorrection',
+    'footprintCorrection',
     'neutralIsoPtSum',
     'puCorrPtSum',
-    # 'photonPtSumOutsideSignalCone',
+    'photonPtSumOutsideSignalCone',
     # 'byTightIsolationMVArun2v1DBoldDMwLT' # For sync check
     
 ]

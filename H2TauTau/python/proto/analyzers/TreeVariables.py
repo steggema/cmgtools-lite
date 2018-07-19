@@ -28,7 +28,6 @@ event_vars = [
     Variable('is_data', lambda ev: ev.input.eventAuxiliary().isRealData(), type=int),
 
     #Generator information
-    # TODO gen top pt 1 and 2
     Variable('geninfo_htgen', lambda ev : getattr(ev, 'genPartonHT', -1)),
     Variable('geninfo_invmass', lambda ev : getattr(ev, 'geninvmass', -1)),
 
@@ -63,7 +62,6 @@ event_vars = [
     Variable('weight', lambda ev : ev.eventWeight),
     Variable('weight_vertex', lambda ev : ev.puWeight),
     Variable('weight_dy', lambda ev : getattr(ev, 'dy_weight', 1.)),
-    # TODO add top pt reweighting weight
     Variable('weight_njet', lambda ev : ev.NJetWeight),
     # Variable('geninfo_mcweight', lambda ev : getattr(ev, 'mcweight', 1.)), TODO add this generator weight to the doc?
 
