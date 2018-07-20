@@ -169,7 +169,7 @@ class TauMuAnalyzer(DiLeptonAnalyzer):
         vLeptons = [muon for muon in leptons if
                     muon.muonID("POG_ID_Medium") and
                     self.testVertex(muon) and
-                    self.testLegKine(muon, ptcut=15, etacut=2.4) and
+                    self.testLegKine(muon, ptcut=10, etacut=2.4) and
                     self.testLeg1Iso(muon, 0.3)
                     ]
 
