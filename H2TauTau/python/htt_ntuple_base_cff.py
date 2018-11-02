@@ -11,9 +11,9 @@ from PhysicsTools.Heppy.analyzers.core.PileUpAnalyzer import PileUpAnalyzer
 from PhysicsTools.Heppy.analyzers.gen.LHEWeightAnalyzer import LHEWeightAnalyzer
 
 # Tau-tau analyzers
-from CMGTools.H2TauTau.proto.analyzers.MCWeighter import MCWeighter
 from CMGTools.H2TauTau.proto.analyzers.TriggerAnalyzer import TriggerAnalyzer
 from CMGTools.H2TauTau.proto.analyzers.JetAnalyzer import JetAnalyzer
+from CMGTools.H2TauTau.proto.analyzers.METAnalyzer import METAnalyzer
 from CMGTools.H2TauTau.proto.analyzers.EmbedWeighter import EmbedWeighter
 from CMGTools.H2TauTau.proto.analyzers.HTTGenAnalyzer import HTTGenAnalyzer
 from CMGTools.H2TauTau.proto.analyzers.HTTGenMatcher import HTTGenMatcher
@@ -21,32 +21,23 @@ from CMGTools.H2TauTau.proto.analyzers.NJetsAnalyzer import NJetsAnalyzer
 # from CMGTools.H2TauTau.proto.analyzers.HiggsPtWeighter import HiggsPtWeighter
 from CMGTools.H2TauTau.proto.analyzers.VBFAnalyzer import VBFAnalyzer
 from CMGTools.H2TauTau.proto.analyzers.RecoilCorrector import RecoilCorrector
+from CMGTools.H2TauTau.proto.analyzers.METFilter import METFilter
 
 # TTH analyzers
 from CMGTools.TTHAnalysis.analyzers.ttHhistoCounterAnalyzer import ttHhistoCounterAnalyzer
 from CMGTools.TTHAnalysis.analyzers.susyParameterScanAnalyzer import susyParameterScanAnalyzer
-from CMGTools.TTHAnalysis.analyzers.badMuonAnalyzerMoriond2017 import badMuonAnalyzerMoriond2017
 
-puFileMC = '$CMSSW_BASE/src/CMGTools/H2TauTau/data/MC_Moriond17_PU25ns_V1.root'
-puFileData = '/afs/cern.ch/user/a/anehrkor/public/Data_Pileup_2016_271036-284044_80bins.root'
+puFileMC = '$CMSSW_BASE/src/CMGTools/H2TauTau/data/pudistributions_mc_2017_artur_Jul9.root'
+puFileData = '$CMSSW_BASE/src/CMGTools/H2TauTau/data/pudistributions_data_2017.root'
 
-badCloneMuonAnaMoriond2017 = cfg.Analyzer(
-    badMuonAnalyzerMoriond2017, name='badCloneMuonMoriond2017',
-    muons='slimmedMuons',
-    vertices='offlineSlimmedPrimaryVertices',
-    minMuPt=20,
-    selectClones=True,
-    postFix='',
-)
-
-badMuonAnaMoriond2017 = cfg.Analyzer(
-    badMuonAnalyzerMoriond2017, name='badMuonMoriond2017',
-    muons='slimmedMuons',
-    vertices='offlineSlimmedPrimaryVertices',
-    minMuPt=20,
-    selectClones=False,
-    postFix='',
-)
+# badMuonAnaMoriond2017 = cfg.Analyzer(
+#     badMuonAnalyzerMoriond2017, name='badMuonMoriond2017',
+#     muons='slimmedMuons',
+#     vertices='offlineSlimmedPrimaryVertices',
+#     minMuPt=20,
+#     selectClones=False,
+#     postFix='',
+# )
 
 susyCounter = cfg.Analyzer(
     ttHhistoCounterAnalyzer, name="ttHhistoCounterAnalyzer",
@@ -82,10 +73,6 @@ skimAna = cfg.Analyzer(
     name='SkimAnalyzerCount'
 )
 
-mcWeighter = cfg.Analyzer(
-    MCWeighter,
-    name='MCWeighter'
-)
 
 triggerAna = cfg.Analyzer(
     TriggerAnalyzer,
@@ -106,7 +93,8 @@ vertexAna = cfg.Analyzer(
 pileUpAna = cfg.Analyzer(
     PileUpAnalyzer,
     name='PileUpAnalyzer',
-    true=True
+    true=True,
+    autoPU=False
 )
 
 # genAna = GeneratorAnalyzer.defaultConfig
@@ -145,6 +133,10 @@ jetAna = cfg.Analyzer(
     puJetIDDisc='pileupJetId:fullDiscriminant',
 )
 
+metAna = cfg.Analyzer(
+    METAnalyzer
+)
+
 vbfAna = cfg.Analyzer(
     VBFAnalyzer,
     name='VBFAnalyzer',
@@ -173,6 +165,24 @@ NJetsAna = cfg.Analyzer(
     verbose=False
 )
 
+metFilter = cfg.Analyzer(
+    METFilter,
+    name='METFilter',
+    processName='PAT',
+    # https://twiki.cern.ch/twiki/bin/viewauth/CMS/MissingETOptionalFiltersRun2#Moriond_2018
+    triggers=[
+        'Flag_goodVertices',
+        'Flag_globalTightHalo2016Filter',
+        'Flag_HBHENoiseFilter', 
+        'Flag_HBHENoiseIsoFilter', 
+        'Flag_EcalDeadCellTriggerPrimitiveFilter',
+        'Flag_BadPFMuonFilter',
+        'Flag_BadChargedCandidateFilter',
+        'Flag_eeBadScFilter',
+        'Flag_ecalBadCalibFilter',
+    ]
+)
+
 # higgsWeighter = cfg.Analyzer(
 #     HiggsPtWeighter,
 #     name='HiggsPtWeighter',
@@ -186,20 +196,21 @@ commonSequence = cfg.Sequence([
     lheWeightAna,
     jsonAna,
     skimAna,
-    mcWeighter,
     # genAna,
     # susyScanAna,
     triggerAna,  # First analyser that applies selections
     vertexAna,
+    jetAna,
+    metAna,
     httGenAna, # only relies on gen quantities
     httGenMatcher, # interpretation of event
-    jetAna,
     vbfAna,
     recoilCorr,
     pileUpAna,
     embedWeighter,
     NJetsAna,
+    metFilter
     # higgsWeighter,
-    badCloneMuonAnaMoriond2017,
-    badMuonAnaMoriond2017
+    # badCloneMuonAnaMoriond2017,
+    # badMuonAnaMoriond2017
 ])

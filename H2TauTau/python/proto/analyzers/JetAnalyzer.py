@@ -51,13 +51,16 @@ class JetAnalyzer(Analyzer):
     def __init__(self, cfg_ana, cfg_comp, looperName):
         super(JetAnalyzer, self).__init__(cfg_ana, cfg_comp, looperName)
         self.btagSF = {
-            'medium':BTagSF(0, wp='medium'),
-            'loose':BTagSF(0, wp='loose')
+            'medium': BTagSF(0, wp='medium'),
+            'loose': BTagSF(0, wp='loose')
         }
         self.recalibrateJets = getattr(cfg_ana, 'recalibrateJets', False)
 
-        mcGT = getattr(cfg_ana, 'mcGT', '80X_mcRun2_asymptotic_2016_TrancheIV_v8')
-        dataGT = getattr(cfg_ana, 'dataGT', '80X_dataRun2_2016SeptRepro_v7')
+        mcGT = getattr(cfg_ana, 'mcGT', '94X_mc2017_realistic_v14')
+        dataGT = getattr(cfg_ana, 'dataGT', '94X_dataRun2_v6')
+        dataGT = getattr(cfg_comp, 'dataGT', dataGT)
+        print 'Jet Analyzer - dataGT', dataGT        
+        print 'Jet Analyzer -   mcGT', mcGT
 
         if self.recalibrateJets:
             doResidual = getattr(cfg_ana, 'applyL2L3Residual', 'Data')
@@ -67,22 +70,18 @@ class JetAnalyzer(Analyzer):
                 doResidual = not self.cfg_comp.isMC
             elif doResidual not in [True, False]:
                 raise RuntimeError, "If specified, applyL2L3Residual must be any of { True, False, 'MC', 'Data'(default)}"
-            GT = getattr(cfg_comp, 'jecGT', mcGT if self.cfg_comp.isMC else dataGT)
+            GT = getattr(cfg_comp, 'jecGT',
+                         mcGT if self.cfg_comp.isMC else dataGT)
 
             # instantiate the jet re-calibrator
-            self.jetReCalibrator = JetReCalibrator(GT, 'AK4PFchs', doResidual, jecPath="%s/src/CMGTools/RootTools/data/jec" % os.environ['CMSSW_BASE'])
-
+            self.jetReCalibrator = JetReCalibrator(
+                GT, 'AK4PFchs', doResidual, jecPath="%s/src/CMGTools/RootTools/data/jec" % os.environ['CMSSW_BASE'])
 
     def declareHandles(self):
         super(JetAnalyzer, self).declareHandles()
 
         self.handles['jets'] = AutoHandle(self.cfg_ana.jetCol,
                                           'std::vector<pat::Jet>')
-
-        if hasattr(self.cfg_ana, 'leptonCollections'):
-            for coll, cms_type in self.cfg_ana.leptonCollections.items():
-                self.handles[coll] = AutoHandle(coll, cms_type)
-
 
         if self.cfg_comp.isMC:
             self.mchandles['genParticles'] = AutoHandle('packedGenParticles',
@@ -105,36 +104,21 @@ class JetAnalyzer(Analyzer):
         self.readCollections(event.input)
         miniaodjets = self.handles['jets'].product()
 
-        allJets = []
+        event.allJets = []
         event.jets = []
         event.bJets = []
         event.bJetsLoose = []
-        event.cleanJets = []
-        event.cleanBJets = []
-        event.cleanBJetsLoose = []
-
-        leptons = []
-        if hasattr(event, 'selectedLeptons'):
-            leptons = event.selectedLeptons
-        if hasattr(self.cfg_ana, 'toClean'):
-            leptons = getattr(event, self.cfg_ana.toClean)
-            
-
-        if hasattr(self.cfg_ana, 'leptonCollections'):
-            for coll in self.cfg_ana.leptonCollections:
-                leptons += self.handles[coll].product()
 
         genJets = None
         if self.cfg_comp.isMC:
             genJets = map(GenJet, self.mchandles['genJets'].product())
 
-        allJets = [Jet(jet) for jet in miniaodjets]
-
+        event.allJets = [Jet(jet) for jet in miniaodjets]
+        event.metShift = [0., 0.]
         if self.recalibrateJets:
-            self.jetReCalibrator.correctAll(allJets, event.rho, delta=0., 
-                                                addCorr=True, addShifts=True)
-
-        for jet in allJets:
+            self.jetReCalibrator.correctAll(event.allJets, event.rho, delta=0.,
+                                            addCorr=True, addShifts=True, metShift=event.metShift)
+        for jet in event.allJets:
             if genJets:
                 # Use DeltaR = 0.25 matching like JetMET
                 pairs = matchObjectCollection([jet], genJets, 0.25 * 0.25)
@@ -155,7 +139,24 @@ class JetAnalyzer(Analyzer):
             if self.testBJet(jet, csv_cut=0.5426, wp='loose'):
                 event.bJetsLoose.append(jet)
 
+                
         self.counters.counter('jets').inc('all events')
+
+        event.jets30 = [jet for jet in event.jets if jet.pt() > 30]
+        if len(event.jets30) >= 2:
+            self.counters.counter('jets').inc('at least 2 good jets')
+
+        return True
+
+    @staticmethod
+    def createCleanCollections(event):
+        event.cleanJets = []
+        event.cleanBJets = []
+        event.cleanBJetsLoose = []
+
+        leptons = []
+        if hasattr(event, 'selectedLeptons'):
+            leptons = event.selectedLeptons
 
         event.cleanJets, dummy = cleanObjectCollection(event.jets,
                                                        masks=leptons,
@@ -165,14 +166,14 @@ class JetAnalyzer(Analyzer):
                                                         deltaRMin=0.5)
 
         event.cleanBJetsLoose, dummy = cleanObjectCollection(event.bJetsLoose,
-                                                        masks=leptons,
-                                                        deltaRMin=0.5)
+                                                             masks=leptons,
+                                                             deltaRMin=0.5)
 
         # Attach matched jets to selected + other leptons
         if hasattr(event, 'otherLeptons'):
             leptons += event.otherLeptons
-            
-        pairs = matchObjectCollection(leptons, allJets, 0.5 * 0.5)
+
+        pairs = matchObjectCollection(leptons, event.allJets, 0.5 * 0.5)
         # associating a jet to each lepton
         for lepton in leptons:
             jet = pairs[lepton]
@@ -190,26 +191,22 @@ class JetAnalyzer(Analyzer):
         for jet in event.cleanJets:
             jet.matchGenParton = 999.0
 
-        event.jets30 = [jet for jet in event.jets if jet.pt() > 30]
         event.cleanJets30 = [jet for jet in event.cleanJets if jet.pt() > 30]
-        if len(event.jets30) >= 2:
-            self.counters.counter('jets').inc('at least 2 good jets')
-        if len(event.cleanJets30) >= 2:
-            self.counters.counter('jets').inc('at least 2 clean jets')
-        if len(event.cleanBJets) > 0:
-            self.counters.counter('jets').inc('at least 1 b jet')
-            if len(event.cleanBJets) > 1:
-                self.counters.counter('jets').inc('at least 2 b jets')
-                
+
+        # if len(event.cleanJets30) >= 2:
+        #     self.counters.counter('jets').inc('at least 2 clean jets')
+        # if len(event.cleanBJets) > 0:
+        #     self.counters.counter('jets').inc('at least 1 b jet')
+        #     if len(event.cleanBJets) > 1:
+        #         self.counters.counter('jets').inc('at least 2 b jets')
+
         # save HTs
-        event.HT_allJets     = sum([jet.pt() for jet in allJets          ])
-        event.HT_jets        = sum([jet.pt() for jet in event.jets       ])
-        event.HT_bJets       = sum([jet.pt() for jet in event.bJets      ])
-        event.HT_cleanJets   = sum([jet.pt() for jet in event.cleanJets  ])
-        event.HT_jets30      = sum([jet.pt() for jet in event.jets30     ])
+        event.HT_allJets = sum([jet.pt() for jet in event.allJets])
+        event.HT_jets = sum([jet.pt() for jet in event.jets])
+        event.HT_bJets = sum([jet.pt() for jet in event.bJets])
+        event.HT_cleanJets = sum([jet.pt() for jet in event.cleanJets])
+        event.HT_jets30 = sum([jet.pt() for jet in event.jets30])
         event.HT_cleanJets30 = sum([jet.pt() for jet in event.cleanJets30])
-        
-        return True
 
     def jerCorrection(self, jet):
         ''' Adds JER correction according to first method at
@@ -248,38 +245,42 @@ class JetAnalyzer(Analyzer):
 
     def testJetID(self, jet):
         jet.puJetIdPassed = jet.puJetId()
-        jet.pfJetIdPassed = jet.jetID("POG_PFID_Loose")
-        puJetId = self.cfg_ana.relaxPuJetId or jet.puJetIdPassed 
-        pfJetId = self.cfg_ana.relaxJetId or jet.pfJetIdPassed 
+        jet.pfJetIdPassed = jet.jetID("POG_PFID_Tight")
+        puJetId = self.cfg_ana.relaxPuJetId or jet.puJetIdPassed
+        pfJetId = self.cfg_ana.relaxJetId or jet.pfJetIdPassed
         return puJetId and pfJetId
 
     def testJet(self, jet):
         pt = jet.pt()
         if hasattr(self.cfg_ana, 'ptUncTolerance') and self.cfg_ana.ptUncTolerance:
-            pt = max(pt, pt * jet.corrJECUp/jet.corr, pt * jet.corrJECDown/jet.corr)
+            pt = max(pt, pt * jet.corrJECUp/jet.corr,
+                     pt * jet.corrJECDown/jet.corr)
         return pt > self.cfg_ana.jetPt and \
-            abs( jet.eta() ) < self.cfg_ana.jetEta and \
+            abs(jet.eta()) < self.cfg_ana.jetEta and \
             self.testJetID(jet)
 
-    def testBJet(self, jet, csv_cut=0.8484, wp='medium'):
+    def testBJet(self, jet, csv_cut=0.4941, wp='medium'):
         # medium csv working point
         # https://twiki.cern.ch/twiki/bin/viewauth/CMS/BtagRecommendation74X
-        jet.btagMVA = jet.btag('pfCombinedInclusiveSecondaryVertexV2BJetTags')
+        jet.btagMVA = jet.btag('pfDeepCSVDiscriminatorsJetTags:BvsAll')
         # jet.btagFlag = jet.btagMVA > csv_cut
 
         # Use the following once we start applying data-MC scale factors:
+        # TODO add run-dependant scale factor from https://twiki.cern.ch/twiki/bin/viewauth/CMS/BtagRecommendation94X
         setattr(jet, 'btagFlag'+wp,
-            self.btagSF[wp].isBTagged(
-                pt=jet.pt(),
-                eta=jet.eta(),
-                csv=jet.btag("pfCombinedInclusiveSecondaryVertexV2BJetTags"),
-                jetflavor=abs(jet.partonFlavour()),
-                is_data=not self.cfg_comp.isMC,
-                csv_cut=csv_cut
-            )
-        )
+                self.btagSF[wp].isBTagged(
+                    pt=jet.pt(),
+                    eta=jet.eta(),
+                    csv=jet.btag(
+                        "pfDeepCSVDiscriminatorsJetTags:BvsAll"),
+                    jetflavor=abs(jet.hadronFlavour()),
+                    is_data=not self.cfg_comp.isMC,
+                    csv_cut=csv_cut
+                    )
+                )
+
 
         return self.testJet(jet) and \
-            abs(jet.eta()) < 2.4 and \
+            abs(jet.eta()) < 2.5 and \
             getattr(jet, 'btagFlag'+wp) and \
             self.testJetID(jet)

@@ -23,8 +23,6 @@ def _dasPopen(dbs, verbose=True):
     #--- this below fails also locally, so it's off for the moment; to be improved ---
     #if 'GLOBUS_GRAM_JOB_CONTACT':
     #    raise RuntimeError, "Trying to do a DAS query while in a Grid job (env variable GLOBUS_GRAM_JOB_CONTACT defined)\nquery was: %s" % dbs
-    if dbs.startswith("das_client.py") and ('X509_USER_PROXY' in os.environ):
-         dbs += " --key {0} --cert {0}".format(os.environ['X509_USER_PROXY'])
     if verbose: print 'dbs\t: %s' % dbs
     return os.popen(dbs)
 
@@ -67,7 +65,6 @@ class BaseDataset( object ):
         return self.primaryDatasetEntries
 
     def printFiles(self, abspath=True, info=True):
-        # import pdb; pdb.set_trace()
         if self.files == None:
             self.buildListOfFiles(self.pattern)
         for file in self.files:
@@ -181,7 +178,7 @@ class CMSDataset( BaseDataset ):
             runs = self.run_range
         if not hasattr(self,'summaries'):
             self.summaries = self.findPrimaryDatasetSummaries(self.name.rstrip('/'),
-                                                  runs[0],runs[1])
+                                                              runs[0],runs[1],self.dbsInstance)
         num_files = self.summaries['files']
         if num_files == -1:
             raise RuntimeError, "Error querying DAS for dataset %r" % self.name.rstrip('/')
@@ -401,7 +398,7 @@ class PrivateDataset ( BaseDataset ):
     def buildListOfFilesDBS(self, name, dbsInstance):
         entries = self.findPrimaryDatasetNumFiles(name, dbsInstance, -1, -1)
         files = []
-        dbs = 'das_client.py --query="file dataset=%s instance=prod/%s" --limit=%s' % (name, dbsInstance, entries)
+        dbs = 'dasgoclient --query="file dataset=%s instance=prod/%s" --limit=%s' % (name, dbsInstance, entries)
         dbsOut = _dasPopen(dbs)
         for line in dbsOut:
             if line.find('/store')==-1:
@@ -427,7 +424,7 @@ class PrivateDataset ( BaseDataset ):
             else:
                 print "WARNING: queries with run ranges are slow in DAS"
                 query = "%s run between [%d, %d]" % (query,runmin if runmin > 0 else 1, runmax if runmax > 0 else 999999)
-        dbs='das_client.py --query="summary %s=%s instance=prod/%s"'%(qwhat, query, dbsInstance)
+        dbs='dasgoclient --query="summary %s=%s instance=prod/%s"'%(qwhat, query, dbsInstance)
         dbsOut = _dasPopen(dbs).readlines()
         entries = []
         for line in dbsOut:
@@ -450,7 +447,7 @@ class PrivateDataset ( BaseDataset ):
             else:
                 print "WARNING: queries with run ranges are slow in DAS"
                 query = "%s run between [%d, %d]" % (query,runmin if runmin > 0 else 1, runmax if runmax > 0 else 999999)
-        dbs='das_client.py --query="summary %s=%s instance=prod/%s"'%(qwhat, query, dbsInstance)
+        dbs='dasgoclient --query="summary %s=%s instance=prod/%s"'%(qwhat, query, dbsInstance)
         dbsOut = _dasPopen(dbs).readlines()
         
         entries = []

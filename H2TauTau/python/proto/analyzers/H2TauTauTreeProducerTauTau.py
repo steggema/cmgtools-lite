@@ -69,6 +69,10 @@ class H2TauTauTreeProducerTauTau(H2TauTauTreeProducer):
         tau1 = event.diLepton.leg1()
         tau2 = event.diLepton.leg2()
 
+        if tau1.pt() < tau2.pt():
+            tau1 = event.diLepton.leg2()
+            tau2 = event.diLepton.leg1()
+
         self.fillTau(self.tree, 'l1', tau1)
         self.fillTau(self.tree, 'l2', tau2)
 

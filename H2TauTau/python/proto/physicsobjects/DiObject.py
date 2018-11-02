@@ -113,6 +113,7 @@ class DiTau(DiObject):
         self.pZetaMET_ = metPT*zetaAxis
 
     def mTLeg1(self):
+        
         if hasattr(self, 'mt1'):
             return self.mt1
         else:
@@ -170,6 +171,7 @@ class DirectDiTau(DiTau):
         self.leg1_ = leg1
         self.leg2_ = leg2
         self.met_ = met
+        self.p4_ = (leg1.p4() + leg2.p4())
 
     def mass(self):
         return self.p4_.mass()
@@ -302,7 +304,13 @@ class TauTau(DiTau):
         self.diobject.setP4(self.p4())
 
     def leg1(self):
-        return self.tau
+        if self.tau.pt() > self.tau2.pt():
+            return self.tau
+        else:
+            return self.tau2
 
     def leg2(self):
-        return self.tau2
+        if self.tau.pt() > self.tau2.pt():
+            return self.tau2
+        else:
+            return self.tau

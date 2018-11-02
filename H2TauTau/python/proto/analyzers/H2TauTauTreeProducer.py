@@ -41,9 +41,10 @@ class H2TauTauTreeProducer(H2TauTauTreeProducerBase):
     def declareVariables(self, setup):
 
         self.bookEvent(self.tree)
-        self.bookDiLepton(self.tree)
+        self.bookDiLepton(self.tree, fill_svfit=getattr(self.cfg_ana, 'fillSVFit', False))
         self.bookGenInfo(self.tree)
-        self.bookVBF(self.tree, 'vbf')
+        if getattr(self.cfg_ana, 'addVBF', False):
+            self.bookVBF(self.tree, 'vbf')
 
         self.bookJet(self.tree, 'jet1', fill_extra=getattr(self.cfg_ana, 'addMoreJetInfo', False))
         self.bookJet(self.tree, 'jet2', fill_extra=getattr(self.cfg_ana, 'addMoreJetInfo', False))
@@ -51,16 +52,7 @@ class H2TauTauTreeProducer(H2TauTauTreeProducerBase):
         self.bookJet(self.tree, 'bjet1', fill_extra=getattr(self.cfg_ana, 'addMoreJetInfo', False))
         self.bookJet(self.tree, 'bjet2', fill_extra=getattr(self.cfg_ana, 'addMoreJetInfo', False))
 
-        self.var(self.tree, 'HT_allJets')
-        self.var(self.tree, 'HT_jets')
-        self.var(self.tree, 'HT_bJets')
-        self.var(self.tree, 'HT_cleanJets')
-        self.var(self.tree, 'HT_jets30')
-        self.var(self.tree, 'HT_cleanJets30')
-
-        self.bookGenParticle(self.tree, 'genboson')
         self.bookTopPtReweighting(self.tree)
-        self.bookExtraMetInfo(self.tree)
 
         if hasattr(self.cfg_ana, 'TauSpinner') and self.cfg_ana.TauSpinner :
             self.bookTauSpinner(self.tree)
@@ -80,9 +72,9 @@ class H2TauTauTreeProducer(H2TauTauTreeProducerBase):
         self.fillTopPtReweighting(self.tree, event)
 
         self.fillEvent(self.tree, event)
-        self.fillDiLepton(self.tree, event.diLepton)
+        self.fillDiLepton(self.tree, event.diLepton, fill_svfit=getattr(self.cfg_ana, 'fillSVFit', False))
         self.fillGenInfo(self.tree, event)
-        if hasattr(event, 'vbf'):
+        if getattr(self.cfg_ana, 'addVBF', False) and hasattr(event, 'vbf'):
             self.fillVBF(self.tree, 'vbf', event.vbf)
 
         for i, jet in enumerate(event.cleanJets[:2]):
@@ -90,18 +82,6 @@ class H2TauTauTreeProducer(H2TauTauTreeProducerBase):
 
         for i, jet in enumerate(event.cleanBJets[:2]):
             self.fillJet(self.tree, 'bjet{n}'.format(n=str(i + 1)), jet, fill_extra=hasattr(self.cfg_ana, 'addMoreJetInfo') and self.cfg_ana.addMoreJetInfo)
-
-        self.fill(self.tree, 'HT_allJets', event.HT_allJets) 
-        self.fill(self.tree, 'HT_jets', event.HT_jets) 
-        self.fill(self.tree, 'HT_bJets', event.HT_bJets)
-        self.fill(self.tree, 'HT_cleanJets', event.HT_cleanJets)
-        self.fill(self.tree, 'HT_jets30', event.HT_jets30)
-        self.fill(self.tree, 'HT_cleanJets30', event.HT_cleanJets30) 
-
-        if hasattr(event, 'parentBoson'):
-            self.fillGenParticle(self.tree, 'genboson', event.parentBoson)
-
-        self.fillExtraMetInfo(self.tree, event)
 
         if type(self) is H2TauTauTreeProducer:
             self.fillTree(event)

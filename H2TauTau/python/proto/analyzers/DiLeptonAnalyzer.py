@@ -7,6 +7,7 @@ from PhysicsTools.Heppy.physicsobjects.PhysicsObjects import Lepton
 from PhysicsTools.HeppyCore.utils.deltar import deltaR, deltaR2
 
 from CMGTools.H2TauTau.proto.physicsobjects.DiObject import DiObject, DirectDiTau
+from CMGTools.H2TauTau.proto.analyzers.JetAnalyzer import JetAnalyzer
 
 
 class DiLeptonAnalyzer(Analyzer):
@@ -101,9 +102,10 @@ class DiLeptonAnalyzer(Analyzer):
             self.handles['leptons'].product(), event)
         event.otherLeptons = self.buildOtherLeptons(
             self.handles['otherLeptons'].product(), event)
-        return self.selectionSequence(event, fillCounter=fillCounter,
-                                      leg1IsoCut=self.cfg_ana.iso1,
-                                      leg2IsoCut=self.cfg_ana.iso2)
+        return False
+        # return self.selectionSequence(event, fillCounter=fillCounter,
+                                      # leg1IsoCut=self.cfg_ana.iso1,
+                                      # leg2IsoCut=self.cfg_ana.iso2)
 
     def selectionSequence(self, event, fillCounter, leg1IsoCut=None, leg2IsoCut=None):
 
@@ -218,6 +220,8 @@ class DiLeptonAnalyzer(Analyzer):
                 self.counters.counter('DiLepton').inc('lepton accept')
             event.leptonAccept = True
 
+        JetAnalyzer.createCleanCollections(event)
+
         return True
 
     def declareHandles(self):
@@ -230,7 +234,7 @@ class DiLeptonAnalyzer(Analyzer):
                 )
         else:    
             self.handles['triggerObjects'] =  AutoHandle(
-                'selectedPatTrigger',
+                'slimmedPatTrigger',
                 'std::vector<pat::TriggerObjectStandAlone>'
                 )
 

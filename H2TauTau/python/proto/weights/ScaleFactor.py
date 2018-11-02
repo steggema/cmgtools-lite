@@ -2,7 +2,8 @@ import os
 import imp
 import ROOT
 import array
-
+import json
+import re
 
 class ScaleFactor(object):
 
@@ -22,6 +23,13 @@ class ScaleFactor(object):
                 self._initFromRoot(inputFile, histBaseName)
         elif inputFile.endswith('.py'):
             self._initFromPython(inputFile)
+        elif inputFile.endswith('.json'):
+            self._initFromJSON(inputFile, histBaseName)
+
+    def _initFromJSON(self, inputFile, histBaseName='MediumID'):
+        with open(os.path.expandvars(inputFile)) as f:
+             results = json.load(f)
+             self.json_effs = results[histBaseName]
 
     def _initFromRooFit(self, inputRootFile, histBaseName):
         fileIn = ROOT.TFile(inputRootFile)
@@ -79,6 +87,8 @@ class ScaleFactor(object):
                 continue
             if isinstance(self.eff_mc[etaLabel], ROOT.TF1) and isinstance(self.eff_data[etaLabel], ROOT.TF1):
                 continue
+            if isinstance(self.eff_mc[etaLabel], ROOT.TGraphAsymmErrors) and isinstance(self.eff_data[etaLabel], ROOT.TGraphAsymmErrors):
+                continue
             elif not self.checkSameBinning(self.eff_mc[etaLabel], self.eff_data[etaLabel]):
                 raise RuntimeError(
                     'ERROR in ScaleFactor::init_ScaleFactor(TString inputRootFile) from LepEffInterface/src/ScaleFactor.cc . Can not proceed because ScaleFactor::check_SameBinning returned different pT binning for data and MC for eta label', etaLabel)
@@ -111,6 +121,8 @@ class ScaleFactor(object):
     def getScaleFactor(self, pt, eta, isFake=False, iso=None, dm=None):
         if hasattr(self, 'ws'):
             return self.getFactorWS(pt, eta, 'ratio', isFake=isFake, iso=iso, dm=dm)
+        if hasattr(self, 'json_effs'):
+            return self.getFactorJson(pt, eta)
         return self.getEfficiencyData(pt, eta, isFake, iso, dm)/max(self.getEfficiencyMC(pt, eta, isFake, iso, dm), 1.e-6)
 
     def getEfficiencyData(self, pt, eta, isFake=False, iso=None, dm=None):
@@ -134,8 +146,10 @@ class ScaleFactor(object):
             self.ws.var('_'.join([self.obj_tag, 'dm'])).setVal(dm)
 
         sf_name = self.sf_name.replace('genuine', 'fake') if isFake else self.sf_name
-
-        return self.ws.function('_'.join([sf_name, tag])).getVal()
+        try:
+            return self.ws.function('_'.join([sf_name, tag])).getVal()
+        except TypeError:
+            import pdb; pdb.set_trace()
 
     def findEtaLabel(self, eta, eff_dict):
         eta = abs(eta)
@@ -159,6 +173,27 @@ class ScaleFactor(object):
         else:
             return g_eff.GetXaxis().FindFixBin(pt)
 
+    def getFactorJson(self, pt, eta):
+        aeta = abs(eta)
+        
+        effs = self.json_effs[u'abseta_pt'] if u'abseta_pt' in self.json_effs else self.json_effs[u'abseta_pt_DATA']
+        for key in sorted(effs.keys()):
+            eta_low, eta_high = re.findall("\d+\.\d+", key)
+            if aeta >= float(eta_low) and aeta < float(eta_high):
+                sub_eff = effs[key]
+                for pt_key in sorted(sub_eff.keys()):
+                    pt_low, pt_high = re.findall("\d+\.\d+", pt_key)
+                    if pt >= float(pt_low) and pt < float(pt_high):
+                        return sub_eff[pt_key][u'value']
+                else:
+                    # print 'pT out of range, using last pT bin'
+                    return sub_eff[pt_key][u'value']
+        else:
+            print 'JSON-based scale factor: eta out of range, last eta_high = ', eta_high, 'eta = ', eta
+
+        print 'Unsuccessfully tried to extract json-based scale factor for pt, eta', pt, eta
+        return -99.
+
     def getEfficiency(self, pt, eta, iso, dm, eff_dict):
 
         # return efficiency for when using analytical function
@@ -167,7 +202,6 @@ class ScaleFactor(object):
             args = (a for a in [pt, eta, iso, dm] if a is not None)
             eff = func(*args)
             return eff
-
         label = self.findEtaLabel(eta, eff_dict)
 
         g_eff = eff_dict[label]
@@ -218,3 +252,21 @@ if __name__ == '__main__':
         print 'Eff data', sf.getEfficiencyData(pt, eta, dm=dm)
         print 'Eff MC', sf.getEfficiencyMC(pt, eta, dm=dm)
         print 'SF', sf.getScaleFactor(pt, eta, dm=dm)
+
+    for sf in [ScaleFactor('$CMSSW_BASE/src/CMGTools/H2TauTau/data/RunBCDEF_SF_ID.json', 'NUM_MediumID_DEN_genTracks'),
+               ScaleFactor('$CMSSW_BASE/src/CMGTools/H2TauTau/data/RunBCDEF_SF_ISO.json', 'NUM_TightRelIso_DEN_MediumID'),
+               ScaleFactor('$CMSSW_BASE/src/CMGTools/H2TauTau/data/theJSONfile_RunBtoF_Nov17Nov2017.json', 'IsoMu27_PtEtaBins')
+              ]:
+        for pt, eta in [(50., 0.05, ),
+                            (50., 0.05 ),
+                            (50., 2.05 ),
+                            (45., 0.05 ),
+                            (50., 0.05 ),
+                            (55., 0.05 ),
+                            (60., 0.05 ),
+                            (80., 0.05 ),
+                            (100., 0.05 ),
+                            (1000., 2.04 )]:
+            print '\n==========>'
+            print 'pt %f, eta %f' % (pt, eta)
+            print 'SF', sf.getScaleFactor(pt, eta)

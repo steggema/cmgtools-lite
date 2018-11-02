@@ -4,7 +4,7 @@ import ROOT
 
 from PhysicsTools.Heppy.analyzers.core.AutoHandle import AutoHandle
 from PhysicsTools.Heppy.analyzers.core.Analyzer import Analyzer
-from PhysicsTools.HeppyCore.utils.deltar import bestMatch
+from PhysicsTools.HeppyCore.utils.deltar import bestMatch, deltaR
 
 from PhysicsTools.Heppy.physicsobjects.PhysicsObject import PhysicsObject
 from PhysicsTools.Heppy.physicsobjects.GenParticle import GenParticle
@@ -12,10 +12,12 @@ from PhysicsTools.Heppy.physicsutils.TauDecayModes import tauDecayModes
 
 from CMGTools.H2TauTau.proto.analyzers.TauGenTreeProducer import TauGenTreeProducer
 
-if "/sDYReweighting_cc.so" not in ROOT.gSystem.GetLibraries(): 
-    ROOT.gROOT.ProcessLine(".L %s/src/CMGTools/H2TauTau/python/proto/plotter/DYReweighting.cc+" % os.environ['CMSSW_BASE']);
-    from ROOT import getDYWeight
 
+# if "/sDYReweighting_cc.so" not in ROOT.gSystem.GetLibraries(): 
+#     ROOT.gROOT.ProcessLine(".L %s/src/CMGTools/H2TauTau/python/proto/plotter/DYReweighting.cc+" % os.environ['CMSSW_BASE']);
+ROOT.gSystem.Load("libCMGToolsH2TauTau")
+from ROOT import getDYWeight
+    
 
 class HTTGenAnalyzer(Analyzer):
 
@@ -154,6 +156,8 @@ class HTTGenAnalyzer(Analyzer):
             genjet.decayMode = tauDecayModes.genDecayModeInt(c_genjet)
 
             if p4_genjet.pt() > 15.:
+                if any(deltaR(p4_genjet, stored_genjet)<0.002 for stored_genjet in event.genTauJets):
+                    continue # Remove duplicates
                 event.genTauJets.append(genjet)
                 event.genTauJetConstituents.append(c_genjet)
 
@@ -254,12 +258,12 @@ class HTTGenAnalyzer(Analyzer):
             if dR2best < dR2 and l1match.pt() > 10.:
                 leg.genp = PhysicsObject(l1match)
 
-                jet, dR2best = bestMatch(l1match, event.jets)
+                jet, dR2best = bestMatch(l1match, getattr(event, 'jets', []))
 
                 if dR2best < dR2:
                     leg.genp.detFlavour = jet.partonFlavour()
-                else:
-                    print 'no match found', leg.pt(), leg.eta()
+                # else:
+                #     print 'no match found', leg.pt(), leg.eta()
 
     @staticmethod
     def getTopPtWeight(event):

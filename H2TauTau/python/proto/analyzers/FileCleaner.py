@@ -1,11 +1,12 @@
 import os
+from shutil import copyfile
 
 from PhysicsTools.Heppy.analyzers.core.Analyzer import Analyzer
 
 
 class FileCleaner(Analyzer):
 
-    '''Gets tau decay mode efficiency weight and puts it in the event'''
+    '''Gets rid of the preprocessed rootfile, or saves it somewhere if needed'''
 
     def __init__(self, cfg_ana, cfg_comp, looperName):
         super(FileCleaner, self).__init__(cfg_ana, cfg_comp, looperName)
@@ -18,4 +19,8 @@ class FileCleaner(Analyzer):
         super(FileCleaner, self).endLoop(setup)
         for comp in setup.config.components:
             for f in comp.files:
+                if hasattr(self.cfg_ana, 'savepreproc') and self.cfg_ana.savepreproc:
+                    if not os.path.exists('preprocessed_files/'+comp.name):
+                        os.makedirs('preprocessed_files/'+comp.name)
+                    copyfile(f,'preprocessed_files/'+comp.name+'/cmsswPreProcessing.root')
                 os.remove(f)

@@ -14,6 +14,7 @@ from CMGTools.H2TauTau.proto.analyzers.TauP4Scaler import TauP4Scaler
 from CMGTools.H2TauTau.proto.analyzers.SVfitProducer import SVfitProducer
 from CMGTools.H2TauTau.proto.analyzers.L1TriggerAnalyzer import L1TriggerAnalyzer
 from CMGTools.H2TauTau.proto.analyzers.MT2Analyzer import MT2Analyzer
+from CMGTools.H2TauTau.proto.analyzers.TauIDWeighter import TauIDWeighter
 from CMGTools.H2TauTau.proto.analyzers.METFilter import METFilter
 
 # common configuration and sequence
@@ -32,8 +33,9 @@ def getHeppyOption(option, default):
 production = getHeppyOption('production', True)
 pick_events = getHeppyOption('pick_events', False)
 syncntuple = getHeppyOption('syncntuple', True)
-cmssw = getHeppyOption('cmssw', False)
-doSUSY = getHeppyOption('susy', True)
+cmssw = getHeppyOption('cmssw', True)
+cmssw_reuse = getHeppyOption('cmssw_reuse', True)
+doSUSY = getHeppyOption('susy', False)
 computeSVfit = getHeppyOption('computeSVfit', False)
 data = getHeppyOption('data', False)
 tes_string = getHeppyOption('tes_string', '') # '_tesup' '_tesdown'
@@ -45,6 +47,9 @@ correct_recoil = getHeppyOption('correct_recoil', True)
 if doSUSY:
     cmssw = False
 
+if (not cmssw) or production:
+    cmssw_reuse = False
+
 tes_up = False
 tes_scale = 1.0
 if tes_up:
@@ -53,8 +58,10 @@ if tes_up:
 
 # Just to be sure
 if production:
-    syncntuple = False
+    # syncntuple = False
     pick_events = False
+
+httGenAna.filepath = '$CMSSW_BASE/src/CMGTools/H2TauTau/data/htt_scalefactors_v16_5.root'
 
 if reapplyJEC:
     if cmssw:
@@ -103,7 +110,8 @@ tauTauAna = cfg.Analyzer(
     from_single_objects=False,
     ignoreTriggerMatch=True, 
     scaleTaus=calibrateTaus or scaleTaus,
-    tes_scale=tes_scale
+    tes_scale=tes_scale,
+    tauEnergyScale=True,
 )
 
 if not cmssw:
@@ -130,7 +138,8 @@ tauTauMT2Ana = cfg.Analyzer(
 
 fileCleaner = cfg.Analyzer(
     FileCleaner,
-    name='FileCleaner'
+    name='FileCleaner',
+    savepreproc = True if cmssw_reuse else False
 )
 
 # tau1Calibration = cfg.Analyzer(
@@ -161,7 +170,7 @@ tau1Weighter = cfg.Analyzer(
     LeptonWeighter,
     name='LeptonWeighter_tau1',
     scaleFactorFiles={
-        'trigger': ('$CMSSW_BASE/src/CMGTools/H2TauTau/data/htt_scalefactors_v16_5.root', 't_genuine_TightIso_tt'),
+        'trigger': ('$CMSSW_BASE/src/CMGTools/H2TauTau/data/htt_scalefactors_v16_5.root', 't_genuine_MediumIso_tt'),
         # 'trigger': '$CMSSW_BASE/src/CMGTools/H2TauTau/data/Tau_diTau35_summer16.py',  # include in the event's overall weight
     },
 
@@ -178,7 +187,7 @@ tau2Weighter = cfg.Analyzer(
     LeptonWeighter,
     name='LeptonWeighter_tau2',
     scaleFactorFiles={
-        'trigger': ('$CMSSW_BASE/src/CMGTools/H2TauTau/data/htt_scalefactors_v16_5.root', 't_genuine_TightIso_tt'),
+        'trigger': ('$CMSSW_BASE/src/CMGTools/H2TauTau/data/htt_scalefactors_v16_5.root', 't_genuine_MediumIso_tt'),
         # 'trigger': '$CMSSW_BASE/src/CMGTools/H2TauTau/data/Tau_diTau35_summer16.py',  # include in the event's overall weight
     },
 
@@ -209,7 +218,7 @@ syncTreeProducer = cfg.Analyzer(
     name='H2TauTauSyncTreeProducerTauTau',
     varStyle='sync',
     treename='sync_tree',
-    skimFunction=' and '.join(['event.'+met_filter for met_filter in ['Flag_HBHENoiseFilter', 'Flag_HBHENoiseIsoFilter', 'Flag_EcalDeadCellTriggerPrimitiveFilter', 'Flag_goodVertices', 'Flag_eeBadScFilter', 'Flag_globalTightHalo2016Filter', 'passBadMuonFilter', 'passBadChargedHadronFilter']])
+    skimFunction=' and '.join(['event.'+met_filter for met_filter in ['Flag_HBHENoiseFilter', 'Flag_HBHENoiseIsoFilter', 'Flag_EcalDeadCellTriggerPrimitiveFilter', 'Flag_goodVertices', 'Flag_eeBadScFilter', 'Flag_globalTightHalo2016Filter', 'passBadMuonFilter', 'passBadChargedHadronFilter', 'passBadGlobalMuonFilter', 'passcloneGlobalMuonFilter']])#
 )
 
 svfitProducer = cfg.Analyzer(
@@ -223,18 +232,16 @@ svfitProducer = cfg.Analyzer(
     l2type='tau'
 )
 
-metFilter = cfg.Analyzer(
-    METFilter,
-    name='METFilter',
-    processName='AOD',
-    triggers=[
-        'Flag_HBHENoiseFilter', 
-        'Flag_HBHENoiseIsoFilter', 
-        'Flag_EcalDeadCellTriggerPrimitiveFilter',
-        'Flag_goodVertices',
-        'Flag_eeBadScFilter',
-        'Flag_globalTightHalo2016Filter'
-    ]
+
+
+tauIDWeighter = cfg.Analyzer(
+    TauIDWeighter,
+    name='TauIDWeighter',
+    legs=['leg1', 'leg2'],
+    channel = 'tt',
+    ele_WP = 1,
+    mu_WP = 2,
+    tau_WP = 3,
 )
 
 ###################################################
@@ -247,10 +254,10 @@ from CMGTools.H2TauTau.proto.samples.summer16.sms import samples_susy
 from CMGTools.H2TauTau.proto.samples.summer16.triggers_tauTau import mc_triggers, mc_triggerfilters, data_triggers, data_triggerfilters
 
 data_list = data_tau
-samples = backgrounds + sm_signals + sync_list #+ mssm_signals 
+samples = backgrounds + sm_signals + sync_list + mssm_signals 
 if doSUSY:
     samples = samples_susy #+ SignalSUSY[:1]
-split_factor = 1e5
+split_factor = 1e4
 
 for sample in data_list:
     sample.triggers = data_triggers
@@ -294,8 +301,9 @@ sequence.insert(sequence.index(httGenAna)+1, tauTauAna)
 sequence.append(tauDecayModeWeighter)
 sequence.append(tau1Weighter)
 sequence.append(tau2Weighter)
+if syncntuple:
+    sequence.append(tauIDWeighter)
 sequence.append(tauTauMT2Ana)
-sequence.append(metFilter)
 if doSUSY:
     sequence.insert(sequence.index(mcWeighter) + 1, susyScanAna)
     sequence.insert(sequence.index(susyScanAna) + 1, susyCounter)
@@ -311,7 +319,7 @@ if not cmssw:
 ###             CHERRY PICK EVENTS              ###
 ###################################################
 if pick_events:
-    evtsToPick = [7125, 7204, 19150, 19157, 30297, 67087, 74521, 87615, 93964, 13385, 19948, 21748, 22048, 68695, 68980, 90677, 4019, 5003, 5228, 33261, 48241, 40571, 17727, 42382, 42762, 52834, 52756, 76821, 70141, 4266, 26879, 36797, 92495, 401, 3451, 3526, 32430, 15065, 48579, 44338, 88971, 6115, 55642, 1616, 43645, 51727, 57548, 27953, 22307, 38311, 43239, 43257, 55067, 62198, 76475, 79555, 45228, 91707]
+    evtsToPick = [88930, 26229, 66496, 30256, 57121, 75121, 61113]
 
     eventSelector.toSelect = evtsToPick
     sequence.insert(0, eventSelector)
@@ -332,15 +340,21 @@ if doSUSY:
 ###################################################
 ###            SET BATCH OR LOCAL               ###
 ###################################################
+# selectedComponents = [selectedComponents[0]]
+# selectedComponents[0].files = [selectedComponents[0].files[0]]
+# for comp in selectedComponents:
+#         comp.files = ['root://cms-xrd-global.cern.ch/'+f[30:] for f in comp.files]
 if not production:
     # comp = data_list[0] if data else sync_list[0]
     # comp = SMS
     # comp = samples_susy[1]
-    selectedComponents = [samples_susy[2]] if doSUSY else sync_list
+    # selectedComponents = [samples_susy[2]] if doSUSY else sync_list
     if data:
         selectedComponents = [data_list[0]]
-    selectedComponents = selectedComponents[:1]
+    selectedComponents = [selectedComponents[0]]
+    selectedComponents[0].files = [selectedComponents[0].files[0]]
     for comp in selectedComponents:
+        # comp.files = ['root://cms-xrd-global.cern.ch/'+f[30:] for f in comp.files]
         comp.splitFactor = 1
         comp.fineSplitFactor = 1
     # comp.files = comp.files[13:20]
@@ -352,14 +366,18 @@ if doSUSY:
 
 preprocessor = None
 if cmssw:
-    sequence.append(fileCleaner)
-    cfg_name = "$CMSSW_BASE/src/CMGTools/H2TauTau/prod/h2TauTauMiniAOD_ditau_data_cfg.py" if data else "$CMSSW_BASE/src/CMGTools/H2TauTau/prod/h2TauTauMiniAOD_ditau_cfg.py"
-    preprocessor = CmsswPreprocessor(cfg_name, addOrigAsSecondary=False)
+    if cmssw_reuse and all([os.path.isfile('preprocessed_files/'+comp.name+'/cmsswPreProcessing.root') for comp in selectedComponents]):
+        print "Using Preprocessed files! Make sure you don't need to re-run preprocessor!"
+        for comp in selectedComponents:
+            comp.files = ['preprocessed_files/'+comp.name+'/cmsswPreProcessing.root']
+    else:
+        sequence.append(fileCleaner)
+        cfg_name = "$CMSSW_BASE/src/CMGTools/H2TauTau/prod/h2TauTauMiniAOD_ditau_data_cfg.py" if data else "$CMSSW_BASE/src/CMGTools/H2TauTau/prod/h2TauTauMiniAOD_ditau_cfg.py"
+        preprocessor = CmsswPreprocessor(cfg_name, addOrigAsSecondary=False)
 
 # the following is declared in case this cfg is used in input to the
 # heppy.py script
 from PhysicsTools.HeppyCore.framework.eventsfwlite import Events
-
 config = cfg.Config(components=selectedComponents,
                     sequence=sequence,
                     services=outputService,

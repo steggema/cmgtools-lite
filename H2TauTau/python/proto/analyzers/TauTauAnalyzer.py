@@ -1,5 +1,6 @@
 import os
 import ROOT
+import copy
 from PhysicsTools.HeppyCore.utils.deltar import deltaR
 from PhysicsTools.Heppy.analyzers.core.AutoHandle import AutoHandle
 from PhysicsTools.Heppy.physicsobjects.PhysicsObjects import Tau, Muon
@@ -41,20 +42,16 @@ class TauTauAnalyzer(DiLeptonAnalyzer):
             'std::vector<pat::Jet>'
         )
 
-        self.handles['puppiMET'] = AutoHandle(
-            'slimmedMETsPuppi',
-            'std::vector<pat::MET>'
-        )
-
-        self.handles['pfMET'] = AutoHandle(
-            'slimmedMETs',
-            'std::vector<pat::MET>'
-        )
-
         self.handles['l1IsoTau'] = AutoHandle( 
             ('l1extraParticles', 'IsoTau'), 
             'std::vector<l1extra::L1JetParticle>'   
         )
+
+        if hasattr(self.cfg_ana, 'tauEnergyScale') and self.cfg_ana.tauEnergyScale:
+            self.handles['genParticles'] = AutoHandle( 
+            'prunedGenParticles', 
+            'std::vector<reco::GenParticle'
+            )
 
     def process(self, event):
 
@@ -68,14 +65,8 @@ class TauTauAnalyzer(DiLeptonAnalyzer):
         # as implemented here
         event.goodVertices = event.vertices
 
-        result = super(TauTauAnalyzer, self).process(event)
+        super(TauTauAnalyzer, self).process(event)
 
-        event.isSignal = False
-        if result:
-            event.isSignal = True
-        # trying to get a dilepton from the control region.
-        # it must have well id'ed and trig matched legs,
-        # di-lepton and tri-lepton veto must pass
         result = self.selectionSequence(event,
                                         fillCounter=True,
                                         leg1IsoCut=self.cfg_ana.looseiso1,
@@ -88,11 +79,6 @@ class TauTauAnalyzer(DiLeptonAnalyzer):
         
         if not (hasattr(event, 'leg1') and hasattr(event, 'leg2')):
             return False
-
-        if hasattr(event, 'calibratedPfMet'):
-            event.pfmet = event.calibratedPfMet
-        else:
-            event.pfmet = self.handles['pfMET'].product()[0]
 
         if hasattr(event, 'calibratedPuppiMet'):
             event.puppimet = event.calibratedPuppiMet
@@ -133,11 +119,8 @@ class TauTauAnalyzer(DiLeptonAnalyzer):
         else:
             taus = self.handles['taus'].product()
         
-        if hasattr(event, 'calibratedPfMet'):
-            met = event.calibratedPfMet
-        else:
-            met = self.handles['pfMET'].product()[0]
-        
+        met = event.pfmet
+                
         taus = [Tau(tau) for tau in taus]
 
         if getattr(self.cfg_ana, 'scaleTaus', False):
@@ -166,11 +149,15 @@ class TauTauAnalyzer(DiLeptonAnalyzer):
             pyl = Muon(lep)
             pyl.associatedVertex = event.goodVertices[0]
             pyl.event = event.input.object()
-            if not pyl.muonIDMoriond17():
+            if not pyl.muonID("POG_ID_Medium_Moriond"):
                 continue
             if not pyl.relIsoR(R=0.4, dBetaFactor=0.5, allCharged=0) < 0.3:
                 continue
             if not self.testLegKine(pyl, ptcut=10, etacut=2.4):
+                continue
+            if not abs(pyl.dxy()) <0.045:
+                continue
+            if not abs(pyl.dz()) <0.2:
                 continue
             leptons.append(pyl)
         return leptons
@@ -189,6 +176,14 @@ class TauTauAnalyzer(DiLeptonAnalyzer):
                 continue
             if not self.testLegKine(pyl, ptcut=10, etacut=2.5):
                 continue
+            if not pyl.physObj.passConversionVeto():
+                continue
+            if not pyl.lostInner()<=1:
+                continue
+            if not abs(pyl.dxy()) <0.045:
+                continue
+            if not abs(pyl.dz()) <0.2:
+                continue
             otherLeptons.append(pyl)
         return otherLeptons
 
@@ -197,10 +192,10 @@ class TauTauAnalyzer(DiLeptonAnalyzer):
         # RIC: relaxed
         return (abs(leg.charge()) == 1 and  # RIC: ensure that taus have abs(charge) == 1
                 self.testTauVertex(leg) and
-                leg.tauID(iso) < isocut and
-                leg.pt() > leg_pt and
-                abs(leg.eta()) < leg_eta and
-                leg.tauID('decayModeFinding') > 0.5)
+                leg.tauID(iso) <= isocut and
+                leg.pt() >= leg_pt and
+                abs(leg.eta()) <= leg_eta and
+                leg.tauID('decayModeFinding') >= 0.5)
 
     def testLeg1(self, leg, isocut):
         leg_pt = self.cfg_ana.pt1
@@ -219,7 +214,7 @@ class TauTauAnalyzer(DiLeptonAnalyzer):
         # Just checks if the primary vertex the tau was reconstructed with
         # corresponds to the one used in the analysis
         # isPV = abs(tau.vertex().z() - tau.associatedVertex.z()) < 0.2
-        isPV = abs(tau.leadChargedHadrCand().dz()) < 0.2
+        isPV = abs(tau.leadChargedHadrCand().dz()) <= 0.2
         return isPV
 
     def testVertex(self, lepton, dxy=0.045, dz=0.2):
@@ -358,3 +353,48 @@ class TauTauAnalyzer(DiLeptonAnalyzer):
             met.setP4(metP4)
                     
         return True
+
+    def TauEnergyScale(self, diLeptons, event):
+        # get genmatch-needed informations, needs to be done in this analyzer to scale, though information is usually gathered afterwards in HTTGenAnalyzer
+        genParticles = self.handles['genParticles'].product()
+
+        ptSelGentauleps = [p for p in genParticles if abs(p.pdgId()) in [11, 13] and p.statusFlags().isDirectPromptTauDecayProduct() and p.pt() > 8.]
+
+        ptSelGenleps = [p for p in genParticles if abs(p.pdgId()) in [11, 13] and p.statusFlags().isPrompt() and p.pt() > 8.]
+
+        event.gentaus = [p for p in event.genParticles if abs(p.pdgId()) == 15 and p.statusFlags().isPrompt() and not any(abs(HTTGenAnalyzer.getFinalTau(p).daughter(i_d).pdgId()) in [11, 13] for i_d in xrange(HTTGenAnalyzer.getFinalTau(p).numberOfDaughters()))]
+
+        # create a list of all used leptons without duplicates, using the ROOT.pat::Tau objects as discriminant
+        leps = []
+        
+        for dilep in diLeptons:
+            if dilep.leg1().tau not in [lep.tau for lep in leps]:
+                leps.append(dilep.leg1())
+            if dilep.leg2().tau not in [lep.tau for lep in leps]:
+                leps.append(dilep.leg2())
+
+        # scale leptons
+        for lep in leps:
+            self.Scale(lep, ptSelGentauleps, ptSelGenleps, event)
+            for dilep in diLeptons:
+                for leg in [dilep.leg1(), dilep.leg2()]:
+                    if leg.tau==lep.tau and (not hasattr(leg, 'unscaledP4')):
+                            leg.unscaledP4 = lep.unscaledP4
+
+    def Scale(self, tau, ptSelGentauleps, ptSelGenleps, event):
+        # this function should take values of scales from a file
+        tau.unscaledP4 = copy.deepcopy(tau.p4())
+        HTTGenAnalyzer.genMatch(event, tau, ptSelGentauleps, ptSelGenleps, [])
+        HTTGenAnalyzer.attachGenStatusFlag(tau)
+        if tau.gen_match==5:
+            if tau.decayMode() == 0:
+                tau.scaleEnergy(0.995)
+            elif tau.decayMode() == 1:
+                tau.scaleEnergy(1.011)
+            elif tau.decayMode() == 10:
+                tau.scaleEnergy(1.006)
+        elif tau.gen_match==1:
+            if tau.decayMode() == 0:
+                tau.scaleEnergy(1.024)
+            elif tau.decayMode() == 1:
+                tau.scaleEnergy(1.076)
