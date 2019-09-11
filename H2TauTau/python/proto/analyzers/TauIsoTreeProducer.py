@@ -1,4 +1,4 @@
-from PhysicsTools.HeppyCore.utils.deltar import deltaR, deltaR2
+from PhysicsTools.HeppyCore.utils.deltar import deltaR, deltaR2, deltaPhi
 
 from CMGTools.H2TauTau.proto.analyzers.H2TauTauTreeProducerBase import H2TauTauTreeProducerBase
 from CMGTools.H2TauTau.proto.analyzers.tau_utils import n_photons_tau, e_over_h, tau_pt_weighted_dr_iso, tau_pt_weighted_dphi_strip, tau_pt_weighted_deta_strip, tau_pt_weighted_dr_signal
@@ -8,8 +8,10 @@ class TauIsoTreeProducer(H2TauTauTreeProducerBase):
     ''' Tree producer for tau POG study.
     '''
 
-    def __init__(self, *args):
-        super(TauIsoTreeProducer, self).__init__(*args)
+    def __init__(self, cfg_ana, cfg_comp, looperName):
+        super(TauIsoTreeProducer, self).__init__(cfg_ana, cfg_comp, looperName)
+        self.fill_all_pf = getattr(cfg_ana, 'fill_all_pf', False)
+
 
     def declareHandles(self):
         super(TauIsoTreeProducer, self).declareHandles()
@@ -20,6 +22,8 @@ class TauIsoTreeProducer(H2TauTauTreeProducerBase):
         self.bookTau(self.tree, 'tau')
         self.bookParticle(self.tree, 'gen_jet')
         self.bookParticle(self.tree, 'gen_vis_tau')
+
+        self.tree.var('gen_dm')
 
         self.tree.var('n_true_interactions')
 
@@ -38,7 +42,6 @@ class TauIsoTreeProducer(H2TauTauTreeProducerBase):
         self.tree.var('tau_ip3d_error')
         self.tree.var('tau_ip3d_Sig')
         self.tree.var('tau_leadingTrackNormChi2')
-        self.tree.var('tau_leadingTrackNormChi2')
 
         self.tree.var('tau_n_iso_ch', type=int, default=0)
         self.tree.vector('tau_iso_ch_dz', 'tau_n_iso_ch', maxlen=99, type=float)
@@ -49,6 +52,19 @@ class TauIsoTreeProducer(H2TauTauTreeProducerBase):
         self.tree.var('tau_n_iso_ph', type=int, default=0)
         self.tree.vector('tau_iso_ph_pt', 'tau_n_iso_ph', maxlen=99, type=float)
         self.tree.vector('tau_iso_ph_dr', 'tau_n_iso_ph', maxlen=99, type=float)
+        self.tree.vector('tau_iso_ph_deta', 'tau_n_iso_ph', maxlen=99, type=float)
+        self.tree.vector('tau_iso_ph_dphi', 'tau_n_iso_ph', maxlen=99, type=float)
+
+        if self.fill_all_pf:
+            self.tree.var('tau_n_ph', type=int, default=0)
+            self.tree.vector('tau_ph_pt', 'tau_n_ph', maxlen=299, type=float)
+            self.tree.vector('tau_ph_dr', 'tau_n_ph', maxlen=299, type=float)
+            self.tree.vector('tau_ph_deta', 'tau_n_ph', maxlen=299, type=float)
+            self.tree.vector('tau_ph_dphi', 'tau_n_ph', maxlen=299, type=float)
+            self.tree.vector('tau_ph_deta_lch', 'tau_n_ph', maxlen=299, type=float)
+            self.tree.vector('tau_ph_dphi_lch', 'tau_n_ph', maxlen=299, type=float)
+            self.tree.vector('tau_ph_deta_lph', 'tau_n_ph', maxlen=299, type=float)
+            self.tree.vector('tau_ph_dphi_lph', 'tau_n_ph', maxlen=299, type=float)
 
         self.tree.var('tau_ptSumIso_recalc')
         self.tree.var('tau_chargedIsoPtSum_recalc')
@@ -84,7 +100,7 @@ class TauIsoTreeProducer(H2TauTauTreeProducerBase):
                 matched_gen_jets.append(tau.gen_jet)
             else:
                 if tau.isTauHad:
-                    tau_gen_jet_pairs.append((tau, None, tau.genp))
+                    tau_gen_jet_gen_tau_triplets.append((tau, None, tau.genp))
                     matched_gen_taus.append(tau.genp)
                 else:
                     tau_gen_jet_gen_tau_triplets.append((tau, None, None))
@@ -106,6 +122,7 @@ class TauIsoTreeProducer(H2TauTauTreeProducerBase):
                 if deltaR2(gen_jet, gvt) < 0.09:
                     tau_gen_jet_gen_tau_triplets.append((None, gen_jet, gvt))
                     gj_matched_gen_taus.append(gvt)
+                    break
             else:
                 tau_gen_jet_gen_tau_triplets.append((None, gen_jet, None))
 
@@ -120,6 +137,7 @@ class TauIsoTreeProducer(H2TauTauTreeProducerBase):
             
             if gen_vis_tau:
                 self.fillParticle(self.tree, 'gen_vis_tau', gen_vis_tau)
+                self.tree.fill('gen_dm', gen_vis_tau.decayMode)
             if gen_jet:
                 self.fillParticle(self.tree, 'gen_jet', gen_jet)
             if tau:
@@ -144,7 +162,7 @@ class TauIsoTreeProducer(H2TauTauTreeProducerBase):
                 self.tree.fill('tau_ip3d_Sig', tau.ip3d_Sig())
                 self.tree.fill('tau_leadingTrackNormChi2', tau.leadingTrackNormChi2())
 
-                self.tree.fill('tau_n_iso_ch', tau.isolationChargedHadrCands().size())
+                self.tree.fill('tau_n_iso_ch', len(tau.isolationChargedHadrCands()))
                 dzs = []
                 dxys = []
                 pts = []
@@ -162,11 +180,53 @@ class TauIsoTreeProducer(H2TauTauTreeProducerBase):
                 self.tree.fill('tau_n_iso_ph', tau.isolationGammaCands().size())
                 pts = []
                 drs = []
+                detas = []
+                dphis = []
+
                 for iso_ph in tau.isolationGammaCands():
                     pts.append(iso_ph.pt())
                     drs.append(deltaR(iso_ph, tau))
+                    detas.append(abs(iso_ph.eta() - tau.eta()))
+                    dphis.append(abs(deltaPhi(iso_ph.phi(), tau.phi())))
+
                 self.tree.vfill('tau_iso_ph_pt', pts)
                 self.tree.vfill('tau_iso_ph_dr', drs)
+                self.tree.vfill('tau_iso_ph_deta', detas)
+                self.tree.vfill('tau_iso_ph_dphi', dphis)
+                self.tree.vfill('tau_iso_ph_deta', detas)
+                self.tree.vfill('tau_iso_ph_dphi', dphis)
+
+                if self.fill_all_pf:
+                    photons = [ph for ph in event.pf_candidates if deltaR2(tau, ph) < 0.25 and ph.pt() > 1. and ph.pdgId() == 22]
+                    photons = sorted(photons, key=lambda p: p.pt(), reverse=True)
+                    lead_photon = photons[0] if photons else None
+                    self.tree.fill('tau_n_ph', len(photons))
+                    pts = []
+                    drs = []
+                    detas = []
+                    dphis = []
+                    detas_lch = []
+                    dphis_lch = []
+                    detas_lph = []
+                    dphis_lph = []
+                    tau_lch = tau.leadChargedHadrCand()
+                    for ph in photons:
+                        pts.append(ph.pt())
+                        drs.append(deltaR(ph, tau))
+                        detas.append(abs(ph.eta() - tau.eta()))
+                        dphis.append(deltaPhi(ph.phi(), tau.phi()))
+                        detas_lch.append(abs(ph.eta() - tau_lch.eta()) if tau_lch.isNonnull() else -99.)
+                        dphis_lch.append(abs(deltaPhi(ph.phi(), tau_lch.phi())) if tau_lch.isNonnull() else -99.)
+                        detas_lph.append(abs(ph.eta() - lead_photon.eta()))
+                        dphis_lph.append(abs(deltaPhi(ph.phi(), lead_photon.phi())))
+                    self.tree.vfill('tau_ph_pt', pts)
+                    self.tree.vfill('tau_ph_dr', drs)
+                    self.tree.vfill('tau_ph_deta', detas)
+                    self.tree.vfill('tau_ph_dphi', dphis)
+                    self.tree.vfill('tau_ph_deta_lch', detas_lch)
+                    self.tree.vfill('tau_ph_dphi_lch', dphis_lch)
+                    self.tree.vfill('tau_ph_deta_lph', detas_lph)
+                    self.tree.vfill('tau_ph_dphi_lph', dphis_lph)
 
                 self.tree.fill('tau_ptSumIso_recalc', tau.ptSumIso)
                 self.tree.fill('tau_chargedIsoPtSum_recalc', tau.chargedPtSumIso)

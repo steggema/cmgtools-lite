@@ -54,10 +54,10 @@ class TauIsoAnalyzer(Analyzer):
             gen_tau.charged = [d for d in gen_tau.daughters if d.charge()]
             gen_tau.pizeros = [daughters(d) for d in gen_tau.daughters if d.pdgId() == 111]
 
-        pf_candidates = self.handles['pf_candidates'].product()
+        event.pf_candidates = self.handles['pf_candidates'].product()
 
         for tau in event.taus:
-            TauIsoAnalyzer.addInfo(tau, event, [c for c in pf_candidates if abs(c.pdgId()) == 211], maxDeltaR=0.8)
+            TauIsoAnalyzer.addInfo(tau, event, [c for c in event.pf_candidates if abs(c.pdgId()) == 211], maxDeltaR=0.8)
             matched_gen_jet, dr2 = bestMatch(tau, event.genJets)
             if dr2 < 0.25:
                 tau.gen_jet = matched_gen_jet
